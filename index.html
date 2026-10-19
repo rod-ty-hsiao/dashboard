@@ -1927,6 +1927,7 @@ function friendly(e){
   const m=(e&&e.message)||String(e);
   if(m==='NO_CLIENT_ID') return '尚未設定 Client ID';
   if(m==='GIS_UNAVAILABLE') return '無法載入 Google 登入元件,請確認網路';
+  if(/popup_closed/i.test(m)) return '登入視窗被關閉了,請再按一次並完成登入';
   if(/popup/i.test(m)) return '登入視窗被瀏覽器擋住,請允許彈出視窗後再按一次';
   if(m==='access_denied') return '你取消了授權';
   return m.slice(0,200);
@@ -2192,7 +2193,7 @@ async function loadFromHandle(){
   loadMarkdown(md,f.name);
   $('fileName').textContent=f.name+' · 已連結';
 }
-async function open(){
+async function openLocalFile(){
   if(!FS_OK){ showWarn('此瀏覽器不支援直接讀寫本機檔案,請改用「Google 雲端」。'); return; }
   try{
     [handle]=await window.showOpenFilePicker({types:[{description:'Markdown',accept:{'text/markdown':['.md']}}]});
@@ -2200,8 +2201,8 @@ async function open(){
     idbSet(handle).catch(()=>{});
   }catch(e){ if(e.name!=='AbortError') toast('無法開啟'); }
 }
-$('openBtn').onclick=open;
-$('reconnectOther').onclick=open;
+$('openBtn').onclick=openLocalFile;
+$('reconnectOther').onclick=openLocalFile;
 $('addBtn').onclick=add;
 $('newTask').addEventListener('keydown',e=>{ if(e.key==='Enter')add(); });
 
