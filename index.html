@@ -389,6 +389,142 @@ body.connected .file-out { display: inline-block; }
 .smodal-label { display: block; font-size: 11px; color: #8c8b84; margin-bottom: 4px; letter-spacing: .04em; }
 .smodal-in { width: 100%; background: #2a2926; border: 1px solid #3a3934; color: #f5f4ef; border-radius: 8px; padding: 8px 11px; font-size: 14px; font-family: inherit; outline: none; resize: vertical; }
 .smodal-in:focus { border-color: var(--accent); }
+
+/* ===== 手機版（≤720px）：App 式版面。電腦版不受影響 ===== */
+.mmenu, .drawer, .drawer-bg, .tabbar { display: none; }
+@media (hover: none) { .car-nav { opacity: 1; } }
+@media (max-width: 720px) {
+  html { scroll-behavior: auto; }
+  body { background-image: none; -webkit-tap-highlight-color: transparent; }
+  input, select, textarea { font-size: 16px !important; }   /* 避免 iOS 聚焦時自動放大 */
+  .rail-slot, body.connected .rail-slot { display: none; }
+  .shell { display: block; min-height: 100vh; min-height: 100dvh; }
+  .main { padding: 0 0 calc(88px + env(safe-area-inset-bottom, 0px)); gap: 0; max-width: none; }
+  .content { padding: 4px 16px 0; }
+  .foot { display: none; }
+  .warn, .sub-intro { margin: 8px 16px 0; }
+  .sub-intro { padding: 24px 18px; }
+  .sub-intro .open-btn { width: 100%; }
+  .sub-intro .open-btn + .open-btn { margin: 10px 0 0; }
+
+  /* 頂列：左上選單鈕 + 標題 */
+  .head { position: sticky; top: 0; z-index: 30; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 14px; padding: 12px 16px 10px; background: color-mix(in srgb, var(--bg) 94%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .head > .file { display: none; }
+  .head-title { min-width: 0; }
+  .h1 { font-size: 26px; margin: 0; line-height: 1.15; }
+  .eyebrow { font-size: 11px; letter-spacing: .08em; }
+  .mmenu { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); place-items: center; cursor: pointer; box-shadow: 0 6px 16px -8px rgba(70,50,30,.3); }
+  body.connected .mmenu { display: grid; }
+
+  /* 抽屜選單 */
+  .drawer-bg { display: block; position: fixed; inset: 0; z-index: 70; background: rgba(43,38,34,.45); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .drawer { display: flex; flex-direction: column; gap: 6px; position: fixed; top: 0; bottom: 0; left: 0; z-index: 71; width: min(82vw, 320px); padding: calc(22px + env(safe-area-inset-top, 0px)) 14px calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--bg); transform: translateX(-104%); transition: transform .28s cubic-bezier(.22,.8,.24,1); box-shadow: 18px 0 48px rgba(43,38,34,.22); }
+  body.drawer-open { overflow: hidden; }
+  body.drawer-open .drawer-bg { opacity: 1; pointer-events: auto; }
+  body.drawer-open .drawer { transform: none; }
+  .d-head { padding: 0 8px 18px; }
+  .d-title { font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-weight: 700; font-size: 26px; line-height: 1.2; }
+  .d-date { margin-top: 6px; font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+  .d-item { appearance: none; border: 0; background: transparent; font: inherit; font-size: 16px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 6px; height: 52px; padding: 0 8px; border-radius: 14px; text-align: left; cursor: pointer; }
+  .d-item.is-active { background: #EBE3D6; }
+  .d-item.is-active .ic { color: var(--accent); }
+  .d-spacer { flex: 1; }
+  .d-sync { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
+  .d-sync .dot { width: 8px; height: 8px; border-radius: 50%; background: #B9AE9E; flex: none; }
+  body.connected .d-sync .dot { background: #3F8A5A; }
+  .d-out { appearance: none; border: 1px solid var(--line); background: transparent; font: inherit; font-size: 15px; color: var(--muted); height: 46px; border-radius: 14px; cursor: pointer; }
+
+  /* 底部分頁列（依目前頁面切換內容） */
+  body.connected .tabbar { display: flex; }
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; height: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 0 8px env(safe-area-inset-bottom, 0px); background: color-mix(in srgb, var(--card) 94%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid var(--line); }
+  .tb { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 11px; font-weight: 500; letter-spacing: .04em; cursor: pointer; }
+  .tb svg { width: 24px; height: 24px; }
+  .tb.on { color: var(--accent); }
+  .tb:active { opacity: .6; }
+  .status { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .sync-bar { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+
+  /* 清單頁：去掉外框，清單／便利貼用底部分頁切換 */
+  .board { display: block; }
+  .card { background: none; border: 0; border-radius: 0; box-shadow: none; }
+  .card-left, .card-right { padding: 0; }
+  .card-label, .note-hint { display: none; }
+  #todoView:not([data-pane="notes"]) .card-right { display: none; }
+  #todoView[data-pane="notes"] .card-left { display: none; }
+  .addrow { gap: 10px; margin-top: 4px; }
+  .addrow > .field { flex: 1 1 100%; }
+  .selwrap { flex: 1 1 0; }
+  .btn { flex: none; }
+  .group-head { margin: 22px 0 2px; }
+  .task { padding: 14px 0 12px; }
+  .ttl { font-size: 16.5px; }
+  .grip { display: none; }
+  .del { opacity: .5; }
+  .note-add { opacity: 1; }
+  .notes, .note-add { margin-left: 38px; }
+  .note-in { margin-left: 38px; width: calc(100% - 38px); }
+  .card-right { gap: 12px; }
+  .sticky-list { overflow: visible; -webkit-mask-image: none; mask-image: none; margin: 0; padding: 0; gap: 12px; }
+  .note:hover, .note:focus-visible { transform: none; }
+  .note-del { opacity: .55; }
+
+  /* 影集頁：深色滿版、Netflix 式 3 欄海報 */
+  body.tab-shows { background-color: #141413; }
+  body.tab-shows .head { background: color-mix(in srgb, #141413 94%, transparent); }
+  body.tab-shows .h1 { color: #f5f4ef; }
+  body.tab-shows .eyebrow { color: #8c8b84; }
+  body.tab-shows .mmenu { background: #2a2926; border-color: #3a3934; color: #f5f4ef; box-shadow: none; }
+  body.tab-shows .tabbar { background: color-mix(in srgb, #141413 94%, transparent); border-top-color: #2a2926; }
+  body.tab-shows .tb { color: #8c8b84; }
+  body.tab-shows .tb.on { color: color-mix(in srgb, var(--accent) 65%, #fff); }
+  .show-subtabs { display: block; height: 0; margin: 0; }
+  #statsToggle, .show-subtab { display: none; }
+  .view-switch { position: fixed; top: calc(19px + env(safe-area-inset-top, 0px)); right: 16px; margin: 0; z-index: 31; background: #2a2926; border-color: #3a3934; }
+  .vs-opt { color: #9a9992; }
+  .vs-opt.active { color: #fff; }
+  .vs-thumb { background: var(--accent); }
+  body.mstats .view-switch { display: none; }
+  .shows-panel { background: none; box-shadow: none; border-radius: 0; padding: 0; }
+  .show-toolbar { gap: 8px; margin: 2px 0 16px; }
+  .show-toolbar input, .show-toolbar select { border-radius: 12px; padding: 11px 12px; }
+  #showSearch { flex: 1 1 100%; order: 1; }
+  #filterWatchedDate { flex: 1 1 100%; width: auto; order: 2; }
+  #filterYear, #filterGenre { flex: 1 1 calc(50% - 4px); width: auto; min-width: 0; order: 2; }
+  .show-toolbar .tool-btn { order: 3; flex: 1 1 0; min-width: 0; padding: 10px 4px; font-size: 12.5px; border-radius: 12px; white-space: nowrap; }
+  .select-status { order: 4; flex: 1 1 100%; justify-content: space-between; }
+  .show-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 10px; max-height: none; overflow: visible; padding: 0; margin: 0; -webkit-mask-image: none; mask-image: none; }
+  .show-card { background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; transform: none !important; }
+  .show-card::before, .show-row::before { display: none; }
+  .show-poster { border-radius: 10px; }
+  .show-info { padding: 7px 1px 0; }
+  .show-title { font-size: 12.5px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .show-meta, .show-actions, .row-actions { display: none; }
+  .show-list { max-height: none; overflow: visible; padding: 0; margin: 0; -webkit-mask-image: none; mask-image: none; }
+  .show-row { background-image: none; transform: none !important; }
+  .stats-panel { display: none; background: none; box-shadow: none; padding: 8px 0; margin: 0; gap: 22px; }
+  body.mstats .stats-panel { display: flex; }
+  body.mstats .shows-panel { display: none; }
+  .stats-rings { width: 100%; justify-content: space-between; gap: 12px; }
+  .stats-genres { min-width: 0; }
+
+  /* 美食地圖：地圖／列表用底部分頁切換 */
+  .food-layout { display: block; }
+  #foodMap { height: calc(100vh - 176px); height: calc(100dvh - 176px); min-height: 360px; border-radius: 16px; }
+  #foodView[data-pane="list"] .food-map-wrap { display: none; }
+  #foodView:not([data-pane="list"]) .food-side { display: none; }
+  .food-side { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; height: auto; max-height: none; min-width: 0; }
+  .food-list { overflow: visible; -webkit-mask-image: none; mask-image: none; margin: 0; padding: 4px 0; }
+  .food-row:hover { transform: none; }
+
+  /* 彈窗 */
+  .modal-bg, .smodal-bg { padding: 12px; }
+  .smodal { max-height: 92vh; max-height: 92dvh; }
+  .smodal.wide .smodal-body, .smodal-body { padding: 16px 18px 22px; }
+  .smodal.wide .smodal-title { font-size: 22px; }
+  .field-row { flex-wrap: wrap; }
+  .field-row .smodal-field { flex: 1 1 42%; }
+  .smodal-btns { flex-wrap: wrap; }
+}
 </style>
 </head>
 <body>
@@ -414,7 +550,8 @@ body.connected .file-out { display: inline-block; }
 
   <main class="main">
     <header class="head">
-      <div>
+      <button class="mmenu" id="mMenuBtn" type="button" aria-label="開啟選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h10"/></svg></button>
+      <div class="head-title">
         <div class="eyebrow" id="eyebrow"></div>
         <h1 class="h1" id="pageTitle">Dashboard</h1>
       </div>
@@ -549,6 +686,17 @@ body.connected .file-out { display: inline-block; }
   <div class="foot">改動即時存回 TASKS.md · 備註 Enter 儲存 / Alt+Enter 換行 · 拖曳調整順序 · 便利貼滑過可直接刪除、點開可編輯 · 影集點卡片看詳細並編輯 · 匯出的 CSV 可用 Excel 開啟</div>
   </main>
 </div>
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer" aria-label="選單" aria-hidden="true">
+  <div class="d-head"><div class="d-title">Dashboard</div><div class="d-date" id="drawerDate"></div></div>
+  <button class="d-item is-active" type="button" data-tab="todo"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></span><span>清單</span></button>
+  <button class="d-item" type="button" data-tab="shows"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M10.2 8.6v4.8l4-2.4z"/><path d="M8 20.5h8"/></svg></span><span>影集</span></button>
+  <button class="d-item" type="button" data-tab="food"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.2s-6.6-5.5-6.6-11.2a6.6 6.6 0 0113.2 0c0 5.7-6.6 11.2-6.6 11.2z"/><path d="M10.2 6.6v2.5a1.8 1.8 0 003.6 0V6.6M12 6.6v6.4"/></svg></span><span>美食地圖</span></button>
+  <div class="d-spacer"></div>
+  <div class="d-sync"><span class="dot"></span><span id="drawerSync">尚未開啟檔案</span></div>
+  <button class="d-out" id="drawerOut" type="button">登出</button>
+</aside>
+<nav class="tabbar" id="tabbar" aria-label="分頁"></nav>
 <div class="status" id="status"></div>
 <div class="sync-bar" id="syncBar"><span id="syncMsg"></span><button id="syncRetry" type="button">重新登入並同步</button></div>
 
@@ -564,6 +712,9 @@ let selectMode=false, selectedItems=new Set(), selectAnchor=null;
 let showViewMode = localStorage.getItem('shows-view') || 'grid';
 let statsGenreScope = localStorage.getItem('stats-genre-scope') || 'all';
 const $ = id => document.getElementById(id);
+const COARSE = window.matchMedia('(pointer:coarse)').matches;      // 觸控裝置：沒有 Alt+Enter，Enter 一律換行
+const MQ_MOBILE = window.matchMedia('(max-width:720px)');
+const NOTE_PH = v => COARSE ? '備註…' : '備註… (Enter '+v+', Alt+Enter 換行)';
 
 function toast(m){ const s=$('status'); s.textContent=m; s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),1600); }
 function insertNewline(a){
@@ -846,7 +997,7 @@ function editText(el,t){
   i.addEventListener('blur',c);
 }
 function editNote(el,t){
-  const a=document.createElement('textarea'); a.className='note-in'; a.rows=2; a.value=t.note||''; a.placeholder='備註… (Enter 儲存, Alt+Enter 換行)'; el.replaceWith(a);
+  const a=document.createElement('textarea'); a.className='note-in'; a.rows=2; a.value=t.note||''; a.placeholder=NOTE_PH('儲存'); el.replaceWith(a);
   const row=a.closest('.task'); if(row) row.draggable=false; // 編輯時停用整列拖曳，否則反白文字會觸發移動
   autosize(a);                       // 依內容長高，所有行都看得到
   a.focus(); a.setSelectionRange(a.value.length,a.value.length);
@@ -1352,6 +1503,15 @@ function openShowModal(item){
       const eb=document.createElement('button'); eb.className='smodal-btn primary'; eb.textContent='編輯';
       eb.onclick=()=>{ editing=true; draw(); };
       btns.appendChild(eb);
+      if(MQ_MOBILE.matches){
+        const mk=(t,fn,cls)=>{ const b=document.createElement('button'); b.className='smodal-btn'+(cls?' '+cls:''); b.textContent=t; b.onclick=fn; btns.appendChild(b); };
+        const lst=shows[activeShowTab];
+        if(activeShowTab==='watched'){
+          mk('← 影集',()=>{ close(); moveBack(item,lst,'series'); });
+          mk('← 電影',()=>{ close(); moveBack(item,lst,'movie'); });
+        } else mk('✓ 已看過',()=>{ close(); moveToWatched(item,lst,activeShowTab); },'primary');
+        mk('刪除',()=>{ if(!confirm('刪除「'+item.title+'」？')) return; const i=lst.indexOf(item); if(i>-1) lst.splice(i,1); close(); queueSave(); renderShows(); });
+      }
       const titleEl=document.createElement('div'); titleEl.className='smodal-title'; titleEl.textContent=item.title;
       body.appendChild(titleEl);
       body.appendChild(metaBadges(item,true));
@@ -1368,7 +1528,7 @@ function openShowModal(item){
       const isWatched = activeShowTab==='watched';
       const di=isWatched ? document.createElement('input') : null;
       if(di){ di.type='date'; di.className='smodal-in'; di.value=item.watchedDate||''; }
-      const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.value=item.note||''; na.placeholder='備註…(Enter 儲存, Alt+Enter 換行)';
+      const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.value=item.note||''; na.placeholder=NOTE_PH('儲存');
 
       // 橫幅圖片：可自行增減的多列網址
       let bannerEdit=(item.banner||'').split('|').map(s=>s.trim()).filter(Boolean);
@@ -1443,7 +1603,7 @@ function openAddModal(){
   const gs=buildGenreSelect('');
   const ci=document.createElement('input'); ci.className='smodal-in'; ci.placeholder='例如 朴敘俊、金多美';
   const pi=document.createElement('input'); pi.className='smodal-in'; pi.placeholder='圖片網址（卡片與橫幅共用，之後可分開改）';
-  const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.placeholder='備註…(Enter 新增, Alt+Enter 換行)';
+  const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.placeholder=NOTE_PH('新增');
   const add=()=>{
     const v=ti.value.trim(); if(!v){ toast('請輸入名稱'); ti.focus(); return; }
     draft.title=v; draft.year=yi.value.trim(); draft.genre=gs.value; draft.cast=ci.value.trim(); draft.note=na.value.trim();
@@ -1724,7 +1884,7 @@ function openFoodModal(item, prefill){
   const ms=buildOptSelect(FOOD_MEALS, item?item.meal:'', '時段');
   const hi=document.createElement('input'); hi.className='smodal-in'; hi.value=item?item.hours:''; hi.placeholder='例如 11:00–21:00（週一公休）';
   const ii=document.createElement('input'); ii.className='smodal-in'; ii.value=item?item.img:''; ii.placeholder='圖片網址';
-  const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=3; na.value=item?item.note:''; na.placeholder='備註…(Enter 儲存, Alt+Enter 換行)';
+  const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=3; na.value=item?item.note:''; na.placeholder=NOTE_PH('儲存');
 
   const saveIt=()=>{
     const name=ni.value.trim(); if(!name){ toast('請輸入店家名稱'); ni.focus(); return; }
@@ -1820,20 +1980,25 @@ $('foodImportFile').addEventListener('change', async e=>{
 const TAB_TITLES={todo:'清單',shows:'影集',food:'美食地圖'};
 function updateEyebrow(){
   const d=new Date();
-  $('eyebrow').textContent=d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日 · 週'+'日一二三四五六'[d.getDay()];
+  const t=d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日 · 週'+'日一二三四五六'[d.getDay()];
+  $('eyebrow').textContent=t;
+  const dd=$('drawerDate'); if(dd) dd.textContent=t;
 }
 function switchAppTab(tab){
   activeAppTab=tab;
   $('todoView').style.display = tab==='todo' ? 'grid' : 'none';
   $('showsView').style.display = tab==='shows' ? 'block' : 'none';
   $('foodView').style.display = tab==='food' ? 'block' : 'none';
-  document.querySelectorAll('.nav-item').forEach(b=>{
+  document.querySelectorAll('.nav-item, .d-item').forEach(b=>{
     const on=b.dataset.tab===tab;
     b.classList.toggle('is-active', on);
     if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
   });
   $('pageTitle').textContent=TAB_TITLES[tab]||'Dashboard';
   updateEyebrow();
+  document.body.classList.toggle('tab-shows', tab==='shows');
+  if(tab!=='shows') document.body.classList.remove('mstats');
+  updateTabbar();
   if(tab==='shows') renderShows();
   if(tab==='food'){ initFoodMap(); renderFoods(); }
 }
@@ -1845,6 +2010,8 @@ function switchShowTab(sub){
   const f=showFilter[sub];
   $('filterWatchedDate').value=f.wdate||''; $('filterYear').value=f.year; $('filterGenre').value=f.genre; $('showSearch').value=f.q;
   selectedItems.clear(); selectAnchor=null; // 換頁籤內容整批不同，清掉選取但保留批量選取模式
+  document.body.classList.remove('mstats');
+  updateTabbar();
   renderShows();
 }
 function updateViewToggle(){
@@ -2227,6 +2394,58 @@ async function tryAutoConnect(){
     $('intro').style.display='none'; $('reconnect').style.display='block';
   }catch(e){ /* 找不到已儲存的檔案控制權,維持一般開啟畫面 */ }
 }
+
+/* ---------- 手機版：抽屜選單 + 底部分頁列 ---------- */
+const TB_ICON = {
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg>', notes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5"/></svg>', series:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg>', movie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>', watched:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>', stats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>', map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.2s-6.6-5.5-6.6-11.2a6.6 6.6 0 0113.2 0c0 5.7-6.6 11.2-6.6 11.2z"/><circle cx="12" cy="10" r="2.3"/></svg>', flist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>'
+};
+function tabbarDef(){
+  if(activeAppTab==='todo') return [{id:'list',label:'清單',icon:'list'},{id:'notes',label:'便利貼',icon:'notes'}];
+  if(activeAppTab==='shows') return [{id:'series',label:'影集',icon:'series'},{id:'movie',label:'電影',icon:'movie'},{id:'watched',label:'已觀看',icon:'watched'},{id:'stats',label:'統計',icon:'stats'}];
+  return [{id:'map',label:'地圖',icon:'map'},{id:'list',label:'列表',icon:'flist'}];
+}
+function tbIsOn(id){
+  if(activeAppTab==='todo') return ($('todoView').dataset.pane||'list')===id;
+  if(activeAppTab==='shows'){
+    const st=document.body.classList.contains('mstats');
+    return id==='stats' ? st : (!st && activeShowTab===id);
+  }
+  return ($('foodView').dataset.pane||'map')===id;
+}
+function updateTabbar(){
+  const bar=$('tabbar'); if(!bar) return;
+  bar.innerHTML='';
+  tabbarDef().forEach(d=>{
+    const on=tbIsOn(d.id);
+    const b=document.createElement('button'); b.type='button'; b.className='tb'+(on?' on':''); b.innerHTML=TB_ICON[d.icon]+'<span>'+d.label+'</span>';
+    if(on) b.setAttribute('aria-current','page');
+    b.onclick=()=>tabbarGo(d.id);
+    bar.appendChild(b);
+  });
+}
+function tabbarGo(id){
+  if(activeAppTab==='todo') $('todoView').dataset.pane=id;
+  else if(activeAppTab==='shows'){
+    if(id==='stats'){ document.body.classList.add('mstats'); renderShows(); }
+    else switchShowTab(id);
+  } else {
+    $('foodView').dataset.pane=id;
+    if(id==='map' && foodMap) setTimeout(()=>foodMap.invalidateSize(),60);
+  }
+  updateTabbar(); window.scrollTo(0,0);
+}
+function setDrawer(open){ document.body.classList.toggle('drawer-open',open); $('drawer').setAttribute('aria-hidden',String(!open)); }
+$('mMenuBtn').onclick=()=>setDrawer(true);
+$('drawerBg').onclick=()=>setDrawer(false);
+document.querySelectorAll('.d-item').forEach(b=>b.onclick=()=>{ switchAppTab(b.dataset.tab); setDrawer(false); window.scrollTo(0,0); });
+$('drawerOut').onclick=()=>{ setDrawer(false); $('disconnectBtn').click(); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') setDrawer(false); });
+new MutationObserver(()=>{ $('drawerSync').textContent=$('fileName').textContent; }).observe($('fileName'),{childList:true,characterData:true,subtree:true});
+if(MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change',()=>{ if(!MQ_MOBILE.matches) setDrawer(false); });
+// 觸控裝置沒有 Alt+Enter：多行輸入框的 Enter 一律當換行，不觸發「儲存」（儲存靠按鈕或點外面）
+document.addEventListener('keydown',e=>{
+  if(COARSE && e.key==='Enter' && e.target.tagName==='TEXTAREA' && !e.ctrlKey && !e.metaKey) e.stopImmediatePropagation();
+},true);
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
 (async function boot(){
