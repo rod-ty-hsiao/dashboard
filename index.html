@@ -531,6 +531,42 @@ body.connected .file-out { display: inline-block; }
   .field-row .smodal-field { flex: 1 1 42%; }
   .smodal-btns { flex-wrap: wrap; }
 }
+
+/* ===== 便利貼拖曳 ===== */
+.sticky-list { position: relative; }   /* 插入線以此為定位基準 */
+.note.dragging { opacity: .35; }
+
+/* ===== 電腦版影集頁：壓縮上方留白，格線高度自動貼齊視窗，只留一個捲動區（不再與整頁捲動互相打架）===== */
+@media (min-width: 721px) {
+  body.tab-shows .main { padding-top: 14px; padding-bottom: 16px; gap: 10px; }
+  body.tab-shows .head { gap: 12px; align-items: center; }
+  body.tab-shows .eyebrow { font-size: 12px; }
+  body.tab-shows .h1 { font-size: 30px; margin-top: 0; }
+  body.tab-shows .file { padding: 5px 14px; }
+  body.tab-shows .foot { display: none; }
+  body.tab-shows .show-subtabs { margin-bottom: 10px; }
+  body.tab-shows .shows-panel { padding: 14px 20px; }
+  body.tab-shows .show-toolbar { margin-bottom: 12px; }
+  .show-grid, .show-list { overscroll-behavior: contain; }
+}
+
+/* ===== 手機版：詳細／編輯頁滿版（像另開一頁），左上角返回箭頭 ===== */
+@media (max-width: 720px) {
+  :root { --back-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 5l-7 7 7 7'/%3E%3C/svg%3E"); }
+  @keyframes pageIn { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+  .smodal-bg { padding: 0; align-items: stretch; justify-content: stretch; background: #181816; z-index: 90; }
+  .smodal, .smodal.wide { max-width: none; width: 100%; height: 100%; max-height: none; border-radius: 0; box-shadow: none; animation: pageIn .22s var(--ease-out) backwards; }
+  .smodal-close, .smodal-close:hover { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 14px; right: auto; z-index: 95; width: 42px; height: 42px; font-size: 0; background: rgba(0,0,0,.55) var(--back-arrow) center / 22px no-repeat; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .smodal-body, .smodal.wide .smodal-body { padding: 16px 18px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  .smodal-in { min-width: 0; max-width: 100%; }
+  .smodal-in[type="date"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; min-height: 40px; text-align: left; }
+  body:has(.smodal-bg) { overflow: hidden; }
+  .status, .sync-bar { z-index: 120; }
+}
+
+/* ===== 便利貼：觸控拖曳 ===== */
+.note.lifted { z-index: 8; opacity: .96; box-shadow: 0 20px 38px -10px rgba(60,40,20,.5); }
+@media (pointer: coarse) { .note { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; } }
 </style>
 </head>
 <body>
@@ -883,6 +919,65 @@ function attachDropZoneEnd(container, getList, onDrop, isGrid){
   });
 }
 
+/* 觸控裝置的拖曳排序：長按卡片約 0.4 秒「拿起」，手指移動時顯示插入線，放開即放下；靠近螢幕上下緣會自動捲動。
+   （用觸控事件自己實作，不依賴瀏覽器的 HTML5 拖放，iOS／Android 行為一致。目前給便利貼使用） */
+function attachTouchDrag(el, list, item, onDrop){
+  let timer=null, active=false, sx=0, sy=0, lx=0, ly=0, target=null, raf=null, sp=null, spStart=0, suppress=false;
+  const kids=()=>Array.from(el.parentNode.children).filter(c=>c!==el && c.__item!==undefined);
+  const spPos=()=> sp===document.scrollingElement||sp===document.documentElement ? window.scrollY : sp.scrollTop;
+  const place=()=>{
+    const ks=kids(); let t=null;
+    for(const k of ks){ const r=k.getBoundingClientRect(); if(ly<r.top+r.height/2){ t={el:k,before:true}; break; } }
+    if(!t && ks.length) t={el:ks[ks.length-1],before:false};
+    target = t ? {item:t.el.__item, before:t.before} : null;
+    if(t) placeMarkerAt(el.parentNode, t.el, t.before, false); else removeMarker();
+  };
+  const follow=()=>{ el.style.transform='translate('+(lx-sx)+'px,'+(ly-sy+(spPos()-spStart))+'px) scale(1.03)'; };
+  const loop=()=>{
+    if(!active) return;
+    const b=scrollBoundsFor(sp), top=b.top+80, bottom=b.bottom-(MQ_MOBILE.matches?150:80);
+    let dy=0;
+    if(ly<top) dy=-14*Math.min(1,(top-ly)/80);
+    else if(ly>bottom) dy=14*Math.min(1,(ly-bottom)/80);
+    if(dy){ if(sp===document.scrollingElement||sp===document.documentElement) window.scrollBy(0,dy); else sp.scrollTop+=dy; follow(); place(); }
+    raf=requestAnimationFrame(loop);
+  };
+  const stop=()=>{ if(raf){ cancelAnimationFrame(raf); raf=null; } };
+  const reset=()=>{ el.classList.remove('lifted'); el.style.transform=''; el.style.transition=''; removeMarker(); };
+  const cancelTimer=()=>{ if(timer){ clearTimeout(timer); timer=null; } };
+
+  el.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1 || e.target.closest('.note-del')){ cancelTimer(); return; }
+    const t=e.touches[0]; sx=lx=t.clientX; sy=ly=t.clientY; target=null;
+    cancelTimer();
+    timer=setTimeout(()=>{
+      timer=null; active=true; sp=findScrollParent(el); spStart=spPos();
+      el.classList.add('lifted'); el.style.transition='none';
+      if(navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
+      follow(); place(); raf=requestAnimationFrame(loop);
+    },400);
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    if(!active){ if(Math.hypot(t.clientX-sx,t.clientY-sy)>10) cancelTimer(); return; }   // 還沒拿起就移動 = 想捲動頁面
+    e.preventDefault();
+    lx=t.clientX; ly=t.clientY; follow(); place();
+  },{passive:false});
+  const end=e=>{
+    cancelTimer();
+    if(!active) return;
+    active=false; stop();
+    const moved = e.type==='touchend' && target;
+    reset();
+    suppress=true; setTimeout(()=>{ suppress=false; },350);   // 放手時不要誤觸「點開便利貼」
+    if(moved){ performMove(list,[item],target); queueSave(); onDrop(); }
+  };
+  el.addEventListener('touchend',end);
+  el.addEventListener('touchcancel',end);
+  el.addEventListener('click',e=>{ if(suppress){ e.stopImmediatePropagation(); e.preventDefault(); } },true);
+  el.addEventListener('contextmenu',e=>{ if(COARSE) e.preventDefault(); });
+}
+
 /* ---------- Tasks ---------- */
 function parse(md){
   const secs=[], t={}; let cur=null, curName=null, task=null;
@@ -1070,6 +1165,8 @@ function renderNotes(){
     c.append(del,t,...buildNoteNodes(n.text));
     c.onclick=()=>openModal(n);
     c.onkeydown=e=>{ if(e.key==='Enter'&&e.target===c) openModal(n); };
+    c.__item=n;
+    if(COARSE) attachTouchDrag(c, notesList, n, renderNotes); else attachDrag(c, notesList, n, renderNotes);
     list.appendChild(c);
   });
 }
@@ -1267,6 +1364,7 @@ function renderShows(){
   const grid=$('showGrid');
   grid.className = showViewMode==='list' ? 'show-list' : 'show-grid';
   grid.innerHTML='';
+  fitShowsHeight();
   const list=shows[activeShowTab]||[];
   const f=showFilter[activeShowTab];
   const hasFilter = f.year.trim()||f.genre||f.q.trim()||(f.wdate&&f.wdate.trim());
@@ -1507,7 +1605,8 @@ function openShowModal(item){
   function draw(){
     state.locked=editing;
     m.innerHTML='';
-    const x=document.createElement('button'); x.className='smodal-close'; x.textContent='×'; x.onclick=close;
+    const x=document.createElement('button'); x.className='smodal-close'; x.textContent='×'; x.setAttribute('aria-label','返回');
+    x.onclick=()=>{ if(MQ_MOBILE.matches && editing){ if(confirm('放棄尚未儲存的修改？')){ editing=false; draw(); } } else close(); };
     const body=document.createElement('div'); body.className='smodal-body';
     if(!editing){
       const banner=buildCarousel(item);
@@ -2037,6 +2136,7 @@ let statsVisible = localStorage.getItem('shows-stats-visible') !== 'false';
 function updateStatsToggle(){
   $('statsPanel').classList.toggle('collapsed', !statsVisible);
   $('statsToggle').classList.toggle('primary', statsVisible);
+  if(typeof fitShowsHeight==='function') fitShowsHeight();
 }
 document.querySelectorAll('.nav-item').forEach(b=> b.onclick=()=>switchAppTab(b.dataset.tab));
 function scheduleEyebrow(){
@@ -2097,7 +2197,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-10-26.4';
+const APP_VERSION='2026-10-26.6';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -2485,6 +2585,25 @@ if(MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change',()=>{ if(!MQ_
 document.addEventListener('keydown',e=>{
   if(COARSE && e.key==='Enter' && e.target.tagName==='TEXTAREA' && !e.ctrlKey && !e.metaKey) e.stopImmediatePropagation();
 },true);
+
+/* ---------- 便利貼:拖到最後方 ---------- */
+attachDropZoneEnd($('stickyList'), ()=>notesList, renderNotes, ()=>false);
+
+/* ---------- 電腦版影集頁:格線高度貼齊視窗 ---------- */
+function fitShowsHeight(){
+  const g=$('showGrid'); if(!g) return;
+  if(MQ_MOBILE.matches || activeAppTab!=='shows' || $('showsView').style.display==='none'){ g.style.maxHeight=''; return; }
+  const panel=g.closest('.shows-panel'), main=document.querySelector('.main');
+  const cs=getComputedStyle(g), pcs=getComputedStyle(panel), mcs=getComputedStyle(main);
+  const top=g.getBoundingClientRect().top+window.scrollY;
+  const overhang=-(parseFloat(cs.marginBottom)||0);                     // 格線往下突出面板的量(負邊距)
+  const below=(parseFloat(pcs.paddingBottom)||0)-overhang+(parseFloat(mcs.paddingBottom)||0);
+  const h=Math.max(260, Math.floor(window.innerHeight-top-below-4));
+  const v=h+'px'; if(g.style.maxHeight!==v) g.style.maxHeight=v;
+}
+window.addEventListener('resize',fitShowsHeight);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitShowsHeight);
+if(window.ResizeObserver){ const ro=new ResizeObserver(fitShowsHeight); ['.head','.show-subtabs','.show-toolbar','#statsPanel'].forEach(q=>{ const e=document.querySelector(q); if(e) ro.observe(e); }); }
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
 (async function boot(){
