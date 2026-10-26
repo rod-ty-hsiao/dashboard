@@ -754,6 +754,10 @@ let selectMode=false, selectedItems=new Set(), selectAnchor=null;
 let showViewMode = localStorage.getItem('shows-view') || 'grid';
 let statsGenreScope = localStorage.getItem('stats-genre-scope') || 'all';
 const $ = id => document.getElementById(id);
+let scrollReset = false;   // true = 下一次重繪後回到頂端；預設保留捲動位置（編輯、刪除、移動、拖曳、選取…）
+function restoreWinScroll(y){   // 整頁捲動位置還原：要瞬間到位，不能被 html 的 smooth 捲動拖成動畫
+  const d=document.documentElement, old=d.style.scrollBehavior; d.style.scrollBehavior='auto'; window.scrollTo(0,y); d.style.scrollBehavior=old;
+}
 const COARSE = window.matchMedia('(pointer:coarse)').matches;      // 觸控裝置：沒有 Alt+Enter，Enter 一律換行
 const MQ_MOBILE = window.matchMedia('(max-width:720px)');
 const NOTE_PH = v => COARSE ? '備註…' : '備註… (Enter '+v+', Alt+Enter 換行)';
@@ -1359,6 +1363,12 @@ function renderStats(){
 }
 
 function renderShows(){
+  const g=$('showGrid'), keep=!scrollReset; scrollReset=false;
+  const y=window.scrollY, t=g?g.scrollTop:0;
+  renderShowsCore();
+  if(keep){ if(g) g.scrollTop=t; if(window.scrollY!==y) restoreWinScroll(y); }
+}
+function renderShowsCore(){
   renderStats();
   updateSelectUI();
   const grid=$('showGrid');
@@ -2075,10 +2085,10 @@ function importFoodCSV(text){
   fill($('foodType'),FOOD_TYPES,'全部類型');
   fill($('foodMeal'),FOOD_MEALS,'全部時段');
 })();
-$('foodCity').addEventListener('change',e=>{ foodFilter.city=e.target.value; renderFoods(); });
-$('foodType').addEventListener('change',e=>{ foodFilter.type=e.target.value; renderFoods(); });
-$('foodMeal').addEventListener('change',e=>{ foodFilter.meal=e.target.value; renderFoods(); });
-$('foodSearch').addEventListener('input',e=>{ foodFilter.q=e.target.value; renderFoods(); });
+$('foodCity').addEventListener('change',e=>{ foodFilter.city=e.target.value; scrollReset=true; renderFoods(); });
+$('foodType').addEventListener('change',e=>{ foodFilter.type=e.target.value; scrollReset=true; renderFoods(); });
+$('foodMeal').addEventListener('change',e=>{ foodFilter.meal=e.target.value; scrollReset=true; renderFoods(); });
+$('foodSearch').addEventListener('input',e=>{ foodFilter.q=e.target.value; scrollReset=true; renderFoods(); });
 $('foodAddBtn').onclick=()=>openFoodModal(null);
 $('foodExportBtn').onclick=exportFoodCSV;
 $('foodImportBtn').onclick=()=>$('foodImportFile').click();
@@ -2113,8 +2123,8 @@ function switchAppTab(tab){
   const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.content = tab==='shows' ? '#141413' : '#F6F1E9';
   if(tab!=='shows') document.body.classList.remove('mstats');
   updateTabbar();
-  if(tab==='shows') renderShows();
-  if(tab==='food'){ initFoodMap(); renderFoods(); }
+  if(tab==='shows'){ scrollReset=true; renderShows(); }
+  if(tab==='food'){ initFoodMap(); scrollReset=true; renderFoods(); }
 }
 function switchShowTab(sub){
   activeShowTab=sub;
@@ -2126,7 +2136,7 @@ function switchShowTab(sub){
   selectedItems.clear(); selectAnchor=null; // 換頁籤內容整批不同，清掉選取但保留批量選取模式
   document.body.classList.remove('mstats');
   updateTabbar();
-  renderShows();
+  scrollReset=true; renderShows();
 }
 function updateViewToggle(){
   $('viewSwitch').classList.toggle('list', showViewMode==='list');
@@ -2171,11 +2181,11 @@ $('importFile').addEventListener('change', async e=>{
   try{ importCSV(await f.text()); }
   catch(err){ toast('讀取檔案失敗'); }
 });
-document.querySelectorAll('.vs-opt').forEach(b=> b.onclick=()=>{ showViewMode=b.dataset.mode; localStorage.setItem('shows-view',showViewMode); updateViewToggle(); renderShows(); });
-$('filterWatchedDate').addEventListener('input', e=>{ showFilter[activeShowTab].wdate=e.target.value; renderShows(); });
-$('filterYear').addEventListener('input', e=>{ showFilter[activeShowTab].year=e.target.value; renderShows(); });
-$('filterGenre').addEventListener('change', e=>{ showFilter[activeShowTab].genre=e.target.value; renderShows(); });
-$('showSearch').addEventListener('input', e=>{ showFilter[activeShowTab].q=e.target.value; renderShows(); });
+document.querySelectorAll('.vs-opt').forEach(b=> b.onclick=()=>{ showViewMode=b.dataset.mode; localStorage.setItem('shows-view',showViewMode); updateViewToggle(); scrollReset=true; renderShows(); });
+$('filterWatchedDate').addEventListener('input', e=>{ showFilter[activeShowTab].wdate=e.target.value; scrollReset=true; renderShows(); });
+$('filterYear').addEventListener('input', e=>{ showFilter[activeShowTab].year=e.target.value; scrollReset=true; renderShows(); });
+$('filterGenre').addEventListener('change', e=>{ showFilter[activeShowTab].genre=e.target.value; scrollReset=true; renderShows(); });
+$('showSearch').addEventListener('input', e=>{ showFilter[activeShowTab].q=e.target.value; scrollReset=true; renderShows(); });
 
 /* ---------- 檔案讀寫(Google 雲端 / 本機檔案) ---------- */
 function splitTop(md){
@@ -2197,7 +2207,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-10-26.6';
+const APP_VERSION='2026-10-26.7';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -2604,6 +2614,23 @@ function fitShowsHeight(){
 window.addEventListener('resize',fitShowsHeight);
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitShowsHeight);
 if(window.ResizeObserver){ const ro=new ResizeObserver(fitShowsHeight); ['.head','.show-subtabs','.show-toolbar','#statsPanel'].forEach(q=>{ const e=document.querySelector(q); if(e) ro.observe(e); }); }
+
+/* ---------- 重繪時保留捲動位置（清單、便利貼、美食列表）---------- */
+(function wrapKeepScroll(){
+  const wrap=(name,getEl)=>{
+    const orig=window[name];
+    window[name]=function(){
+      const el=getEl(), keep=!scrollReset; scrollReset=false;
+      const y=window.scrollY, t=el?el.scrollTop:0;
+      const r=orig.apply(this,arguments);
+      if(keep){ if(el) el.scrollTop=t; if(window.scrollY!==y) restoreWinScroll(y); }
+      return r;
+    };
+  };
+  wrap('render',()=>null);
+  wrap('renderNotes',()=>$('stickyList'));
+  wrap('renderFoods',()=>$('foodList'));
+})();
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
 (async function boot(){
