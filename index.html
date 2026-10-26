@@ -2097,7 +2097,14 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const drive={token:null,exp:0,client:null,fileId:null,version:null,tokenP:null,pending:null,lastText:null};
+const APP_VERSION='2026-10-26.4';
+const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
+/* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
+const LS_LOG='dash-sync-log';
+function slog(msg){
+  try{ const a=JSON.parse(lsGet(LS_LOG)||'[]'); a.push(new Date().toTimeString().slice(0,8)+' '+msg); while(a.length>40) a.shift(); lsSet(LS_LOG,JSON.stringify(a)); }catch(e){}
+}
+function syncLogText(){ let a=[]; try{ a=JSON.parse(lsGet(LS_LOG)||'[]'); }catch(e){} return '版本 '+APP_VERSION+'\n\n'+(a.slice(-18).join('\n')||'(尚無紀錄)'); }
 const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const lsSet=(k,v)=>{ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} };
 const clientId=()=>GOOGLE_CLIENT_ID||lsGet(LS_CID)||'';
@@ -2153,7 +2160,7 @@ async function gfetch(url,opts){
 }
 
 /* --- Drive 檔案操作 --- */
-async function driveMeta(id){ return (await gfetch(DRIVE_API+'/files/'+id+'?fields=id,name,version,modifiedTime,trashed')).json(); }
+async function driveMeta(id){ return (await gfetch(DRIVE_API+'/files/'+id+'?fields=id,name,version,md5Checksum,modifiedTime,trashed')).json(); }
 async function driveRead(id){ return (await gfetch(DRIVE_API+'/files/'+id+'?alt=media')).text(); }
 async function driveFind(q){
   const r=await gfetch(DRIVE_API+'/files?spaces=drive&pageSize=10&orderBy=modifiedTime%20desc&fields=files(id,name,modifiedTime)&q='+encodeURIComponent(q));
@@ -2170,7 +2177,7 @@ async function driveCreate(text){
   const b='dashB'+Date.now();
   const meta={name:'TASKS.md',mimeType:'text/markdown',parents:[folder]};
   const body='--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)+'\r\n--'+b+'\r\nContent-Type: text/markdown; charset=UTF-8\r\n\r\n'+text+'\r\n--'+b+'--';
-  const r=await gfetch(DRIVE_UP+'/files?uploadType=multipart&fields=id,version,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body});
+  const r=await gfetch(DRIVE_UP+'/files?uploadType=multipart&fields=id,version,md5Checksum,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body});
   return r.json();
 }
 
@@ -2217,25 +2224,25 @@ async function driveSave(){
   const text=serializeCombined();
   setSyncLabel('同步中…');
   const meta=await driveMeta(drive.fileId);
-  if(meta.version!==drive.version){
-    const remote=await driveRead(drive.fileId);
-    if(remote===drive.lastText){
-      drive.version=meta.version;      // 只是 Drive 內部版本號增加,雲端內容沒被別人改過 → 直接存
-    } else {
-      const keepMine=confirm('雲端上的資料在其他裝置被更新過。\n\n按「確定」:用這台裝置目前的內容覆蓋雲端\n按「取消」:放棄這台尚未同步的變更,改載入雲端最新版');
-      if(!keepMine){
-        lsSet(LS_BAK,text);
-        drive.version=meta.version; drive.lastText=remote; syncFail=false; hideSyncBar();
-        loadMarkdown(remote,'TASKS.md',{refresh:true});
-        setSyncLabel('已同步 '+hhmm()); toast('已載入雲端最新版(放棄的版本備份在此瀏覽器)');
-        return;
-      }
+  if(await remoteChanged(meta)){
+    slog('存檔前發現雲端內容與上次不同 md5='+String(meta.md5Checksum||'?').slice(0,8)+' 本機記錄='+String(drive.md5||'?').slice(0,8));
+    const keepMine=confirm('雲端上的資料在其他裝置被更新過。\n\n按「確定」:用這台裝置目前的內容覆蓋雲端\n按「取消」:放棄這台尚未同步的變更,改載入雲端最新版');
+    if(!keepMine){
+      lsSet(LS_BAK,text);
+      const remote=await driveRead(drive.fileId);
+      drive.version=meta.version; drive.md5=meta.md5Checksum||null; drive.lastText=remote; syncFail=false; hideSyncBar();
+      slog('使用者選擇放棄本機變更、載入雲端');
+      loadMarkdown(remote,'TASKS.md',{refresh:true});
+      setSyncLabel('已同步 '+hhmm()); toast('已載入雲端最新版(放棄的版本備份在此瀏覽器)');
+      return;
     }
+    slog('使用者選擇以本機覆蓋雲端');
   }
-  const r=await gfetch(DRIVE_UP+'/files/'+drive.fileId+'?uploadType=media&fields=version,modifiedTime,size',{method:'PATCH',headers:{'Content-Type':'text/markdown; charset=UTF-8'},body:text});
+  const r=await gfetch(DRIVE_UP+'/files/'+drive.fileId+'?uploadType=media&fields=version,modifiedTime,size,md5Checksum',{method:'PATCH',headers:{'Content-Type':'text/markdown; charset=UTF-8'},body:text});
   const j=await r.json();
-  drive.version=j.version; drive.lastText=text; syncFail=false; hideSyncBar();
+  drive.version=j.version; drive.md5=j.md5Checksum||null; drive.lastText=text; syncFail=false; hideSyncBar();
   const bytes=new TextEncoder().encode(text).length;
+  slog('已上傳 '+bytes+' 位元組 → 雲端回報 '+(j.size||'?')+' md5='+String(j.md5Checksum||'?').slice(0,8));
   if(j.size && +j.size!==bytes){ console.warn('Drive size mismatch',j.size,bytes); toast('已同步,但雲端檔案大小與預期不符,請重新整理確認'); }
   else toast('已同步到雲端');
   setSyncLabel('已同步 '+hhmm());
@@ -2265,18 +2272,22 @@ function editingNow(){
   if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
   return !!document.querySelector('.modal-bg, .smodal-bg');
 }
+/* 雲端內容是否真的變了:優先比 md5(依內容計算);沒有 md5 才退回「版本號 + 內容比對」 */
+async function remoteChanged(meta){
+  if(meta.md5Checksum && drive.md5) return meta.md5Checksum!==drive.md5;
+  if(meta.version===drive.version) return false;
+  return (await driveRead(drive.fileId))!==drive.lastText;
+}
 async function pullRemote(){
   if(mode!=='drive'||pulling||saveT||saving||syncFail||document.hidden||editingNow()) return;
   pulling=true;
   try{
     const meta=await driveMeta(drive.fileId);
-    if(meta.version===drive.version){ setSyncLabel('已同步 '+hhmm()); return; }
+    if(!(await remoteChanged(meta))){ drive.version=meta.version; setSyncLabel('已同步 '+hhmm()); return; }
     const md=await driveRead(drive.fileId);
     if(saveT||saving||editingNow()) return;
-    drive.version=meta.version;
-    // Drive 的 version 會因為內部處理自行增加,內容其實沒變 → 不重新載入,避免蓋掉畫面上的物件
-    if(md===drive.lastText){ setSyncLabel('已同步 '+hhmm()); return; }
-    drive.lastText=md;
+    drive.version=meta.version; drive.md5=meta.md5Checksum||null; drive.lastText=md;
+    slog('拉取:雲端內容有變 → 重新載入 md5='+String(meta.md5Checksum||'?').slice(0,8));
     loadMarkdown(md,'TASKS.md',{refresh:true});
     setSyncLabel('已同步 '+hhmm()); toast('已更新自雲端');
   }catch(e){ /* 靜默,下次再試 */ }
@@ -2291,7 +2302,8 @@ window.addEventListener('beforeunload',e=>{ if(mode==='drive' && (saveT||saving|
 /* --- Google 雲端:連線流程 --- */
 async function loadDrive(id,meta,md){
   if(md===undefined) md=await driveRead(id);
-  mode='drive'; drive.fileId=id; drive.version=meta.version; drive.lastText=md; syncFail=false; hideSyncBar();
+  mode='drive'; drive.fileId=id; drive.version=meta.version; drive.md5=meta.md5Checksum||null; drive.lastText=md; syncFail=false; hideSyncBar();
+  slog('載入 '+(md.length)+' 字 md5='+String(meta.md5Checksum||'?').slice(0,8));
   lsSet(LS_FID,id); lsSet(LS_MODE,'drive');
   window.__cloudMode=true; if(window.__renderPath) window.__renderPath();
   loadMarkdown(md,'TASKS.md');
@@ -2465,6 +2477,7 @@ $('mMenuBtn').onclick=()=>setDrawer(true);
 $('drawerBg').onclick=()=>setDrawer(false);
 document.querySelectorAll('.d-item').forEach(b=>b.onclick=()=>{ switchAppTab(b.dataset.tab); setDrawer(false); window.scrollTo(0,0); });
 $('drawerOut').onclick=()=>{ setDrawer(false); $('disconnectBtn').click(); };
+document.querySelector('.d-sync').onclick=()=>alert(syncLogText());   // 手機:點同步狀態看紀錄與版本
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') setDrawer(false); });
 new MutationObserver(()=>{ $('drawerSync').textContent=$('fileName').textContent; }).observe($('fileName'),{childList:true,characterData:true,subtree:true});
 if(MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change',()=>{ if(!MQ_MOBILE.matches) setDrawer(false); });
@@ -2500,12 +2513,12 @@ $('newNote').addEventListener('keydown', e=>{
   const DEFAULT='';
   const renderPath=()=>{
     const v=localStorage.getItem(KEY);
-    if(window.__cloudMode){ el.textContent='儲存位置:Google 雲端硬碟 / Dashboard / TASKS.md'; return; }
+    if(window.__cloudMode){ el.textContent='儲存位置:Google 雲端硬碟 / Dashboard / TASKS.md · v'+APP_VERSION+'(點此看同步紀錄)'; return; }
     el.textContent='檔案位置：'+(v!==null ? v : DEFAULT);
   };
   el.style.cursor='pointer';
   el.onclick=()=>{
-    if(window.__cloudMode) return;
+    if(window.__cloudMode){ alert(syncLogText()); return; }
     const cur=localStorage.getItem(KEY);
     const v=prompt('輸入這台電腦上儀表板資料夾的位置（純備註，只存在這個瀏覽器裡）', cur!==null ? cur : DEFAULT);
     if(v!==null){ localStorage.setItem(KEY, v.trim()); renderPath(); }
