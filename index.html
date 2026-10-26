@@ -2097,7 +2097,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const drive={token:null,exp:0,client:null,fileId:null,version:null,tokenP:null,pending:null};
+const drive={token:null,exp:0,client:null,fileId:null,version:null,tokenP:null,pending:null,lastText:null};
 const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const lsSet=(k,v)=>{ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){} };
 const clientId=()=>GOOGLE_CLIENT_ID||lsGet(LS_CID)||'';
@@ -2218,20 +2218,27 @@ async function driveSave(){
   setSyncLabel('同步中…');
   const meta=await driveMeta(drive.fileId);
   if(meta.version!==drive.version){
-    const keepMine=confirm('雲端上的資料在其他裝置被更新過。\n\n按「確定」:用這台裝置目前的內容覆蓋雲端\n按「取消」:放棄這台尚未同步的變更,改載入雲端最新版');
-    if(!keepMine){
-      lsSet(LS_BAK,text);
-      const md=await driveRead(drive.fileId);
-      drive.version=meta.version; syncFail=false; hideSyncBar();
-      loadMarkdown(md,'TASKS.md',{refresh:true});
-      setSyncLabel('已同步 '+hhmm()); toast('已載入雲端最新版(放棄的版本備份在此瀏覽器)');
-      return;
+    const remote=await driveRead(drive.fileId);
+    if(remote===drive.lastText){
+      drive.version=meta.version;      // 只是 Drive 內部版本號增加,雲端內容沒被別人改過 → 直接存
+    } else {
+      const keepMine=confirm('雲端上的資料在其他裝置被更新過。\n\n按「確定」:用這台裝置目前的內容覆蓋雲端\n按「取消」:放棄這台尚未同步的變更,改載入雲端最新版');
+      if(!keepMine){
+        lsSet(LS_BAK,text);
+        drive.version=meta.version; drive.lastText=remote; syncFail=false; hideSyncBar();
+        loadMarkdown(remote,'TASKS.md',{refresh:true});
+        setSyncLabel('已同步 '+hhmm()); toast('已載入雲端最新版(放棄的版本備份在此瀏覽器)');
+        return;
+      }
     }
   }
-  const r=await gfetch(DRIVE_UP+'/files/'+drive.fileId+'?uploadType=media&fields=version,modifiedTime',{method:'PATCH',headers:{'Content-Type':'text/markdown; charset=UTF-8'},body:text});
+  const r=await gfetch(DRIVE_UP+'/files/'+drive.fileId+'?uploadType=media&fields=version,modifiedTime,size',{method:'PATCH',headers:{'Content-Type':'text/markdown; charset=UTF-8'},body:text});
   const j=await r.json();
-  drive.version=j.version; syncFail=false; hideSyncBar();
-  setSyncLabel('已同步 '+hhmm()); toast('已同步到雲端');
+  drive.version=j.version; drive.lastText=text; syncFail=false; hideSyncBar();
+  const bytes=new TextEncoder().encode(text).length;
+  if(j.size && +j.size!==bytes){ console.warn('Drive size mismatch',j.size,bytes); toast('已同步,但雲端檔案大小與預期不符,請重新整理確認'); }
+  else toast('已同步到雲端');
+  setSyncLabel('已同步 '+hhmm());
 }
 function driveSaveFailed(e){
   syncFail=true;
@@ -2253,9 +2260,10 @@ $('syncRetry').onclick=async()=>{
 
 /* --- 從雲端拉取其他裝置的更新(沒有未存變更、沒在編輯時)--- */
 function editingNow(){
+  // 只要有輸入框／文字區／下拉選單正在聚焦，或有任何彈窗開著，就視為正在編輯，不做背景重新載入
   const a=document.activeElement;
-  if(a && (a.tagName==='TEXTAREA' || (a.tagName==='INPUT' && a.classList.contains('edit-in')))) return true;
-  return !!document.querySelector('.modal-bg');
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+  return !!document.querySelector('.modal-bg, .smodal-bg');
 }
 async function pullRemote(){
   if(mode!=='drive'||pulling||saveT||saving||syncFail||document.hidden||editingNow()) return;
@@ -2266,6 +2274,9 @@ async function pullRemote(){
     const md=await driveRead(drive.fileId);
     if(saveT||saving||editingNow()) return;
     drive.version=meta.version;
+    // Drive 的 version 會因為內部處理自行增加,內容其實沒變 → 不重新載入,避免蓋掉畫面上的物件
+    if(md===drive.lastText){ setSyncLabel('已同步 '+hhmm()); return; }
+    drive.lastText=md;
     loadMarkdown(md,'TASKS.md',{refresh:true});
     setSyncLabel('已同步 '+hhmm()); toast('已更新自雲端');
   }catch(e){ /* 靜默,下次再試 */ }
@@ -2280,7 +2291,7 @@ window.addEventListener('beforeunload',e=>{ if(mode==='drive' && (saveT||saving|
 /* --- Google 雲端:連線流程 --- */
 async function loadDrive(id,meta,md){
   if(md===undefined) md=await driveRead(id);
-  mode='drive'; drive.fileId=id; drive.version=meta.version; syncFail=false; hideSyncBar();
+  mode='drive'; drive.fileId=id; drive.version=meta.version; drive.lastText=md; syncFail=false; hideSyncBar();
   lsSet(LS_FID,id); lsSet(LS_MODE,'drive');
   window.__cloudMode=true; if(window.__renderPath) window.__renderPath();
   loadMarkdown(md,'TASKS.md');

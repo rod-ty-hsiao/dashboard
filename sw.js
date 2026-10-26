@@ -1,5 +1,5 @@
 /* Dashboard service worker:只快取網頁外殼,資料一律走網路(Google Drive) */
-const CACHE = 'dashboard-shell-v1';
+const CACHE = 'dashboard-shell-v2';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -21,7 +21,7 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return; // Google API / 字體 / 地圖圖磚不經過這裡
   // 網路優先:有網路時永遠拿到最新版,離線才用快取
   e.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-cache' })   // 一律向伺服器確認有沒有新版,不吃瀏覽器的 HTTP 快取
       .then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
