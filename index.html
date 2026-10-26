@@ -567,6 +567,14 @@ body.connected .file-out { display: inline-block; }
 /* ===== 便利貼：觸控拖曳 ===== */
 .note.lifted { z-index: 8; opacity: .96; box-shadow: 0 20px 38px -10px rgba(60,40,20,.5); }
 @media (pointer: coarse) { .note { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; } }
+
+/* 橫幅網址列：序號、上移／下移 */
+.banner-idx { flex: none; width: 22px; height: 22px; border-radius: 7px; background: #2a2926; color: #9a9992; font: 500 12px/22px ui-monospace, Consolas, monospace; text-align: center; }
+.banner-idx.first { background: var(--accent); color: #fff; }
+.banner-row-btn { flex: none; width: 30px; height: 30px; border-radius: 8px; border: 1px solid #3a3934; background: #2a2926; color: #c9c8c2; font-size: 15px; line-height: 1; cursor: pointer; font-family: inherit; transition: border-color .15s var(--ease), color .15s var(--ease), opacity .15s; }
+.banner-row-btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; }
+.banner-row-btn:disabled { opacity: .25; cursor: default; }
+@media (max-width: 720px) { .banner-row-btn { width: 38px; height: 38px; font-size: 17px; } .banner-row { gap: 5px; } .banner-row-del { padding: 0 6px; font-size: 20px; } }
 </style>
 </head>
 <body>
@@ -1665,12 +1673,27 @@ function openShowModal(item){
         bannerRows.innerHTML='';
         bannerEdit.forEach((u,i)=>{
           const row=document.createElement('div'); row.className='banner-row';
+          if(bannerEdit.length>1){ const ix=document.createElement('span'); ix.className='banner-idx'+(i===0?' first':''); ix.textContent=i+1; ix.title= i===0 ? '最先顯示' : '第 '+(i+1)+' 張'; row.appendChild(ix); }
           const inp=document.createElement('input'); inp.className='smodal-in'; inp.value=u;
           inp.placeholder= i===0 ? '橫幅圖片網址（留空沿用卡片圖）' : '第 '+(i+1)+' 張圖片網址';
           inp.addEventListener('input',()=>{ bannerEdit[i]=inp.value; });
           wireEnter(inp);
           row.appendChild(inp);
           if(bannerEdit.length>1){
+            const mkMove=(cls,txt,title,to)=>{
+              const b=document.createElement('button'); b.type='button'; b.className='banner-row-btn '+cls; b.textContent=txt; b.title=title; b.setAttribute('aria-label',title);
+              b.disabled = to<0 || to>=bannerEdit.length;
+              b.onclick=()=>{
+                [bannerEdit[i],bannerEdit[to]]=[bannerEdit[to],bannerEdit[i]];
+                rebuildBannerRows();
+                const r=bannerRows.querySelectorAll('.banner-row')[to];            // 移動後把焦點留在同一張，可以連續按
+                const nb=r&&r.querySelector('.'+cls);
+                const f=(nb&&!nb.disabled) ? nb : (r ? r.querySelector('input') : null);
+                if(f) f.focus({preventScroll:true});
+              };
+              return b;
+            };
+            row.append(mkMove('banner-row-up','↑','上移（排得更前面）',i-1), mkMove('banner-row-down','↓','下移（排得更後面）',i+1));
             const delB=document.createElement('button'); delB.type='button'; delB.className='banner-row-del'; delB.textContent='×'; delB.title='移除這張';
             delB.onclick=()=>{ bannerEdit.splice(i,1); rebuildBannerRows(); };
             row.appendChild(delB);
@@ -2207,7 +2230,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-10-26.7';
+const APP_VERSION='2026-10-26.8';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
