@@ -526,7 +526,7 @@ body.connected .file-out { display: inline-block; }
   .smodal { max-height: 92vh; max-height: 92dvh; }
   .smodal.wide .smodal-body, .smodal-body { padding: 16px 18px 22px; }
   .smodal.wide .smodal-title { font-size: 22px; }
-  .smodal.wide .smodal-banner { aspect-ratio: 3/4; max-height: 62vh; }
+  .smodal.wide .smodal-banner { aspect-ratio: auto; width: 100%; height: min(133.33vw, 62vh); }
   .field-row { flex-wrap: wrap; }
   .field-row .smodal-field { flex: 1 1 42%; }
   .smodal-btns { flex-wrap: wrap; }
@@ -562,7 +562,7 @@ body.connected .file-out { display: inline-block; }
   .smodal-body, .smodal.wide .smodal-body { padding: 16px 18px calc(32px + env(safe-area-inset-bottom, 0px)); }
   .smodal-in { min-width: 0; max-width: 100%; }
   .smodal-in[type="date"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; min-height: 40px; text-align: left; }
-  html:has(.smodal-bg) { overflow: hidden; }   /* 詳細頁開著時鎖住背後頁面捲動（html 已設 overflow-x:hidden，所以鎖在 html 上） */
+  body:has(.smodal-bg) { overflow: hidden; }
   .status, .sync-bar { z-index: 120; }
 }
 
@@ -577,14 +577,6 @@ body.connected .file-out { display: inline-block; }
 .banner-row-btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; }
 .banner-row-btn:disabled { opacity: .25; cursor: default; }
 @media (max-width: 720px) { .banner-row-btn { width: 38px; height: 38px; font-size: 17px; } .banner-row { gap: 5px; } .banner-row-del { padding: 0 6px; font-size: 20px; } }
-
-/* ===== 手機：防止頁面被撐寬而被 iPhone 自動縮小 ===== */
-@media (max-width: 720px) {
-  html { overflow-x: hidden; }
-  .smodal-bg { max-width: none; contain: paint; }
-  .smodal-banner, .smodal-banner .bimg { contain: paint; }
-  .smodal { overscroll-behavior: contain; }
-}
 </style>
 </head>
 <body>
@@ -1539,7 +1531,6 @@ function smodalShell(extraClass){
   if(MQ_MOBILE.matches) setTimeout(()=>{ try{
     const vv=window.visualViewport, wide=[...document.body.querySelectorAll('*')].filter(e=>e.getBoundingClientRect().right>window.innerWidth+1).slice(0,3).map(e=>(e.id||e.className||e.tagName).toString().slice(0,24));
     slog('詳細頁寬度 inner='+window.innerWidth+' visual='+(vv?vv.width.toFixed(0)+'@'+vv.scale.toFixed(2):'?')+' doc='+document.documentElement.scrollWidth+(wide.length?' 超出:'+wide.join(','):''));
-    diagWidth('詳細頁');
   }catch(e){} },900);
   const m=document.createElement('div'); m.className='smodal'+(extraClass?' '+extraClass:'');
   bg.appendChild(m); document.body.appendChild(bg);
@@ -2245,7 +2236,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-10-30.11';
+const APP_VERSION='2026-10-30.12';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -2669,26 +2660,6 @@ if(window.ResizeObserver){ const ro=new ResizeObserver(fitShowsHeight); ['.head'
   wrap('renderNotes',()=>$('stickyList'));
   wrap('renderFoods',()=>$('foodList'));
 })();
-
-/* ---------- 診斷：找出讓頁面比螢幕寬的元素（手機）---------- */
-function diagWidth(label){
-  try{
-    const d=document.documentElement, old=d.style.width, sw=screen.width||window.innerWidth, before=window.innerWidth;
-    d.style.width=sw+'px'; void d.offsetWidth;                 // 暫時把頁面固定成螢幕寬度，滿版元素就不會被撐寬
-    const bad=[];
-    document.body.querySelectorAll('*').forEach(e=>{
-      const r=e.getBoundingClientRect();
-      if(r.width>0 && r.right>sw+1){
-        const cn=(typeof e.className==='string' && e.className.trim()) ? '.'+e.className.trim().split(/\s+/)[0] : '';
-        bad.push((e.id?'#'+e.id:'')+cn+(e.id||cn?'':e.tagName)+':'+Math.round(r.right));
-      }
-    });
-    const sc=d.scrollWidth;
-    d.style.width=old;
-    slog(label+' 螢幕='+sw+' 目前頁寬='+before+' 固定螢幕寬後 doc='+sc+(bad.length?' 超出:'+bad.slice(0,8).join(' '):' 無超出元素'));
-  }catch(e){}
-}
-if(MQ_MOBILE.matches) setTimeout(()=>diagWidth('啟動'),2500);
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
 (async function boot(){
