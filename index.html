@@ -960,10 +960,83 @@ body.trip-open .tv-detail { display: flex; flex-direction: column; }
 /* 日期／時間欄位：iOS 原生控制項有固有最小寬度，會把欄位撐出對話框 */
 .ui-dlg, .ui-ov { overflow-x: hidden; max-width: 100%; }
 .ui-fl, .tv-irow > *, .tv-pfx { min-width: 0; max-width: 100%; }
-.ui-in[type="date"], .ui-in[type="time"] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; box-sizing: border-box; line-height: 1.2; }
-.ui-in[type="date"]::-webkit-date-and-time-value, .ui-in[type="time"]::-webkit-date-and-time-value { text-align: left; min-width: 0; margin: 0; }
-.ui-in[type="date"]::-webkit-datetime-edit, .ui-in[type="time"]::-webkit-datetime-edit { padding: 0; }
+.ui-in[type="date"], .ui-in[type="time"] { -webkit-appearance: none; appearance: none; display: flex; align-items: center; justify-content: flex-start; min-width: 0; max-width: 100%; box-sizing: border-box; line-height: normal; }
+.ui-in[type="date"]::-webkit-date-and-time-value, .ui-in[type="time"]::-webkit-date-and-time-value { text-align: left; min-width: 0; margin: 0; display: flex; align-items: center; min-height: 1.4em; line-height: normal; }
+.ui-in[type="date"]::-webkit-datetime-edit, .ui-in[type="time"]::-webkit-datetime-edit { padding: 0; line-height: normal; }
 @media (max-width: 720px) { .ui-ov, .tv-idlg, .ui-dlg { touch-action: pan-y; overscroll-behavior-x: none; } }
+
+/* ===== 旅遊：編輯旅程 ===== */
+.tv-edit { display: none; }
+body.trip-edit #tvDetail { display: none !important; }
+body.trip-edit #tvTrips, body.trip-edit .tv-bar, body.trip-edit .tv-fab { display: none; }
+body.trip-edit .tv-edit { display: block; }
+.tv-etop { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.tv-etitle { order: -1; flex: 1; margin: 0; font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-weight: 700; font-size: 34px; line-height: 1.2; }
+.tv-btn2.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tv-btn2.pri:hover { background: #A24A28; border-color: #A24A28; color: #fff; }
+.tv-ecols { display: grid; grid-template-columns: minmax(0,1fr) 400px; gap: 28px; align-items: start; }
+.tv-ecols > * { min-width: 0; }
+.tv-eside { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.tv-ecard { display: flex; flex-direction: column; gap: 16px; padding: 24px 24px 22px; }
+.tv-erow2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.tv-ehint { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.tv-ehint.bad { color: #A8321F; }
+.tv-edesc { margin: 0; font-size: 14px; line-height: 1.65; color: #6B6259; }
+.tv-ecovers { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.tv-ecov { appearance: none; padding: 0; height: 62px; border-radius: 14px; border: 2.5px solid transparent; box-shadow: 0 0 0 1.5px #D8CDBB; overflow: hidden; cursor: pointer; background: none; }
+.tv-ecov svg { display: block; width: 100%; height: 100%; }
+.tv-ecov.on { box-shadow: 0 0 0 2.5px var(--accent); }
+.tv-ecov:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+.tv-ecvprev { height: 112px; border-radius: 14px; overflow: hidden; }
+.tv-ecvprev .tv-cvr { height: 100%; }
+.tv-emodes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; background: #F0E8DA; border-radius: 14px; padding: 4px; }
+.tv-emode { appearance: none; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 500; height: 40px; border-radius: 10px; color: #6B6259; cursor: pointer; }
+.tv-emode.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(60,40,20,.14); }
+.tv-emode:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 1px; }
+.tv-ecrows { display: flex; flex-direction: column; gap: 10px; }
+.tv-ecrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tv-ecrow .nm { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; min-width: 0; }
+.tv-ecrow .nm i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.tv-ecrow .tv-pfx { width: 158px; flex: none; }
+.tv-esum { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.tv-esum b { font-family: ui-monospace, Consolas, monospace; font-size: 18px; color: var(--ink); }
+.tv-ecat { cursor: default; }
+.tv-ecat:hover { border-color: #D8CDBB; }
+.tv-ecat.custom { padding-right: 4px; }
+.tv-ecat .x { appearance: none; border: 0; background: transparent; width: 28px; height: 28px; margin-left: 2px; border-radius: 50%; color: var(--muted); font-size: 19px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.tv-ecat .x:hover { background: #F0E8DA; color: #A8321F; }
+.tv-edanger { border-color: #E9C8BE; }
+.tv-edanger .tv-btn2 { align-self: flex-start; }
+.tv-eitems { list-style: none; margin: 16px 0 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: 8px; }
+.tv-er { display: flex; align-items: center; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--c, #8F8579); border-radius: 14px; padding: 0 8px 0 2px; }
+.tv-er .hd { width: 30px; height: 52px; display: grid; place-items: center; color: #B8AC9A; cursor: grab; flex: none; }
+.tv-er.dragging { opacity: .35; }
+.tv-er.lifted { position: relative; z-index: 3; background: #fff; box-shadow: 0 14px 30px -10px rgba(60,40,20,.35); }
+.tv-erb { appearance: none; border: 0; background: none; font: inherit; color: var(--ink); text-align: left; flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 10px 2px; cursor: pointer; }
+.tv-erb .tm { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; color: var(--muted); min-width: 44px; flex: none; }
+.tv-erb .mid { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.tv-erb .nm { font-size: 15.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-erb .ct { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-erb .ct i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.tv-erb .cs { font-family: ui-monospace, Consolas, monospace; font-size: 14px; flex: none; }
+.tv-erb:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; border-radius: 10px; }
+.tv-dadd { min-width: 92px; background: transparent; border: 1.5px dashed #D3C7B4; color: var(--muted); align-items: center; justify-content: center; }
+.tv-dadd b { font-size: 18px; line-height: 1; }
+.tv-dadd:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+.tv-delday { margin-top: 18px; }
+.tv-rb.edit { left: auto; right: 70px; }
+@media (max-width: 1100px) and (min-width: 721px) { .tv-ecols { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 720px) {
+  body.trip-edit .tv-edit { display: block; position: fixed; inset: 0; z-index: 91; background: #F6F2EA; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+  .tv-etop { position: sticky; top: 0; z-index: 5; margin: 0; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; background: #F6F2EA; border-bottom: 1px solid var(--line); }
+  .tv-etitle { order: 0; text-align: center; font-size: 18px; }
+  .tv-etop .tv-btn2 { height: 40px; padding: 0 16px; font-size: 14.5px; border-radius: 12px; }
+  .tv-ecols { display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 16px; }
+  .tv-eside { display: contents; }
+  .tv-e1 { order: 1; } .tv-e2 { order: 2; } .tv-e3 { order: 3; } .tv-e4 { order: 4; } .tv-e5 { order: 5; }
+  .tv-ecard { padding: 20px 18px 18px; }
+  .tv-ecrow .tv-pfx { width: 150px; }
+}
 </style>
 </head>
 <body>
@@ -1142,6 +1215,7 @@ body.trip-open .tv-detail { display: flex; flex-direction: column; }
         <div id="tvTrips"></div>
         <div id="tvPlaces" class="tv-soon"><div class="tv-soon-card"><b>地點</b><span>依地區整理想去的景點與美食，下一階段加入。</span></div></div>
         <section id="tvDetail" class="tv-detail" aria-label="旅程詳情"></section>
+        <section id="tvEdit" class="tv-edit" aria-label="編輯旅程"></section>
         <button type="button" class="tv-fab" id="tvFab" aria-label="新增旅程"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
 
@@ -2882,7 +2956,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-01.17';
+const APP_VERSION='2026-11-01.18';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -3059,7 +3133,7 @@ function editingNow(){
   // 只要有輸入框／文字區／下拉選單正在聚焦，或有任何彈窗開著，就視為正在編輯，不做背景重新載入
   const a=document.activeElement;
   if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
-  return !!document.querySelector('.modal-bg, .smodal-bg');
+  return !!document.querySelector('.modal-bg, .smodal-bg') || document.body.classList.contains('trip-edit');
 }
 /* 雲端內容是否真的變了:優先比 md5(依內容計算);沒有 md5 才退回「版本號 + 內容比對」 */
 async function remoteChanged(meta){
@@ -3989,7 +4063,10 @@ function openTrip(id){
   if(!tvUI.pg) tvUI.pg=pushPage({close:()=>{ tvUI.pg=null; closeTripUI(); }});
   renderTripDetail(); window.scrollTo(0,0);
 }
-function closeTrip(){ if(tvUI.pg){ const pg=tvUI.pg; tvUI.pg=null; popPage(pg); } closeTripUI(); }
+function closeTrip(){   // 一次退掉「編輯頁＋詳情頁」的歷史紀錄（編輯頁開著時按刪除旅程、切換分頁）
+  const list=[]; if(tvEd.pg){ list.push(tvEd.pg); tvEd.pg=null; } if(tvUI.pg){ list.push(tvUI.pg); tvUI.pg=null; }
+  tvPopMany(list); if(tvEd.draft) closeTripEditUI(true); closeTripUI();
+}
 function closeTripUI(){
   document.body.classList.remove('trip-open'); tvUI.tripId=null; $('tvDetail').innerHTML=''; renderTripList();
 }
@@ -4009,10 +4086,11 @@ function renderTripDetail(){
   const showCost=t.mode==='item';
   const BACK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
   const TRASH='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg>';
+  const PENCIL='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></svg>';
   let h='';
-  h+='<div class="tv-hero" id="tvHero"><button type="button" class="tv-rb" id="tvMBack" aria-label="返回旅程">'+BACK+'</button><button type="button" class="tv-rb del" id="tvMDel" aria-label="刪除旅程">'+TRASH+'</button></div>';
+  h+='<div class="tv-hero" id="tvHero"><button type="button" class="tv-rb" id="tvMBack" aria-label="返回旅程">'+BACK+'</button><button type="button" class="tv-rb edit" id="tvMEdit" aria-label="編輯旅程">'+PENCIL+'</button><button type="button" class="tv-rb del" id="tvMDel" aria-label="刪除旅程">'+TRASH+'</button></div>';
   h+='<header class="tv-dtop"><div class="tv-dl"><button type="button" class="tv-back" id="tvBack">'+BACK+'旅程</button><h1 class="tv-dtitle">'+esc(t.name||'未命名旅程')+'</h1><div class="tv-dmeta"><span class="tv-mono">'+esc(tripRange(t))+'</span><span class="tv-chip">'+t.days.length+' 天</span><span class="tv-chip">'+tvSpotCount(t)+' 個景點</span></div></div>';
-  h+='<div class="tv-dact"><button type="button" class="tv-btn2 danger" id="tvDelTrip">'+TRASH+'刪除旅程</button></div></header>';
+  h+='<div class="tv-dact"><button type="button" class="tv-btn2" id="tvEditTrip">'+PENCIL+'編輯旅程</button><button type="button" class="tv-btn2 danger" id="tvDelTrip">'+TRASH+'刪除旅程</button></div></header>';
   h+='<div class="tv-cols"><section class="tv-card tv-main" aria-label="行程"><span class="tv-lbl">行程</span><div class="tv-days" role="tablist" aria-label="選擇日期">';
   t.days.forEach((d,i)=>{ const x=tripDayDate(t,i); h+='<button type="button" role="tab" class="tv-dtab'+(i===di?' is-on':'')+'" data-d="'+i+'" aria-selected="'+(i===di)+'"><b>Day '+(i+1)+'</b><span>'+(x?fmtMD(x):'—')+'</span></button>'; });
   h+='</div><div class="tv-dayhead"><span class="tv-daytitle">'+esc(dayTitle)+'</span><span class="tv-daysum">'+(showCost?'當日花費 <b>'+(dayTotal>0?fmtMoney(dayTotal):'—')+'</b>':'')+'</span></div>';
@@ -4044,6 +4122,7 @@ function renderTripDetail(){
   box.innerHTML=h;
   box.querySelector('#tvHero').insertBefore(buildCoverEl(t.cover,'tv-herocvr'), box.querySelector('#tvHero').firstChild);
   box.querySelector('#tvBack').onclick=closeTrip; box.querySelector('#tvMBack').onclick=closeTrip;
+  box.querySelector('#tvEditTrip').onclick=openTripEdit; box.querySelector('#tvMEdit').onclick=openTripEdit;
   box.querySelector('#tvDelTrip').onclick=tvDeleteTrip; box.querySelector('#tvMDel').onclick=tvDeleteTrip;
   box.querySelectorAll('.tv-dtab').forEach(b=>b.onclick=()=>{ tvUI.day=+b.dataset.d; renderTripDetail(); });
   box.querySelectorAll('.tv-itb').forEach(b=>b.onclick=()=>openItemDialog(t,di,+b.dataset.i));
@@ -4057,7 +4136,7 @@ function tvSortDay(t,di){
 }
 
 /* --- 項目編輯（網頁＝對話框，手機＝底部面板）--- */
-function openItemDialog(t,dayIdx,itemIdx){
+function openItemDialog(t,dayIdx,itemIdx,hooks){   // hooks（編輯旅程頁用）：{onChange(newDay)}；有的話不直接存檔，交給編輯頁的草稿
   const isNew=itemIdx==null;
   const src=isNew ? {time:'',name:'',cat:'',cost:null,note:''} : t.days[dayIdx].items[itemIdx];
   const st={cat:src.cat||'', extra:[], adding:false, newColor:TV_SWATCHES[0]};
@@ -4120,12 +4199,15 @@ function openItemDialog(t,dayIdx,itemIdx){
     if(isNew){ t.days[newDay].items.push(rec); }
     else if(newDay===dayIdx){ Object.assign(t.days[dayIdx].items[itemIdx],rec); }
     else { t.days[dayIdx].items.splice(itemIdx,1); t.days[newDay].items.push(rec); }
+    if(hooks){ closeDlg(); hooks.onChange(newDay); toast(isNew?'已新增項目':'已儲存'); return; }
     queueSave(); tvUI.day=newDay; closeDlg(); renderTripDetail(); renderTripList(); toast(isNew?'已新增項目':'已儲存');
   }
   q('.tv-x').onclick=closeDlg; q('#tiCancel').onclick=closeDlg; q('#tiSave').onclick=save;
   if(!isNew) q('#tiDel').onclick=async()=>{
     const ok=await uiConfirm('刪除「'+src.name+'」？','這個行程項目會被刪除，無法復原。','刪除項目',true); if(!ok) return;
-    t.days[dayIdx].items.splice(itemIdx,1); queueSave(); closeDlg(); renderTripDetail(); renderTripList(); toast('已刪除項目');
+    t.days[dayIdx].items.splice(itemIdx,1);
+    if(hooks){ closeDlg(); hooks.onChange(dayIdx); toast('已刪除項目'); return; }
+    queueSave(); closeDlg(); renderTripDetail(); renderTripList(); toast('已刪除項目');
   };
   ov.addEventListener('mousedown',e=>{ if(e.target===ov) closeDlg(); });
   document.body.appendChild(ov);
@@ -4146,6 +4228,260 @@ document.querySelectorAll('.tv-seg button').forEach(b=>b.onclick=()=>{ tvUI.pane
 $('tvAdd').onclick=tvNewTrip; $('tvFab').onclick=tvNewTrip;
 TB_ICON.trip='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12.5" rx="2.5"/><path d="M9 7.5V5.8A1.3 1.3 0 0110.3 4.5h3.4A1.3 1.3 0 0115 5.8v1.7"/><path d="M8.5 7.5V20M15.5 7.5V20"/></svg>';
 TB_ICON.place='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+
+/* ---------- 旅遊：編輯旅程（用「草稿」編輯，按「儲存變更」才寫回；取消／返回會先確認）---------- */
+const tvEd={draft:null, snap:'', day:0, pg:null, addOpen:false, newColor:TV_SWATCHES[0], lastBuiltin:'builtin:island'};
+try{ if(history.state && history.state.dashPage) history.replaceState(null,''); }catch(e){}   // 重新整理後清掉殘留的頁面紀錄，避免返回手勢錯亂
+const TV_MODES=[
+  {id:'total',label:'僅總額',desc:'只記錄整趟旅程的總花費，不拆分類別。'},
+  {id:'cat',label:'依類別',desc:'不逐項記帳，只填每個類別的合計。'},
+  {id:'item',label:'逐項明細',desc:'每個行程項目各自填金額與類別，總額與圓餅圖會自動加總。'}];
+const TV_BUILTIN_KEYS=['island','mountain','oldstreet','hills'];
+const tvEdDirty=()=>!!tvEd.draft && JSON.stringify(tvEd.draft)!==tvEd.snap;
+const ymdOf=d=>d.getUTCFullYear()+'-'+tvP2(d.getUTCMonth()+1)+'-'+tvP2(d.getUTCDate());
+function tvSyncEnd(d){ const a=ymdToDate(d.start); if(!a||!d.days.length) return; a.setUTCDate(a.getUTCDate()+d.days.length-1); d.end=ymdOf(a); }   // 返回日＝出發日＋天數－1
+function tvPopMany(list){   // 一次退掉多個頁面的歷史紀錄（連續呼叫多次 history.back() 在部分瀏覽器會被合併，造成之後的返回手勢失效）
+  let n=0;
+  list.forEach(e=>{ if(e && !e.closed){ e.closed=true; const i=pageStack.indexOf(e); if(i>=0) pageStack.splice(i,1); n++; } });
+  if(n && history.state && history.state.dashPage){ suppressPop++; try{ history.go(-n); }catch(_){ suppressPop--; } }
+}
+
+function openTripEdit(){
+  const t=curTrip(); if(!t || tvEd.draft) return;
+  tvEd.draft=JSON.parse(JSON.stringify(t)); tvEd.snap=JSON.stringify(tvEd.draft);
+  tvEd.day=Math.min(tvUI.day,Math.max(0,t.days.length-1)); tvEd.addOpen=false; tvEd.newColor=TV_SWATCHES[0];
+  tvEd.lastBuiltin=/^builtin:/.test(t.cover||'')?t.cover:'builtin:island';
+  document.body.classList.add('trip-edit');
+  tvEd.pg=pushPage({close:()=>{ tvEd.pg=null; closeTripEditUI(); }, guard:()=>!tvEdDirty(),
+    blocked:decide=>{ uiConfirm('放棄尚未儲存的修改？','編輯到一半的內容會遺失。','放棄修改',true).then(decide); }});
+  renderTripEdit(); $('tvEdit').scrollTop=0; window.scrollTo(0,0);
+}
+function closeTripEditUI(silent){
+  document.body.classList.remove('trip-edit'); tvEd.draft=null; $('tvEdit').innerHTML='';
+  if(!silent){ renderTripDetail(); renderTripList(); }
+}
+function tvEdClose(){ if(tvEd.pg){ const p=tvEd.pg; tvEd.pg=null; popPage(p); } closeTripEditUI(); }
+async function tvEdCancel(){
+  if(tvEdDirty()){ const ok=await uiConfirm('放棄尚未儲存的修改？','編輯到一半的內容會遺失。','放棄修改',true); if(!ok) return; }
+  tvEdClose();
+}
+function tvEdSave(){
+  const d=tvEd.draft; if(!d) return;
+  d.name=noSep(d.name).slice(0,30);
+  if(!d.name){ toast('請輸入旅程名稱'); const i=$('teName'); if(i) i.focus(); return; }
+  const i=trips.findIndex(x=>x.id===d.id);
+  if(i<0){ toast('找不到這趟旅程（可能已在其他裝置刪除）'); return; }
+  trips[i]=d; tvUI.day=Math.min(tvEd.day,Math.max(0,d.days.length-1));
+  queueSave(); tvEdClose(); renderTripList(); toast('已儲存變更');
+}
+
+/* 刪除自訂類別：已有項目（或「依類別」金額）在用時，先讓使用者選要改成哪個類別 */
+function tvPickCat(d,name,n,cc){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div'); ov.className='ui-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','刪除類別');
+    const dlg=document.createElement('div'); dlg.className='ui-dlg';
+    const opts=[{v:'__spot',l:'景點（不計花費）'}].concat(tvCats(d).filter(c=>c.name!==name).map(c=>({v:c.name,l:c.name})));
+    const why=[]; if(n) why.push('有 '+n+' 個行程項目使用這個類別'); if(cc) why.push('「依類別」記錄的金額也會併入新類別');
+    dlg.innerHTML='<h2>刪除類別「'+esc(name)+'」</h2><p>'+why.join('，')+'。請選擇要改成哪個類別：</p>'
+      +'<label class="ui-fl"><span>改成</span><select class="ui-in" id="tpSel">'+opts.map(o=>'<option value="'+esc(o.v)+'"'+(o.v==='其他'?' selected':'')+'>'+esc(o.l)+'</option>').join('')+'</select></label>'
+      +'<div class="ui-acts"><button type="button" class="ui-btn ghost" data-a="no">取消</button><button type="button" class="ui-btn danger" data-a="ok">改成並刪除</button></div>';
+    const done=v=>{ ov.remove(); document.removeEventListener('keydown',onKey,true); resolve(v); };
+    const onKey=e=>{ if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); done(null); } };
+    document.addEventListener('keydown',onKey,true);
+    dlg.querySelector('[data-a=no]').onclick=()=>done(null);
+    dlg.querySelector('[data-a=ok]').onclick=()=>{ const v=dlg.querySelector('#tpSel').value; done(v==='__spot'?'':v); };
+    ov.addEventListener('mousedown',e=>{ if(e.target===ov) done(null); });
+    ov.appendChild(dlg); document.body.appendChild(ov); dlg.querySelector('select').focus();
+  });
+}
+async function tvEdDelCat(name){
+  const d=tvEd.draft; let n=0;
+  d.days.forEach(x=>x.items.forEach(it=>{ if(it.cat===name) n++; }));
+  const cc=(d.catCosts[name]||0)>0;
+  if(n||cc){
+    const target=await tvPickCat(d,name,n,cc); if(target===null) return;
+    d.days.forEach(x=>x.items.forEach(it=>{ if(it.cat===name) it.cat=target; }));
+    if(cc && target) d.catCosts[target]=(d.catCosts[target]||0)+d.catCosts[name];
+  }
+  delete d.catCosts[name]; d.cats=d.cats.filter(c=>c.name!==name);
+  renderTripEdit();
+}
+async function tvEdDelDay(){
+  const d=tvEd.draft, di=tvEd.day; if(d.days.length<=1) return;
+  const n=d.days[di].items.length;
+  if(n){
+    const ok=await uiConfirm('刪除 Day '+(di+1)+'？','這天有 '+n+' 個行程項目，會一併刪除。後面的天數會往前遞補，返回日也會提前一天。','刪除這一天',true);
+    if(!ok) return;
+  }
+  d.days.splice(di,1); tvSyncEnd(d); renderTripEdit();
+}
+function tvEdSort(){
+  const items=tvEd.draft.days[tvEd.day].items, key=it=>/^\d{1,2}:\d{2}$/.test(it.time)?it.time.padStart(5,'0'):'99:99';
+  const idx=items.map((it,i)=>({it,i})).sort((a,b)=>key(a.it)<key(b.it)?-1:(key(a.it)>key(b.it)?1:a.i-b.i));
+  items.splice(0,items.length,...idx.map(x=>x.it)); renderTripEdit(); toast('已依時間排序');
+}
+
+const TV_GRIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg>';
+const TV_TRASH_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg>';
+const tvMoneyIn=(id,v,ph)=>'<span class="tv-pfx"><i>NT$</i><input class="ui-in" id="'+id+'" inputmode="numeric" autocomplete="off" value="'+(v!=null&&v>0?Number(v).toLocaleString('en-US'):(v===0?'0':''))+'" placeholder="'+(ph||'—')+'"></span>';
+
+function tvEdCostHtml(d){
+  const m=TV_MODES.find(x=>x.id===d.mode)||TV_MODES[2];
+  let h='<span class="tv-lbl">花費記錄方式</span><div class="tv-emodes" role="tablist" aria-label="花費記錄方式">'
+    +TV_MODES.map(x=>'<button type="button" role="tab" class="tv-emode'+(x.id===d.mode?' on':'')+'" data-m="'+x.id+'" aria-selected="'+(x.id===d.mode)+'">'+x.label+'</button>').join('')+'</div>'
+    +'<p class="tv-edesc">'+m.desc+'</p>';
+  if(d.mode==='total'){
+    h+='<label class="ui-fl"><span>整趟總花費</span>'+tvMoneyIn('teTotal',d.total)+'</label>';
+  } else if(d.mode==='cat'){
+    const names=tvCats(d).map(c=>c.name); Object.keys(d.catCosts).forEach(k=>{ if(!names.includes(k)) names.push(k); });
+    h+='<div class="tv-ecrows">'+names.map(n=>'<div class="tv-ecrow"><span class="nm"><i style="background:'+tvColor(d,n)+'"></i>'+esc(n)+'</span>'+tvMoneyIn('teCat_'+names.indexOf(n),d.catCosts[n]).replace('<input ','<input data-cat="'+esc(n)+'" ')+'</div>').join('')+'</div>'
+      +'<div class="tv-esum"><span>合計</span><b id="teCatSum">'+fmtMoney(tvTotal(d))+'</b></div>';
+  } else {
+    h+='<div class="tv-esum"><span>目前合計</span><b>'+fmtMoney(tvTotal(d))+'</b></div>';
+  }
+  return h;
+}
+
+function renderTripEdit(){
+  const d=tvEd.draft, box=$('tvEdit'); if(!d){ box.innerHTML=''; return; }
+  const sy=window.scrollY, st=box.scrollTop;
+  if(tvEd.day>=d.days.length) tvEd.day=Math.max(0,d.days.length-1);
+  const di=tvEd.day, day=d.days[di], isUrl=(d.cover||'').startsWith('url:');
+  const dd=day?tripDayDate(d,di):null;
+  let h='<div class="tv-etop"><button type="button" class="tv-btn2" id="teCancel">取消</button><h1 class="tv-etitle">編輯旅程</h1><button type="button" class="tv-btn2 pri" id="teSave">儲存變更</button></div>';
+  h+='<div class="tv-ecols">';
+  /* 行程 */
+  h+='<section class="tv-card tv-emain tv-e4" aria-label="行程"><span class="tv-lbl">行程</span><div class="tv-days" role="tablist" aria-label="選擇日期">';
+  d.days.forEach((_,i)=>{ const x=tripDayDate(d,i); h+='<button type="button" role="tab" class="tv-dtab'+(i===di?' is-on':'')+'" data-d="'+i+'" aria-selected="'+(i===di)+'"><b>Day '+(i+1)+'</b><span>'+(x?fmtMD(x):'—')+'</span></button>'; });
+  h+='<button type="button" class="tv-dtab tv-dadd" id="teAddDay" aria-label="新增一天"><b>＋</b><span>新增一天</span></button></div>';
+  if(day){
+    h+='<div class="tv-dayhead"><span class="tv-daytitle">Day '+(di+1)+(dd?' · '+fmtMD(dd):'')+'</span><span class="tv-daysum">'+(d.mode==='item'?'當日花費 <b>'+(tvDayTotal(d,di)>0?fmtMoney(tvDayTotal(d,di)):'—')+'</b>':'')+'</span></div>';
+    h+=day.items.length?'<ul class="tv-eitems" id="teItems"></ul>':'<div class="tv-emptyday">這天還沒有行程，按下面的按鈕新增第一個項目。</div>';
+    h+='<div class="tv-dayact"><button type="button" class="tv-additem" id="teAddItem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增行程項目</button>'+(day.items.length>1?'<button type="button" class="tv-sortbtn" id="teSort">依時間排序</button>':'')+'</div>';
+    if(d.days.length>1) h+='<button type="button" class="tv-btn2 danger tv-delday" id="teDelDay">'+TV_TRASH_SVG+'刪除 Day '+(di+1)+'</button>';
+  } else h+='<div class="tv-emptyday">這趟旅程還沒有天數，按上面的「＋」新增一天。</div>';
+  h+='</section><div class="tv-eside">';
+  /* 基本資料 */
+  h+='<section class="tv-card tv-ecard tv-e1" aria-label="基本資料"><span class="tv-lbl">基本資料</span>'
+    +'<label class="ui-fl"><span>旅程名稱</span><input class="ui-in" id="teName" maxlength="30" autocomplete="off" value="'+esc(d.name)+'"></label>'
+    +'<div class="tv-erow2"><label class="ui-fl"><span>出發日</span><input class="ui-in" id="teStart" type="date" value="'+esc(d.start)+'"></label><label class="ui-fl"><span>返回日</span><input class="ui-in" id="teEnd" type="date" value="'+esc(d.end)+'"></label></div>'
+    +'<div class="tv-ehint">共 '+d.days.length+' 天。改返回日會自動增減天數；縮短時若那幾天已有行程，會先問你。</div>'
+    +'<div class="ui-fl"><span>封面</span><div class="tv-ecovers" id="teCovers">'+TV_BUILTIN_KEYS.map(k=>'<button type="button" class="tv-ecov'+(!isUrl&&d.cover==='builtin:'+k?' on':'')+'" data-k="'+k+'" aria-label="內建封面：'+k+'">'+TV_COVERS[k]+'</button>').join('')+'</div></div>'
+    +'<label class="ui-fl"><span>或貼上封面圖片網址</span><input class="ui-in" id="teCoverUrl" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="https://" value="'+(isUrl?esc(d.cover.slice(4)):'')+'"></label>'
+    +'<div class="tv-ehint" id="teCvHint">只儲存連結，不會上傳檔案。網址打不開時會改用內建插圖。</div><div class="tv-ecvprev" id="teCvPrev" style="display:none"></div></section>';
+  /* 花費記錄方式 */
+  h+='<section class="tv-card tv-ecard tv-e2" id="teCost" aria-label="花費記錄方式">'+tvEdCostHtml(d)+'</section>';
+  /* 類別 */
+  h+='<section class="tv-card tv-ecard tv-e3" aria-label="這趟旅程的類別"><span class="tv-lbl">這趟旅程的類別</span><div class="tv-ichips" id="teCats">'
+    +TRIP_DEFAULT_CATS.map(c=>'<span class="tv-ichip tv-ecat"><i style="background:'+c.color+'"></i>'+esc(c.name)+'</span>').join('')
+    +d.cats.map(c=>'<span class="tv-ichip tv-ecat custom"><i style="background:'+esc(c.color)+'"></i>'+esc(c.name)+'<button type="button" class="x" data-c="'+esc(c.name)+'" aria-label="刪除類別 '+esc(c.name)+'">×</button></span>').join('')
+    +'<button type="button" class="tv-ichip add'+(tvEd.addOpen?' on':'')+'" id="teCatAdd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增自訂類別</button></div>'
+    +(tvEd.addOpen?'<div class="tv-newcat"><div class="tv-nrow"><label class="ui-fl"><span>新類別名稱</span><input class="ui-in" id="teNewName" maxlength="10" placeholder="例如：租車、門票" autocomplete="off"></label><button type="button" class="tv-go" id="teNewGo">加入</button></div><div class="tv-sws" role="group" aria-label="類別顏色">'
+      +TV_SWATCHES.map(c=>'<button type="button" class="tv-sw'+(c===tvEd.newColor?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="顏色 '+c+'"></button>').join('')+'</div></div>':'')
+    +'<div class="tv-ehint">前五個是預設類別；自訂類別只會用在這趟旅程，可按 × 刪除。「景點」不算類別，代表不計花費。</div></section>';
+  /* 危險區 */
+  h+='<section class="tv-card tv-ecard tv-edanger tv-e5" aria-label="刪除旅程"><span class="tv-lbl">危險區</span><p class="tv-edesc">行程與花費紀錄會一併刪除，無法復原。</p><button type="button" class="tv-btn2 danger" id="teDelTrip">'+TV_TRASH_SVG+'刪除這趟旅程</button></section>';
+  h+='</div></div>';
+  box.innerHTML=h;
+  const $$=s=>box.querySelector(s);
+
+  /* 事件：頂列 */
+  $$('#teCancel').onclick=tvEdCancel; $$('#teSave').onclick=tvEdSave;
+  /* 基本資料 */
+  $$('#teName').addEventListener('input',e=>{ d.name=e.target.value; });
+  $$('#teStart').addEventListener('change',e=>{
+    const v=e.target.value; if(!ymdToDate(v)){ e.target.value=d.start||''; toast('請選擇出發日'); return; }
+    d.start=v; tvSyncEnd(d); renderTripEdit();
+  });
+  $$('#teEnd').addEventListener('change',async e=>{
+    const el=e.target, v=el.value, a=ymdToDate(d.start), b=ymdToDate(v), back=()=>{ el.value=d.end||''; };
+    if(!a){ toast('請先設定出發日'); back(); return; }
+    if(!b){ back(); return; }
+    const n=Math.round((b-a)/86400000)+1;
+    if(n<1){ toast('返回日不能早於出發日'); back(); return; }
+    if(n>60){ toast('一趟旅程最多 60 天'); back(); return; }
+    if(n<d.days.length){
+      const cut=d.days.slice(n), cnt=cut.reduce((s,x)=>s+x.items.length,0);
+      if(cnt>0){
+        const ok=await uiConfirm('縮短旅程？','Day '+(n+1)+(cut.length>1?' – Day '+d.days.length:'')+' 共有 '+cnt+' 個行程項目，縮短後這些天與其中的項目會一併刪除。','刪除並縮短',true);
+        if(!ok){ back(); return; }
+      }
+      d.days.length=n;
+    } else while(d.days.length<n) d.days.push({items:[]});
+    tvSyncEnd(d); renderTripEdit();
+  });
+  /* 封面 */
+  const coverUI=()=>{
+    const url=(d.cover||'').startsWith('url:'), prev=$$('#teCvPrev'), hint=$$('#teCvHint');
+    box.querySelectorAll('.tv-ecov').forEach(b=>b.classList.toggle('on',!url && d.cover==='builtin:'+b.dataset.k));
+    prev.innerHTML=''; hint.textContent='只儲存連結，不會上傳檔案。網址打不開時會改用內建插圖。'; hint.classList.remove('bad');
+    if(url && d.cover.length>8){
+      prev.style.display=''; prev.appendChild(buildCoverEl(d.cover,'tv-cvr'));
+      const img=prev.querySelector('img'); if(img) img.addEventListener('error',()=>{ hint.textContent='這個網址無法載入圖片，旅程會改用內建插圖。'; hint.classList.add('bad'); });
+    } else prev.style.display='none';
+  };
+  box.querySelectorAll('.tv-ecov').forEach(b=>b.onclick=()=>{ d.cover='builtin:'+b.dataset.k; tvEd.lastBuiltin=d.cover; $$('#teCoverUrl').value=''; coverUI(); });
+  const urlIn=$$('#teCoverUrl');
+  urlIn.addEventListener('change',()=>{
+    const v=urlIn.value.trim();
+    if(!v){ if((d.cover||'').startsWith('url:')) d.cover=tvEd.lastBuiltin; coverUI(); return; }
+    if(!/^https?:\/\/[^\s]+$/i.test(v)){ toast('請貼上 http:// 或 https:// 開頭的網址'); urlIn.value=(d.cover||'').startsWith('url:')?d.cover.slice(4):''; return; }
+    d.cover='url:'+v; coverUI();
+  });
+  urlIn.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); urlIn.blur(); } });
+  coverUI();
+  /* 花費 */
+  box.querySelectorAll('.tv-emode').forEach(b=>b.onclick=()=>{ d.mode=b.dataset.m; renderTripEdit(); });
+  const fmtIn=el=>{ const n=numOrNull(el.value); el.value=n==null?'':n.toLocaleString('en-US'); };
+  const tot=$$('#teTotal'); if(tot){
+    tot.addEventListener('input',()=>{ const n=numOrNull(tot.value); d.total=n==null||n<0?null:n; });
+    tot.addEventListener('change',()=>{ fmtIn(tot); });
+  }
+  box.querySelectorAll('[data-cat]').forEach(inp=>{
+    const name=inp.dataset.cat;
+    inp.addEventListener('input',()=>{ const n=numOrNull(inp.value); if(n==null||n<=0) delete d.catCosts[name]; else d.catCosts[name]=n; $$('#teCatSum').textContent=fmtMoney(tvTotal(d)); });
+    inp.addEventListener('change',()=>{ fmtIn(inp); });
+  });
+  /* 類別 */
+  box.querySelectorAll('#teCats .x').forEach(b=>b.onclick=()=>tvEdDelCat(b.dataset.c));
+  $$('#teCatAdd').onclick=()=>{ tvEd.addOpen=!tvEd.addOpen; renderTripEdit(); const i=$('teNewName'); if(i) i.focus(); };
+  if(tvEd.addOpen){
+    box.querySelectorAll('.tv-sw').forEach(b=>b.onclick=()=>{ tvEd.newColor=b.dataset.c; box.querySelectorAll('.tv-sw').forEach(x=>x.classList.toggle('on',x===b)); });
+    const add=()=>{
+      const name=noSep($$('#teNewName').value).replace(/[|=]/g,'').slice(0,10);
+      if(!name){ toast('請輸入類別名稱'); return; }
+      if(name==='景點' || tvCats(d).some(c=>c.name===name)){ toast('已有同名的類別'); return; }
+      d.cats.push({name,color:tvEd.newColor}); tvEd.addOpen=false; renderTripEdit();
+    };
+    $$('#teNewGo').onclick=add;
+    $$('#teNewName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); } });
+  }
+  /* 行程 */
+  box.querySelectorAll('.tv-dtab[data-d]').forEach(b=>b.onclick=()=>{ tvEd.day=+b.dataset.d; renderTripEdit(); });
+  $$('#teAddDay').onclick=()=>{
+    if(d.days.length>=60){ toast('一趟旅程最多 60 天'); return; }
+    d.days.push({items:[]}); tvSyncEnd(d); tvEd.day=d.days.length-1; renderTripEdit();
+  };
+  if(day){
+    const ul=$$('#teItems');
+    if(ul){
+      day.items.forEach((it,i)=>{
+        const li=document.createElement('li'); li.className='tv-er'; li.__item=it; li.style.setProperty('--c',tvColor(d,it.cat));
+        const cost=(d.mode==='item' && it.cat && it.cost>0)?fmtMoney(it.cost):'';
+        li.innerHTML='<span class="hd" aria-hidden="true">'+TV_GRIP+'</span><button type="button" class="tv-erb" aria-label="編輯：'+esc(it.name)+'"><span class="tm">'+esc(it.time||'—')+'</span><span class="mid"><span class="nm">'+esc(it.name)+'</span><span class="ct"><i style="background:'+tvColor(d,it.cat)+'"></i>'+esc(it.cat||'景點')+(it.note?'・'+esc(it.note):'')+'</span></span><span class="cs">'+cost+'</span></button>';
+        li.querySelector('.tv-erb').onclick=()=>openItemDialog(d,di,i,{onChange:nd=>{ tvEd.day=nd; renderTripEdit(); }});
+        if(COARSE) attachTouchDrag(li,day.items,it,renderTripEdit); else attachDrag(li,day.items,it,renderTripEdit);
+        ul.appendChild(li);
+      });
+      attachDropZoneEnd(ul,()=>day.items,renderTripEdit,()=>false);
+    }
+    $$('#teAddItem').onclick=()=>openItemDialog(d,di,null,{onChange:nd=>{ tvEd.day=nd; renderTripEdit(); }});
+    const so=$$('#teSort'); if(so) so.onclick=tvEdSort;
+    const dl=$$('#teDelDay'); if(dl) dl.onclick=tvEdDelDay;
+  }
+  $$('#teDelTrip').onclick=tvDeleteTrip;
+  window.scrollTo(0,sy); box.scrollTop=st;
+}
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
 (async function boot(){
