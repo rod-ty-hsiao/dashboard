@@ -868,7 +868,7 @@ body.trip-open .tv-detail { display: flex; flex-direction: column; }
 .tv-pill { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: #EDE5D7; color: #5E5446; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tv-x { appearance: none; margin-left: auto; width: 36px; height: 36px; border-radius: 50%; border: 0; background: transparent; color: var(--muted); font-size: 24px; line-height: 1; cursor: pointer; }
 .tv-x:hover { background: #F0E8DA; }
-.tv-irow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.tv-irow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
 .tv-pfx { position: relative; display: block; }
 .tv-pfx i { position: absolute; left: 12px; top: 0; height: 46px; display: flex; align-items: center; font-style: normal; font-size: 13px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; pointer-events: none; }
 .tv-pfx .ui-in { padding-left: 46px; text-align: right; font-family: ui-monospace, Consolas, monospace; font-weight: 600; }
@@ -945,7 +945,7 @@ body.trip-open .tv-detail { display: flex; flex-direction: column; }
   /* 項目編輯：底部面板 */
   .tv-ov { align-items: end; padding: 0; }
   .tv-idlg { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 28px 28px 0 0; padding: 20px 20px calc(18px + env(safe-area-inset-bottom, 0px)); }
-  .tv-irow { grid-template-columns: 1.3fr 1fr; }
+  .tv-irow { grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); }
   .tv-irow #tiCostWrap { grid-column: 1 / -1; }
   .tv-ifoot { position: sticky; bottom: -18px; background: var(--card); padding-bottom: 6px; }
   .tv-idel span { display: none; }
@@ -956,6 +956,14 @@ body.trip-open .tv-detail { display: flex; flex-direction: column; }
   .ui-ov.tv-ov .ui-acts { flex-direction: row; }
   .ui-in { font-size: 16px !important; }
 }
+
+/* 日期／時間欄位：iOS 原生控制項有固有最小寬度，會把欄位撐出對話框 */
+.ui-dlg, .ui-ov { overflow-x: hidden; max-width: 100%; }
+.ui-fl, .tv-irow > *, .tv-pfx { min-width: 0; max-width: 100%; }
+.ui-in[type="date"], .ui-in[type="time"] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; box-sizing: border-box; line-height: 1.2; }
+.ui-in[type="date"]::-webkit-date-and-time-value, .ui-in[type="time"]::-webkit-date-and-time-value { text-align: left; min-width: 0; margin: 0; }
+.ui-in[type="date"]::-webkit-datetime-edit, .ui-in[type="time"]::-webkit-datetime-edit { padding: 0; }
+@media (max-width: 720px) { .ui-ov, .tv-idlg, .ui-dlg { touch-action: pan-y; overscroll-behavior-x: none; } }
 </style>
 </head>
 <body>
@@ -2874,7 +2882,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-01.16';
+const APP_VERSION='2026-11-01.17';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
