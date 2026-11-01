@@ -577,6 +577,150 @@ body.connected .file-out { display: inline-block; }
 .banner-row-btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; }
 .banner-row-btn:disabled { opacity: .25; cursor: default; }
 @media (max-width: 720px) { .banner-row-btn { width: 38px; height: 38px; font-size: 17px; } .banner-row { gap: 5px; } .banner-row-del { padding: 0 6px; font-size: 20px; } }
+
+/* ===== 對話框（確認／輸入／選單）===== */
+.ui-ov { position: fixed; inset: 0; z-index: 150; background: rgba(32,26,20,.52); display: grid; place-items: center; padding: 24px; }
+.ui-dlg { width: min(440px, 100%); background: var(--card); border-radius: 24px; padding: 26px 26px 22px; box-shadow: 0 30px 80px -20px rgba(20,14,8,.5); display: flex; flex-direction: column; gap: 12px; }
+.ui-ic { width: 48px; height: 48px; border-radius: 50%; background: #FBEDE9; color: #A8321F; display: grid; place-items: center; }
+.ui-dlg h2 { margin: 0; font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-weight: 700; font-size: 22px; line-height: 1.35; overflow-wrap: anywhere; }
+.ui-dlg p { margin: 0; font-size: 15px; line-height: 1.7; color: #4A4138; }
+.ui-in { font: inherit; font-size: 16px; color: var(--ink); background: #fff; border: 1.5px solid #D8CDBB; border-radius: 12px; height: 46px; padding: 0 14px; width: 100%; }
+.ui-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.ui-acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.ui-btn { appearance: none; height: 46px; padding: 0 22px; border-radius: 14px; border: 0; font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; }
+.ui-btn.ghost { background: #fff; border: 1.5px solid #D8CDBB; color: var(--ink); }
+.ui-btn.primary { background: var(--accent); color: #fff; }
+.ui-btn.danger { background: #A8321F; color: #fff; }
+.ui-btn:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+@media (max-width: 720px) { .ui-ov { align-items: end; padding: 12px; } .ui-dlg { border-radius: 26px; } .ui-acts { flex-direction: column-reverse; } .ui-btn { width: 100%; height: 50px; } }
+
+/* ===== Notes（網頁三欄）===== */
+.mm-ws { display: grid; grid-template-columns: 224px 352px minmax(0,1fr); height: calc(100vh - 192px); min-height: 560px; overflow: hidden; }
+@media (min-width: 721px) { body.tab-memo .foot { display: none; } body.tab-memo .main { padding-bottom: 28px; } }
+.mm-colf { padding: 24px 14px; border-right: 1px solid #EFE8DB; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 0; }
+.mm-coll { padding: 20px 12px; border-right: 1px solid #EFE8DB; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-width: 0; min-height: 0; }
+.mm-cole { position: relative; padding: 24px 40px 40px; display: flex; flex-direction: column; gap: 20px; min-width: 0; min-height: 0; overflow-y: auto; }
+.mm-lbl { font-size: 12.5px; font-weight: 500; letter-spacing: .16em; color: var(--muted); padding: 0 10px 8px; }
+.mm-foldrow { position: relative; }
+.mm-fold { appearance: none; border: 0; background: transparent; font: inherit; font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 10px; width: 100%; height: 44px; padding: 0 12px; border-radius: 12px; cursor: pointer; text-align: left; transition: background .15s; }
+.mm-fold:hover { background: #F6EFE3; }
+.mm-fold.is-on { background: #F3E4DA; font-weight: 500; }
+.mm-fold svg { flex: none; color: var(--muted); }
+.mm-fold.is-on svg { color: var(--accent); }
+.mm-fold .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mm-fold .ct { font-size: 13px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; }
+.mm-fmore { position: absolute; right: 6px; top: 6px; width: 32px; height: 32px; border-radius: 10px; border: 0; background: #F3E4DA; color: var(--ink); display: grid; place-items: center; cursor: pointer; opacity: 0; }
+.mm-foldrow:hover .mm-fmore, .mm-foldrow:focus-within .mm-fmore { opacity: 1; }
+.mm-foldrow:hover .ct { opacity: 0; }
+.mm-addf { appearance: none; font: inherit; font-size: 14.5px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; margin-top: auto; background: transparent; border: 1.5px dashed #D8CDBB; border-radius: 12px; cursor: pointer; }
+.mm-addf:hover { border-color: var(--accent); color: var(--accent); }
+.mm-fold:focus-visible, .mm-row:focus-visible, .mm-ib:focus-visible, .mm-addf:focus-visible, .mm-newb:focus-visible, .mm-fmore:focus-visible, .mm-chip:focus-visible, .mm-back:focus-visible, .mm-done:focus-visible, .mm-fab:focus-visible, .mm-chipf:focus-within { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 1px; }
+
+.mm-searchrow { display: flex; gap: 10px; padding: 0 2px 6px; }
+.mm-searchwrap { position: relative; flex: 1; min-width: 0; }
+.mm-searchwrap svg { position: absolute; left: 14px; top: 13px; pointer-events: none; }
+.mm-field { font: inherit; font-size: 15px; color: var(--ink); background: #fff; border: 1.5px solid #D8CDBB; border-radius: 14px; height: 44px; padding: 0 14px 0 40px; width: 100%; }
+.mm-field::placeholder { color: #7C7268; }
+.mm-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.mm-newb { appearance: none; border: 0; flex: none; width: 44px; height: 44px; border-radius: 14px; background: var(--accent); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.mm-newb:hover { filter: brightness(.94); }
+.mm-chips { display: none; }
+.mm-glabel { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; letter-spacing: .12em; color: var(--muted); padding: 16px 10px 6px; }
+.mm-row { appearance: none; border: 0; background: transparent; font: inherit; text-align: left; width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px; cursor: pointer; transition: background .15s; }
+.mm-row:hover { background: #F6EFE3; }
+.mm-row.is-sel { background: #F3E4DA; }
+.mm-rt { font-size: 15.5px; font-weight: 700; line-height: 1.4; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mm-rt.none { color: #8A8074; font-weight: 500; }
+.mm-rs { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.5; color: var(--muted); min-width: 0; }
+.mm-rs .d { flex: none; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; padding-top: 1px; }
+.mm-rs .p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mm-rf { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.mm-nolist { color: #8A8074; font-size: 14px; padding: 18px 12px; }
+
+.mm-mhead, .mm-mtools { display: none; }
+.mm-etop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.mm-stamp { font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+.mm-eacts { display: flex; align-items: center; gap: 6px; }
+.mm-ib { appearance: none; border: 0; background: transparent; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
+.mm-ib:hover { background: #F3EBDD; color: var(--ink); }
+.mm-ib.on { color: var(--accent); background: #F3E4DA; }
+.mm-chipf { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px 0 14px; border-radius: 999px; background: #F0E8DA; color: #5E5446; font-size: 13.5px; font-weight: 500; margin-right: 6px; }
+.mm-chipf select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: inherit; padding: 0 2px; cursor: pointer; max-width: 150px; text-overflow: ellipsis; }
+.mm-chipf select:focus { outline: none; }
+.mm-erow { display: grid; grid-template-columns: 44px minmax(0,1fr); column-gap: 14px; }
+.mm-gl { font-size: 12px; font-weight: 500; letter-spacing: .1em; color: #7C7268; padding-top: 10px; }
+.mm-title { display: block; width: 100%; margin: 0; padding: 0; border: 0; background: transparent; resize: none; overflow: hidden; font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-weight: 700; font-size: 34px; line-height: 1.4; letter-spacing: .01em; color: var(--ink); overflow-wrap: anywhere; }
+.mm-title::placeholder { color: #B9AE9E; }
+.mm-title:focus, .mm-body:focus { outline: none; }
+.mm-bodywrap { min-width: 0; }
+.mm-body { display: block; width: 100%; min-height: 140px; margin: 0; padding: 0; border: 0; background: transparent; resize: none; overflow: hidden; font: inherit; font-size: 17px; line-height: 1.95; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.mm-body::placeholder { color: #B9AE9E; }
+.mm-render { display: none; font-size: 17px; line-height: 1.95; color: var(--ink); min-height: 140px; cursor: text; overflow-wrap: anywhere; }
+.mm-render:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 4px; border-radius: 8px; }
+.mm-line { white-space: pre-wrap; min-height: 1.95em; }
+.mm-ck { display: flex; align-items: flex-start; gap: 12px; padding: 2px 0; cursor: pointer; }
+.mm-ck input { flex: none; width: 22px; height: 22px; margin: 8px 0 0; accent-color: var(--accent); cursor: pointer; }
+.mm-ck span { white-space: pre-wrap; min-width: 0; }
+.mm-ck.done span { color: #857A6E; text-decoration: line-through; }
+.mm-code { margin: 8px 0; font: 14px/1.7 ui-monospace, 'Cascadia Mono', Consolas, monospace; white-space: pre-wrap; color: #3C342D; background: #F6F1E6; border-radius: 14px; padding: 14px 18px; overflow: auto; }
+.mm-empty { display: none; color: #8A8074; font-size: 15px; padding: 40px 0; text-align: center; }
+.mm-cole.mm-none > :not(.mm-empty) { display: none !important; }
+.mm-cole.mm-none .mm-empty { display: block; }
+.mm-fab { display: none; }
+@media (max-width: 1100px) and (min-width: 721px) { .mm-ws { grid-template-columns: minmax(0,1fr); height: auto; overflow: visible; } .mm-colf, .mm-coll { border-right: 0; border-bottom: 1px solid #EFE8DB; overflow: visible; } .mm-cole { overflow: visible; } }
+
+/* ===== Notes（手機）===== */
+@media (max-width: 720px) {
+  body.tab-memo .tabbar { display: none; }
+  body.tab-memo .main { padding-bottom: 40px; }
+  .mm-ws { display: block; height: auto; min-height: 0; overflow: visible; }
+  .mm-colf { display: none; }
+  .mm-coll { padding: 0; border: 0; overflow: visible; gap: 14px; }
+  .mm-searchrow { padding: 0; }
+  .mm-newb { display: none; }
+  .mm-field { height: 48px; border-radius: 16px; border: 1.5px solid #E3DACB; background: var(--card); font-size: 16px; padding-left: 46px; }
+  .mm-searchwrap svg { left: 16px; top: 14px; width: 20px; height: 20px; }
+  .mm-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+  .mm-chips::-webkit-scrollbar { display: none; }
+  .mm-chip { appearance: none; flex: none; border: 0; font: inherit; font-size: 14.5px; font-weight: 500; height: 40px; padding: 0 16px; border-radius: 999px; background: #EDE5D7; color: #5E5446; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .mm-chip.on { background: var(--ink); color: #fff; }
+  .mm-chip.add { background: transparent; border: 1.5px dashed #D3C7B4; color: var(--muted); }
+  .mm-chip .c { opacity: .8; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+  .mm-group { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; box-shadow: 0 8px 24px -16px rgba(70,50,30,.2); }
+  .mm-glabel { padding: 6px 8px 8px; font-size: 13px; letter-spacing: .1em; }
+  .mm-gwrap { display: flex; flex-direction: column; }
+  .mm-row { border-radius: 0; padding: 14px 18px 13px; gap: 3px; }
+  .mm-row + .mm-row { border-top: 1px solid #EFE8DB; }
+  .mm-row:hover { background: transparent; }
+  .mm-row.is-sel { background: transparent; }
+  .mm-rt { font-size: 16.5px; }
+  .mm-rs { font-size: 14px; }
+  .mm-fab { display: grid; position: fixed; right: 20px; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); width: 58px; height: 58px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; place-items: center; box-shadow: 0 10px 24px -6px rgba(181,83,47,.55); cursor: pointer; z-index: 40; }
+  body.memo-open .mm-fab { display: none; }
+
+  /* 編輯頁：滿版 */
+  .mm-cole { display: none; }
+  body.memo-open .mm-cole { display: flex; position: fixed; inset: 0; z-index: 90; background: #F6F2EA; padding: calc(64px + env(safe-area-inset-top, 0px)) 24px calc(92px + env(safe-area-inset-bottom, 0px)); gap: 14px; overflow-y: auto; overscroll-behavior: contain; }
+  body.memo-open .mm-mhead { display: flex; position: fixed; left: 0; right: 0; top: 0; z-index: 3; align-items: center; justify-content: space-between; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 6px 6px; background: #F6F2EA; }
+  .mm-back { appearance: none; border: 0; background: transparent; font: inherit; font-size: 17px; font-weight: 500; color: var(--accent); display: inline-flex; align-items: center; gap: 2px; height: 44px; padding: 0 8px 0 0; cursor: pointer; }
+  .mm-mright { display: flex; align-items: center; gap: 2px; }
+  .mm-mhead .mm-ib { width: 44px; height: 44px; border-radius: 50%; color: var(--ink); }
+  .mm-mhead .mm-ib.on { color: var(--accent); background: #F3E4DA; }
+  .mm-etop { flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .mm-dsk { display: none; }
+  .mm-chipf { margin-right: 0; height: 34px; font-size: 14px; }
+  .mm-chipf select { font-size: 16px; max-width: 60vw; }
+  .mm-erow { grid-template-columns: minmax(0,1fr); }
+  .mm-gl { display: none; }
+  .mm-title { font-size: 30px !important; }          /* 蓋過手機版「輸入框一律 16px」的全域規則 */
+  .mm-body { font-size: 17.5px !important; }
+  .mm-render { font-size: 17.5px; }
+  body.memo-open .mm-mtools { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(76px + env(safe-area-inset-bottom, 0px)); align-items: flex-start; justify-content: space-between; padding: 10px 12px 0 14px; background: var(--card); border-top: 1px solid var(--line); }
+  .mm-mtl { display: flex; align-items: center; gap: 4px; }
+  .mm-mtools .mm-ib { width: 44px; height: 44px; border-radius: 50%; color: var(--ink); }
+  .mm-done { appearance: none; border: 0; background: transparent; font: inherit; font-size: 17px; font-weight: 700; color: var(--accent); height: 44px; padding: 0 6px; cursor: pointer; }
+  .mm-cole.mm-none { display: none; }
+}
 </style>
 </head>
 <body>
@@ -588,6 +732,10 @@ body.connected .file-out { display: inline-block; }
       <button class="nav-item is-active" type="button" data-tab="todo" aria-label="清單" aria-current="page" title="清單">
         <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></span>
         <span class="lb">清單</span>
+      </button>
+      <button class="nav-item" type="button" data-tab="memo" aria-label="Notes" title="Notes">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l4.5 4.5v10.5a2 2 0 01-2 2H6a2 2 0 01-2-2v-13a2 2 0 012-2z"/><path d="M14.5 3.5V8h5"/><path d="M8 13h8M8 16.5h5"/></svg></span>
+        <span class="lb">Notes</span>
       </button>
       <button class="nav-item" type="button" data-tab="shows" aria-label="影集" title="影集">
         <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M10.2 8.6v4.8l4-2.4z"/><path d="M8 20.5h8"/></svg></span>
@@ -673,6 +821,72 @@ body.connected .file-out { display: inline-block; }
         </aside>
       </div>
 
+      <div id="memoView" style="display:none">
+        <section class="card mm-ws" aria-label="Notes">
+
+          <div class="mm-colf">
+            <span class="mm-lbl">資料夾</span>
+            <div id="mmFolders" class="mm-folders"></div>
+            <button type="button" class="mm-addf" id="mmAddFolder"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增資料夾</button>
+          </div>
+
+          <div class="mm-coll">
+            <div class="mm-searchrow">
+              <div class="mm-searchwrap">
+                <input class="mm-field" id="mmSearch" type="search" placeholder="搜尋標題或內容" aria-label="搜尋 Notes" autocomplete="off">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6259" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+              </div>
+              <button type="button" class="mm-newb" id="mmNew" aria-label="新增 Note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
+            </div>
+            <div class="mm-chips" id="mmChips" role="group" aria-label="資料夾"></div>
+            <div id="mmList"></div>
+          </div>
+
+          <div class="mm-cole" id="mmEditor">
+            <div class="mm-mhead">
+              <button type="button" class="mm-back" id="mmBack"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Notes</button>
+              <div class="mm-mright">
+                <button type="button" class="mm-ib" id="mmPinM" aria-label="釘選"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3z"/><path d="M12 13.5V20"/></svg></button>
+              </div>
+            </div>
+            <div class="mm-etop">
+              <span class="mm-stamp" id="mmStamp"></span>
+              <div class="mm-eacts">
+                <label class="mm-chipf" title="移到資料夾"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 012-2h4l2 2.5h7a2 2 0 012 2v7.5a2 2 0 01-2 2h-13a2 2 0 01-2-2z"/></svg><select id="mmFolderSel" aria-label="資料夾"></select><svg class="mm-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></label>
+                <button type="button" class="mm-ib mm-dsk" id="mmPin" aria-label="釘選"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3z"/><path d="M12 13.5V20"/></svg></button>
+                <button type="button" class="mm-ib mm-dsk" id="mmCheck" aria-label="插入核取清單"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></button>
+                <button type="button" class="mm-ib mm-dsk" id="mmCode" aria-label="插入程式碼區塊"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 7l-5 5 5 5M15.5 7l5 5-5 5"/></svg></button>
+                <button type="button" class="mm-ib mm-dsk" id="mmDel" aria-label="刪除"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg></button>
+              </div>
+            </div>
+
+            <div class="mm-erow">
+              <span class="mm-gl">標題</span>
+              <textarea class="mm-title mm-keep" id="mmTitle" rows="1" placeholder="標題（可留空）" aria-label="標題" enterkeyhint="next" spellcheck="false"></textarea>
+            </div>
+            <div class="mm-erow">
+              <span class="mm-gl">內容</span>
+              <div class="mm-bodywrap">
+                <textarea class="mm-body mm-keep" id="mmBody" placeholder="內容" aria-label="內容"></textarea>
+                <div class="mm-render" id="mmRender" tabindex="0" aria-label="內容（點一下編輯）"></div>
+              </div>
+            </div>
+
+            <nav class="mm-mtools" aria-label="編輯工具">
+              <div class="mm-mtl">
+                <button type="button" class="mm-ib" id="mmCheckM" aria-label="插入核取清單"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></button>
+                <button type="button" class="mm-ib" id="mmCodeM" aria-label="插入程式碼區塊"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 7l-5 5 5 5M15.5 7l5 5-5 5"/></svg></button>
+                <button type="button" class="mm-ib" id="mmDelM" aria-label="刪除"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg></button>
+              </div>
+              <button type="button" class="mm-done" id="mmDone">完成</button>
+            </nav>
+
+            <div class="mm-empty" id="mmEmpty">選一則 Note，或按右上角的鉛筆新增。</div>
+          </div>
+        </section>
+        <button type="button" class="mm-fab" id="mmFab" aria-label="新增 Note"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
+      </div>
+
       <div id="showsView" style="display:none">
         <div class="show-subtabs">
           <button class="tool-btn" id="statsToggle" title="顯示/隱藏統計儀表板">📊 統計</button>
@@ -742,6 +956,7 @@ body.connected .file-out { display: inline-block; }
 <aside class="drawer" id="drawer" aria-label="選單" aria-hidden="true">
   <div class="d-head"><div class="d-title">Dashboard</div><div class="d-date" id="drawerDate"></div></div>
   <button class="d-item is-active" type="button" data-tab="todo"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></span><span>清單</span></button>
+  <button class="d-item" type="button" data-tab="memo"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l4.5 4.5v10.5a2 2 0 01-2 2H6a2 2 0 01-2-2v-13a2 2 0 012-2z"/><path d="M14.5 3.5V8h5"/><path d="M8 13h8M8 16.5h5"/></svg></span><span>Notes</span></button>
   <button class="d-item" type="button" data-tab="shows"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M10.2 8.6v4.8l4-2.4z"/><path d="M8 20.5h8"/></svg></span><span>影集</span></button>
   <button class="d-item" type="button" data-tab="food"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.2s-6.6-5.5-6.6-11.2a6.6 6.6 0 0113.2 0c0 5.7-6.6 11.2-6.6 11.2z"/><path d="M10.2 6.6v2.5a1.8 1.8 0 003.6 0V6.6M12 6.6v6.4"/></svg></span><span>美食地圖</span></button>
   <div class="d-spacer"></div>
@@ -1524,7 +1739,9 @@ function smodalField(label, el){
 function smodalShell(extraClass){
   const bg=document.createElement('div'); bg.className='smodal-bg';
   const state={locked:false}; // locked=true 時（編輯中）點背景與 Esc 都不關閉，避免誤觸遺失輸入
-  const close=()=>{ bg.remove(); document.removeEventListener('keydown',esc); };
+  let pg=null;
+  const realClose=()=>{ bg.remove(); document.removeEventListener('keydown',esc); };
+  const close=()=>{ if(pg){ const p=pg; pg=null; popPage(p); } realClose(); };
   const esc=e=>{ if(e.key==='Escape'&&!state.locked) close(); };
   bg.onclick=e=>{ if(e.target===bg&&!state.locked) close(); };
   document.addEventListener('keydown',esc);
@@ -1534,6 +1751,7 @@ function smodalShell(extraClass){
   }catch(e){} },900);
   const m=document.createElement('div'); m.className='smodal'+(extraClass?' '+extraClass:'');
   bg.appendChild(m); document.body.appendChild(bg);
+  if(MQ_MOBILE.matches) pg=pushPage({close:()=>{ pg=null; realClose(); }, guard:()=>!state.locked || confirm('放棄尚未儲存的修改？')});   // iPhone 左緣右滑 = 返回
   return {m, close, state};
 }
 function bannerUrls(item){
@@ -2129,7 +2347,7 @@ $('foodImportFile').addEventListener('change', async e=>{
 });
 
 /* ---------- 頁籤切換 ---------- */
-const TAB_TITLES={todo:'清單',shows:'影集',food:'美食地圖'};
+const TAB_TITLES={todo:'清單',memo:'Notes',shows:'影集',food:'美食地圖'};
 function updateEyebrow(){
   const d=new Date();
   const t=d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日 · 週'+'日一二三四五六'[d.getDay()];
@@ -2139,6 +2357,7 @@ function updateEyebrow(){
 function switchAppTab(tab){
   activeAppTab=tab;
   $('todoView').style.display = tab==='todo' ? 'grid' : 'none';
+  $('memoView').style.display = tab==='memo' ? 'block' : 'none';
   $('showsView').style.display = tab==='shows' ? 'block' : 'none';
   $('foodView').style.display = tab==='food' ? 'block' : 'none';
   document.querySelectorAll('.nav-item, .d-item').forEach(b=>{
@@ -2149,9 +2368,12 @@ function switchAppTab(tab){
   $('pageTitle').textContent=TAB_TITLES[tab]||'Dashboard';
   updateEyebrow();
   document.body.classList.toggle('tab-shows', tab==='shows');
+  document.body.classList.toggle('tab-memo', tab==='memo');
+  if(tab!=='memo' && document.body.classList.contains('memo-open')) closeMemoPage();
   const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.content = tab==='shows' ? '#141413' : '#F6F1E9';
   if(tab!=='shows') document.body.classList.remove('mstats');
   updateTabbar();
+  if(tab==='memo'){ scrollReset=true; renderMemos(); }
   if(tab==='shows'){ scrollReset=true; renderShows(); }
   if(tab==='food'){ initFoodMap(); scrollReset=true; renderFoods(); }
 }
@@ -2217,16 +2439,176 @@ $('filterGenre').addEventListener('change', e=>{ showFilter[activeShowTab].genre
 $('showSearch').addEventListener('input', e=>{ showFilter[activeShowTab].q=e.target.value; scrollReset=true; renderShows(); });
 
 /* ---------- 檔案讀寫(Google 雲端 / 本機檔案) ---------- */
+/* ---------- 檔案區段切分（整行比對）---------- */
+const SECTION_NAMES=['Tasks','Notes','Shows','Foods','Memos','Trips','Places'];
 function splitTop(md){
-  const markers=['# Tasks','# Notes','# Shows','# Foods'];
-  const found=markers.map(m=>({m,i:md.indexOf(m)})).filter(x=>x.i>=0).sort((a,b)=>a.i-b.i);
-  const out={};
-  found.forEach((cur,i)=>{ const end = i+1<found.length ? found[i+1].i : md.length; out[cur.m]=md.slice(cur.i,end); });
+  const out={}; let cur=null, buf=[];
+  const flush=()=>{ if(cur){ const k='# '+cur; out[k] = (k in out) ? out[k]+'\n'+buf.join('\n') : buf.join('\n'); } };
+  md.replace(/\r\n/g,'\n').split('\n').forEach(l=>{
+    const m=l.match(/^# (\S+)\s*$/);
+    if(m && SECTION_NAMES.includes(m[1])){ flush(); cur=m[1]; buf=[l]; }
+    else if(cur) buf.push(l);
+  });
+  flush();
   return out;
 }
 function serializeCombined(){
-  return serialize().trimEnd()+'\n\n'+serializeNotes().trimEnd()+'\n\n'+serializeShows().trimEnd()+'\n\n'+serializeFoods().trimEnd()+'\n';
+  let md=serialize().trimEnd()+'\n\n'+serializeNotes().trimEnd()+'\n\n'+serializeShows().trimEnd()+'\n\n'+serializeFoods().trimEnd()+'\n';
+  [serializeMemos(), serializeTrips(), serializePlaces()].forEach(s=>{ if(s) md+='\n'+s.trimEnd()+'\n'; });
+  return md;
 }
+
+/* ---------- Memos（Notes 分頁）---------- */
+// 格式：
+//   # Memos
+//   ## folders
+//   - 資料夾名稱
+//   ## memo 2026-10-01 14:14:05 :: 資料夾 [:: pin]
+//   第一行＝標題，其餘＝內文（行首若是 # 或 \ ，存檔時前面補一個 \ ）
+let memos=[], memoFolders=[];
+const MEMO_ESC=l=>/^[#\\]/.test(l) ? '\\'+l : l;
+const MEMO_UNESC=l=>/^\\[#\\]/.test(l) ? l.slice(1) : l;
+const noSep=s=>String(s==null?'':s).replace(/\s*::\s*/g,' : ').replace(/[\r\n]+/g,' ').trim();   // 欄位內容不可含 " :: " 與換行
+function parseMemos(md){
+  const out={folders:[], memos:[]}; if(!md) return out;
+  const lines=md.split('\n'); let mode=null, cur=null;
+  const finish=()=>{ if(cur){ cur.text=cur.lines.join('\n').replace(/\n+$/,''); delete cur.lines; out.memos.push(cur); cur=null; } };
+  for(let i=1;i<lines.length;i++){
+    const l=lines[i];
+    if(/^## folders\s*$/.test(l)){ finish(); mode='folders'; continue; }
+    if(l.startsWith('## memo ')){
+      finish(); mode='memo';
+      const p=l.slice(8).split(' :: ');
+      cur={id:(p[0]||'').trim(), folder:(p[1]||'').trim(), pinned:(p[2]||'').trim()==='pin', text:'', lines:[]};
+      continue;
+    }
+    if(mode==='folders'){ const m=l.match(/^-\s+(.+?)\s*$/); if(m && !out.folders.includes(m[1])) out.folders.push(m[1]); }
+    else if(mode==='memo') cur.lines.push(MEMO_UNESC(l));
+  }
+  finish();
+  return out;
+}
+function serializeMemos(){
+  const real=memos.filter(m=>(m.text||'').trim()!=='');
+  if(!real.length && !memoFolders.length) return '';
+  let md='# Memos\n';
+  if(memoFolders.length){ md+='\n## folders\n'; memoFolders.forEach(f=>{ md+='- '+noSep(f)+'\n'; }); }
+  real.forEach(m=>{
+    md+='\n## memo '+m.id+' :: '+noSep(m.folder)+(m.pinned?' :: pin':'')+'\n';
+    md+=String(m.text).replace(/\s+$/,'').split('\n').map(MEMO_ESC).join('\n')+'\n';
+  });
+  return md;
+}
+
+/* ---------- Trips（旅遊：旅程）---------- */
+// 格式：
+//   # Trips
+//   ## trip 澎湖四日
+//   - id: t_1752480000
+//   - dates: 2025-07-14 ~ 2025-07-17
+//   - cover: builtin:island | url:https://…
+//   - mode: total | cat | item
+//   - total: 20270
+//   - cat-costs: 交通=7500 | 住宿=6300
+//   - cats: 伴手禮=#7A5C99
+//   ### Day 1
+//   - 10:30 :: 抵達馬公機場 :: 交通 :: 5200 :: 來回機票
+const TRIP_DEFAULT_CATS=[{name:'交通',color:'#3D6E8F'},{name:'住宿',color:'#B5532F'},{name:'餐飲',color:'#C9902B'},{name:'體驗',color:'#5E8A55'},{name:'其他',color:'#8F8579'}];
+let trips=[];
+const numOrNull=s=>{ const n=parseInt(String(s==null?'':s).replace(/[^\d-]/g,''),10); return isNaN(n)?null:n; };
+function parseKV(s){ const o={}; String(s||'').split(' | ').forEach(p=>{ const i=p.lastIndexOf('='); if(i>0){ const k=p.slice(0,i).trim(), v=p.slice(i+1).trim(); if(k) o[k]=v; } }); return o; }
+function parseTrips(md){
+  const out=[]; if(!md) return out;
+  let t=null, day=null;
+  md.split('\n').slice(1).forEach(l=>{
+    if(l.startsWith('## trip ')){
+      t={id:'', name:l.slice(8).trim(), start:'', end:'', cover:'builtin:island', mode:'item', total:null, catCosts:{}, cats:[], days:[]}; day=null; out.push(t); return;
+    }
+    if(!t) return;
+    const dm=l.match(/^### Day (\d+)\s*$/);
+    if(dm){ day={items:[]}; t.days.push(day); return; }
+    const m=l.match(/^-\s(.*)$/); if(!m) return;
+    const body=m[1];
+    if(!day){
+      const kv=body.match(/^([a-z-]+):\s*(.*)$/); if(!kv) return;
+      const k=kv[1], v=kv[2].trim();
+      if(k==='id') t.id=v;
+      else if(k==='dates'){ const d=v.split('~'); t.start=(d[0]||'').trim(); t.end=(d[1]||'').trim(); }
+      else if(k==='cover') t.cover=v||'builtin:island';
+      else if(k==='mode') t.mode=['total','cat','item'].includes(v)?v:'item';
+      else if(k==='total') t.total=numOrNull(v);
+      else if(k==='cat-costs'){ const o=parseKV(v); Object.keys(o).forEach(n=>{ const c=numOrNull(o[n]); if(c!==null) t.catCosts[n]=c; }); }
+      else if(k==='cats'){ const o=parseKV(v); Object.keys(o).forEach(n=>t.cats.push({name:n,color:o[n]})); }
+    } else {
+      const p=body.split(' :: ');
+      day.items.push({time:(p[0]||'').trim(), name:(p[1]||'').trim(), cat:(p[2]||'').trim(), cost:numOrNull(p[3]), note:(p[4]||'').trim()});
+    }
+  });
+  out.forEach((t,i)=>{
+    if(!t.id) t.id='t_'+Date.now().toString(36)+i;
+    const n=tripSpanDays(t); while(t.days.length<n) t.days.push({items:[]});   // 日期範圍比 Day 標題多時補空白天，不丟資料
+  });
+  return out;
+}
+function tripSpanDays(t){
+  if(!t.start||!t.end) return 0;
+  const a=Date.parse(t.start+'T00:00:00Z'), b=Date.parse(t.end+'T00:00:00Z');
+  if(isNaN(a)||isNaN(b)||b<a) return 0;
+  return Math.min(60, Math.round((b-a)/86400000)+1);
+}
+function serializeTrips(){
+  if(!trips.length) return '';
+  let md='# Trips\n';
+  trips.forEach(t=>{
+    md+='\n## trip '+noSep(t.name)+'\n';
+    md+='- id: '+t.id+'\n';
+    md+='- dates: '+(t.start||'')+' ~ '+(t.end||'')+'\n';
+    md+='- cover: '+(t.cover||'builtin:island')+'\n';
+    md+='- mode: '+t.mode+'\n';
+    if(t.total!=null) md+='- total: '+t.total+'\n';
+    const cc=Object.keys(t.catCosts||{}).filter(k=>t.catCosts[k]!=null);
+    if(cc.length) md+='- cat-costs: '+cc.map(k=>noSep(k).replace(/[|=]/g,'')+'='+t.catCosts[k]).join(' | ')+'\n';
+    if((t.cats||[]).length) md+='- cats: '+t.cats.map(c=>noSep(c.name).replace(/[|=]/g,'')+'='+c.color).join(' | ')+'\n';
+    t.days.forEach((d,i)=>{
+      md+='### Day '+(i+1)+'\n';
+      d.items.forEach(it=>{ md+='- '+noSep(it.time)+' :: '+noSep(it.name)+' :: '+noSep(it.cat)+' :: '+(it.cost==null?'':it.cost)+' :: '+noSep(it.note)+'\n'; });
+    });
+  });
+  return md;
+}
+
+/* ---------- Places（旅遊：地點）---------- */
+//   # Places
+//   ## region 埔里
+//   - @cover builtin:hills
+//   - 埔里酒廠 :: 景點 :: 想去 :: 紹興酒冰品、伴手禮
+let regions=[];
+function parsePlaces(md){
+  const out=[]; if(!md) return out;
+  let r=null;
+  md.split('\n').slice(1).forEach(l=>{
+    if(l.startsWith('## region ')){ r={name:l.slice(10).trim(), cover:'builtin:hills', spots:[]}; out.push(r); return; }
+    if(!r) return;
+    const m=l.match(/^-\s(.*)$/); if(!m) return;
+    const c=m[1].match(/^@cover\s+(.*)$/);
+    if(c){ r.cover=c[1].trim()||'builtin:hills'; return; }
+    const p=m[1].split(' :: ');
+    r.spots.push({name:(p[0]||'').trim(), kind:(p[1]||'').trim()==='吃'?'吃':'景點', status:(p[2]||'').trim()==='去過'?'去過':'想去', note:(p[3]||'').trim()});
+  });
+  return out;
+}
+function serializePlaces(){
+  if(!regions.length) return '';
+  let md='# Places\n';
+  regions.forEach(r=>{
+    md+='\n## region '+noSep(r.name)+'\n- @cover '+(r.cover||'builtin:hills')+'\n';
+    r.spots.forEach(s=>{ md+='- '+noSep(s.name)+' :: '+s.kind+' :: '+s.status+' :: '+noSep(s.note)+'\n'; });
+  });
+  return md;
+}
+
+/* 載入後：資料夾清單補齊（Note 引用到但清單沒有的資料夾）*/
+function syncMemoFolders(){ memos.forEach(m=>{ if(m.folder && !memoFolders.includes(m.folder)) memoFolders.push(m.folder); }); }
 
 /* Google OAuth Client ID:填在這裡,或第一次開啟時貼在畫面上(只存在該瀏覽器) */
 const GOOGLE_CLIENT_ID='607264147812-d6b3needgqejtitntlkhj464r0qs02hb.apps.googleusercontent.com';
@@ -2236,7 +2618,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-10-30.12';
+const APP_VERSION='2026-11-01.13';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -2330,12 +2712,14 @@ function loadMarkdown(md,name,opts){
   const hadShows=!!parts['# Shows'];
   if(hadShows){ shows=parseShows(parts['# Shows']); } else { seedShows(); }
   foods=parseFoods(parts['# Foods']||'# Foods\n');
+  { const mm=parseMemos(parts['# Memos']); memos=mm.memos; memoFolders=mm.folders; syncMemoFolders(); }
+  trips=parseTrips(parts['# Trips']); regions=parsePlaces(parts['# Places']);
   ['intro','reconnect','driveSeed','driveReconnect'].forEach(id=>$(id).style.display='none');
   $('browserWarn').style.display='none';
   $('app').style.display='flex'; document.body.classList.add('connected');
   if(opts.refresh){ selectedItems.clear(); selectAnchor=null; }
   else { switchAppTab('todo'); switchShowTab('series'); }
-  render(); renderNotes(); renderShows(); renderFoods();
+  render(); renderNotes(); renderShows(); renderFoods(); renderMemos();
   if(!opts.refresh) toast('已開啟 '+name);
   if(migrated || !hadShows) queueSave();
 }
@@ -2572,11 +2956,404 @@ async function tryAutoConnect(){
   }catch(e){ /* 找不到已儲存的檔案控制權,維持一般開啟畫面 */ }
 }
 
+/* ---------- 手機「頁面堆疊」：讓 iPhone 左緣右滑／瀏覽器返回 = 關閉最上層頁面 ---------- */
+const pageStack=[];
+let suppressPop=0;
+function pushPage(entry){        // entry: {close(), guard?()}  guard 回傳 false 代表「先別關」（例如編輯中尚未儲存）
+  entry.closed=false;
+  pageStack.push(entry);
+  try{ history.pushState({dashPage:pageStack.length},''); }catch(e){}
+  return entry;
+}
+function popPage(entry){         // 由程式（按返回鈕、按 ×）關閉頁面時呼叫：把對應的歷史紀錄也退掉
+  if(!entry || entry.closed) return;
+  entry.closed=true;
+  const i=pageStack.indexOf(entry); if(i>=0) pageStack.splice(i,1);
+  if(history.state && history.state.dashPage){ suppressPop++; try{ history.back(); }catch(e){ suppressPop--; } }
+}
+window.addEventListener('popstate',()=>{
+  if(suppressPop>0){ suppressPop--; return; }
+  const e=pageStack[pageStack.length-1]; if(!e) return;
+  if(e.guard && !e.guard()){ try{ history.pushState({dashPage:pageStack.length},''); }catch(_){} return; }   // 使用者選擇留下 → 補回歷史紀錄
+  pageStack.pop(); e.closed=true; e.close();
+});
+
+/* ---------- 對話框（確認／輸入／選單），取代瀏覽器內建 confirm / prompt ---------- */
+function uiDialog(opt){
+  // opt: {title, text, input:{value,placeholder}, buttons:[{label,value,kind:'primary'|'danger'|'ghost'}], danger}
+  return new Promise(resolve=>{
+    const ov=document.createElement('div'); ov.className='ui-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label',opt.title||'');
+    const dlg=document.createElement('div'); dlg.className='ui-dlg';
+    if(opt.danger){ const ic=document.createElement('div'); ic.className='ui-ic'; ic.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg>'; dlg.appendChild(ic); }
+    const h=document.createElement('h2'); h.textContent=opt.title||''; dlg.appendChild(h);
+    if(opt.text){ const p=document.createElement('p'); p.textContent=opt.text; dlg.appendChild(p); }
+    let inp=null;
+    if(opt.input){ inp=document.createElement('input'); inp.className='ui-in'; inp.type='text'; inp.value=opt.input.value||''; inp.placeholder=opt.input.placeholder||''; inp.maxLength=40; dlg.appendChild(inp); }
+    const acts=document.createElement('div'); acts.className='ui-acts'; dlg.appendChild(acts);
+    const cleanup=()=>{ ov.remove(); document.removeEventListener('keydown',onKey,true); };
+    const finish=v=>{ cleanup(); resolve({value:v, input:inp?inp.value:null}); };
+    const btns=opt.buttons||[{label:'取消',value:null,kind:'ghost'},{label:'確定',value:true,kind:'primary'}];
+    let first=null;
+    btns.forEach(b=>{
+      const el=document.createElement('button'); el.type='button'; el.className='ui-btn '+(b.kind||'ghost'); el.textContent=b.label;
+      el.onclick=()=>finish(b.value);
+      acts.appendChild(el);
+      if(!first && (b.kind==='primary'||b.kind==='danger')) first=el;
+    });
+    const primary=btns.find(b=>b.kind==='primary'||b.kind==='danger');
+    const onKey=e=>{
+      if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); finish(null); }
+      else if(e.key==='Enter' && inp && document.activeElement===inp && primary){ e.stopPropagation(); e.preventDefault(); finish(primary.value); }
+    };
+    document.addEventListener('keydown',onKey,true);
+    ov.addEventListener('mousedown',e=>{ if(e.target===ov) finish(null); });
+    ov.appendChild(dlg); document.body.appendChild(ov);
+    (inp||first||acts.lastChild).focus(); if(inp) inp.select();
+  });
+}
+async function uiConfirm(title,text,okLabel,danger){
+  const r=await uiDialog({title,text,danger:!!danger,buttons:[{label:'取消',value:false,kind:'ghost'},{label:okLabel||'確定',value:true,kind:danger?'danger':'primary'}]});
+  return r.value===true;
+}
+async function uiPrompt(title,value,placeholder,okLabel){
+  const r=await uiDialog({title,input:{value:value||'',placeholder:placeholder||''},buttons:[{label:'取消',value:null,kind:'ghost'},{label:okLabel||'確定',value:'ok',kind:'primary'}]});
+  if(r.value!=='ok') return null;
+  return (r.input||'').trim()||null;
+}
+async function uiMenu(title,items){    // items: [{label,value,kind}]；回傳選到的 value 或 null
+  const r=await uiDialog({title,buttons:items.concat([{label:'取消',value:null,kind:'ghost'}])});
+  return r.value;
+}
+
+/* ---------- Notes（Memos）---------- */
+const MM_ALL='全部';
+const memoUI={folder:MM_ALL, sel:null, q:'', editBody:false, pg:null};
+const MM_FOLDER_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 012-2h4l2 2.5h7a2 2 0 012 2v7.5a2 2 0 01-2 2h-13a2 2 0 01-2-2z"/></svg>';
+const MM_FOLDER_SM='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 012-2h4l2 2.5h7a2 2 0 012 2v7.5a2 2 0 01-2 2h-13a2 2 0 01-2-2z"/></svg>';
+const MM_PIN_SM='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3z"/><path d="M12 13.5V20"/></svg>';
+
+const mmPad=n=>String(n).padStart(2,'0');
+const mmStamp=d=>d.getFullYear()+'-'+mmPad(d.getMonth()+1)+'-'+mmPad(d.getDate())+' '+mmPad(d.getHours())+':'+mmPad(d.getMinutes())+':'+mmPad(d.getSeconds());
+function newMemoId(){ let t=Date.now(); for(;;){ const id=mmStamp(new Date(t)); if(!memos.some(m=>m.id===id)) return id; t+=1000; } }
+function memoTitle(m){ const i=m.text.indexOf('\n'); return (i<0?m.text:m.text.slice(0,i)); }
+function memoBody(m){ const i=m.text.indexOf('\n'); return i<0?'':m.text.slice(i+1); }
+function setMemoText(m,title,body){ m.text = title + (body!=='' ? '\n'+body : ''); }
+function memoStampFull(id){ const m=id.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/); return m ? m[1]+' 年 '+(+m[2])+' 月 '+(+m[3])+' 日 '+m[4] : id; }
+function memoShort(id){ return id.slice(5,7)+'/'+id.slice(8,10); }
+function memoPreview(m){
+  const body=memoBody(m);
+  const src = memoTitle(m).trim()==='' ? body : body;
+  const t=src.replace(/^```.*$/mg,' ').replace(/^- \[[ xX]\] /mg,'').replace(/\s+/g,' ').trim();
+  return t.slice(0,48);
+}
+function curMemo(){ return memos.find(m=>m.id===memoUI.sel)||null; }
+
+function memoVisible(){
+  const q=memoUI.q.trim().toLowerCase();
+  return memos.filter(m=>{
+    if(m.text.trim()==='' && m.id!==memoUI.sel) return false;                 // 空白的新 Note 只有被選取時才顯示
+    if(memoUI.folder!==MM_ALL && m.folder!==memoUI.folder) return false;
+    if(q && !m.text.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>a.id<b.id?1:-1);
+}
+function memoGroups(list){
+  const groups=[], pin=list.filter(m=>m.pinned);
+  if(pin.length) groups.push({label:'釘選',pinned:true,items:pin});
+  const by={};
+  list.filter(m=>!m.pinned).forEach(m=>{
+    const label=m.id.slice(0,4)+' 年 '+(+m.id.slice(5,7))+' 月';
+    if(!by[label]){ by[label]={label,pinned:false,items:[]}; groups.push(by[label]); }
+    by[label].items.push(m);
+  });
+  return groups;
+}
+function memoCount(folder){ return memos.filter(m=>m.text.trim()!=='' && (folder===MM_ALL || m.folder===folder)).length; }
+
+/* --- 資料夾（網頁側欄＋手機 chip）--- */
+function renderMemoFolders(){
+  const box=$('mmFolders'); box.innerHTML='';
+  const chips=$('mmChips'); chips.innerHTML='';
+  [MM_ALL].concat(memoFolders).forEach(name=>{
+    const on=name===memoUI.folder, ct=memoCount(name);
+    const row=document.createElement('div'); row.className='mm-foldrow';
+    const b=document.createElement('button'); b.type='button'; b.className='mm-fold'+(on?' is-on':'');
+    b.innerHTML=MM_FOLDER_SVG+'<span class="nm"></span><span class="ct">'+ct+'</span>';
+    b.querySelector('.nm').textContent=name;
+    b.onclick=()=>{ memoUI.folder=name; scrollReset=true; renderMemoFolders(); renderMemoList(); };
+    row.appendChild(b);
+    if(name!==MM_ALL){
+      const mb=document.createElement('button'); mb.type='button'; mb.className='mm-fmore'; mb.setAttribute('aria-label','管理資料夾：'+name); mb.title='重新命名／刪除';
+      mb.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/></svg>';
+      mb.onclick=()=>memoFolderMenu(name);
+      row.appendChild(mb);
+    }
+    box.appendChild(row);
+
+    const c=document.createElement('button'); c.type='button'; c.className='mm-chip'+(on?' on':'');
+    c.innerHTML='<span class="t"></span>'+(name===MM_ALL?' <span class="c">'+ct+'</span>':'');
+    c.querySelector('.t').textContent=name;
+    c.onclick=()=>{ memoUI.folder=name; scrollReset=true; renderMemoFolders(); renderMemoList(); };
+    chips.appendChild(c);
+  });
+  if(memoUI.folder!==MM_ALL){
+    const mc=document.createElement('button'); mc.type='button'; mc.className='mm-chip add'; mc.textContent='管理';
+    mc.onclick=()=>memoFolderMenu(memoUI.folder); chips.appendChild(mc);
+  }
+  const add=document.createElement('button'); add.type='button'; add.className='mm-chip add'; add.setAttribute('aria-label','新增資料夾');
+  add.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增';
+  add.onclick=memoAddFolder; chips.appendChild(add);
+  fillFolderSelect();
+}
+async function memoAddFolder(){
+  const name=await uiPrompt('新增資料夾','','資料夾名稱','新增');
+  if(!name) return;
+  const n=noSep(name).slice(0,20);
+  if(!n || n===MM_ALL){ toast('名稱不可用'); return; }
+  if(memoFolders.includes(n)){ memoUI.folder=n; }
+  else { memoFolders.push(n); memoUI.folder=n; queueSave(); }
+  renderMemoFolders(); renderMemoList();
+}
+async function memoFolderMenu(name){
+  const act=await uiMenu('資料夾「'+name+'」',[{label:'重新命名',value:'rename',kind:'primary'},{label:'刪除資料夾',value:'del',kind:'danger'}]);
+  if(act==='rename'){
+    const nn=await uiPrompt('重新命名資料夾',name,'資料夾名稱','儲存');
+    if(!nn) return;
+    const n=noSep(nn).slice(0,20);
+    if(!n || n===MM_ALL || (n!==name && memoFolders.includes(n))){ toast('名稱不可用或已存在'); return; }
+    memoFolders=memoFolders.map(f=>f===name?n:f);
+    memos.forEach(m=>{ if(m.folder===name) m.folder=n; });
+    if(memoUI.folder===name) memoUI.folder=n;
+    queueSave(); renderMemoFolders(); renderMemoList(); renderMemoEditor();
+  } else if(act==='del'){
+    const cnt=memos.filter(m=>m.folder===name && m.text.trim()!=='').length;
+    const ok=await uiConfirm('刪除資料夾「'+name+'」？', cnt ? '裡面的 '+cnt+' 則 Note 不會被刪除，會變成「未分類」，仍然可以在「全部」看到。' : '這個資料夾是空的。', '刪除資料夾', true);
+    if(!ok) return;
+    memoFolders=memoFolders.filter(f=>f!==name);
+    memos.forEach(m=>{ if(m.folder===name) m.folder=''; });
+    if(memoUI.folder===name) memoUI.folder=MM_ALL;
+    queueSave(); renderMemoFolders(); renderMemoList(); renderMemoEditor();
+  }
+}
+function fillFolderSelect(){
+  const sel=$('mmFolderSel'); if(!sel) return;
+  const m=curMemo(); sel.innerHTML='';
+  const o0=document.createElement('option'); o0.value=''; o0.textContent='未分類'; sel.appendChild(o0);
+  memoFolders.forEach(f=>{ const o=document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o); });
+  sel.value = m ? (m.folder||'') : '';
+}
+
+/* --- 列表 --- */
+function renderMemoList(){
+  const box=$('mmList'); box.innerHTML='';
+  const list=memoVisible();
+  if(!list.length){ const e=document.createElement('div'); e.className='mm-nolist'; e.textContent = memoUI.q.trim() ? '找不到符合的 Note' : '這裡還沒有 Note'; box.appendChild(e); return; }
+  memoGroups(list).forEach(g=>{
+    const wrap=document.createElement('div'); wrap.className='mm-group';
+    const lab=document.createElement('div'); lab.className='mm-glabel'; if(g.pinned) lab.innerHTML=MM_PIN_SM; const sp=document.createElement('span'); sp.textContent=g.label; lab.appendChild(sp);
+    const items=document.createElement('div'); items.className='mm-gwrap';
+    g.items.forEach(m=>{
+      const b=document.createElement('button'); b.type='button'; b.className='mm-row'+(m.id===memoUI.sel && !MQ_MOBILE.matches?' is-sel':'');
+      const t=memoTitle(m).trim();
+      const title=document.createElement('span'); title.className='mm-rt'+(t?'':' none'); title.textContent=t||'無標題';
+      const pv=memoPreview(m);
+      const sub=document.createElement('span'); sub.className='mm-rs';
+      const d=document.createElement('span'); d.className='d'; d.textContent=memoShort(m.id);
+      const p=document.createElement('span'); p.className='p'; p.textContent=pv||'沒有其他文字';
+      sub.append(d,p);
+      const f=document.createElement('span'); f.className='mm-rf'; f.innerHTML=MM_FOLDER_SM; const fn=document.createElement('span'); fn.textContent=m.folder||'未分類'; f.appendChild(fn);
+      b.append(title,sub,f);
+      b.onclick=()=>selectMemo(m.id,true);
+      items.appendChild(b);
+    });
+    // 群組標題在卡片外、列在卡片內（手機版）；網頁版兩者都是一般區塊
+    const head=document.createElement('div'); head.appendChild(lab);
+    box.appendChild(head); wrap.appendChild(items); box.appendChild(wrap);
+  });
+}
+
+/* --- 編輯區 --- */
+function pruneEmptyMemos(keepId){
+  const before=memos.length;
+  memos=memos.filter(m=>m.text.trim()!=='' || m.id===keepId);
+  return memos.length!==before;
+}
+function selectMemo(id,userAction){
+  pruneEmptyMemos(id);
+  memoUI.sel=id; memoUI.editBody=false;
+  renderMemoList(); renderMemoEditor();
+  if(userAction && MQ_MOBILE.matches) openMemoPage();
+}
+function setIfDiff(el,v){ if(el.value!==v) el.value=v; }
+function renderMemoEditor(){
+  const m=curMemo(), ed=$('mmEditor');
+  ed.classList.toggle('mm-none', !m);
+  if(!m) return;
+  $('mmStamp').textContent=memoStampFull(m.id);
+  setIfDiff($('mmTitle'), memoTitle(m)); setIfDiff($('mmBody'), memoBody(m));
+  ['mmPin','mmPinM'].forEach(id=>{ const b=$(id); b.classList.toggle('on', !!m.pinned); b.setAttribute('aria-pressed',String(!!m.pinned)); });
+  fillFolderSelect();
+  autosize($('mmTitle')); renderBodyView();
+}
+function memoRich(body){ return /^- \[[ xX]\] /m.test(body) || /^```/m.test(body); }
+function renderBodyView(){
+  const body=$('mmBody'), rv=$('mmRender'), m=curMemo();
+  const showRender = !!m && memoRich(body.value) && !memoUI.editBody && document.activeElement!==body;
+  rv.style.display = showRender ? 'block' : 'none';
+  body.style.display = showRender ? 'none' : 'block';
+  if(showRender) buildRender(rv, body.value); else autosize(body);
+}
+function buildRender(rv,text){
+  rv.innerHTML='';
+  const lines=text.split('\n'); let i=0;
+  while(i<lines.length){
+    const l=lines[i];
+    if(/^```/.test(l)){
+      const buf=[]; i++;
+      while(i<lines.length && !/^```/.test(lines[i])){ buf.push(lines[i]); i++; }
+      i++;                                   // 跳過結尾的 ```
+      const pre=document.createElement('pre'); pre.className='mm-code'; pre.textContent=buf.join('\n'); rv.appendChild(pre); continue;
+    }
+    const ck=l.match(/^- \[([ xX])\] ?(.*)$/);
+    if(ck){
+      const idx=i, done=ck[1]!==' ';
+      const lab=document.createElement('label'); lab.className='mm-ck'+(done?' done':'');
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=done;
+      const sp=document.createElement('span'); sp.textContent=ck[2];
+      cb.onchange=()=>{
+        const arr=$('mmBody').value.split('\n');
+        arr[idx]=arr[idx].replace(/^- \[[ xX]\]/, cb.checked?'- [x]':'- [ ]');
+        $('mmBody').value=arr.join('\n'); memoFromFields(); renderBodyView();
+      };
+      lab.append(cb,sp); rv.appendChild(lab); i++; continue;
+    }
+    const div=document.createElement('div'); div.className='mm-line'; div.textContent=l; rv.appendChild(div); i++;
+  }
+}
+function memoFromFields(){
+  const m=curMemo(); if(!m) return;
+  let title=$('mmTitle').value, body=$('mmBody').value;
+  if(title.includes('\n')){ const k=title.indexOf('\n'); body=title.slice(k+1)+(body?'\n'+body:''); title=title.slice(0,k); $('mmTitle').value=title; $('mmBody').value=body; }
+  const wasEmpty=m.text.trim()==='';
+  setMemoText(m,title,body);
+  queueSave();
+  renderMemoList();
+  if(wasEmpty !== (m.text.trim()==='')) renderMemoFolders();    // 只有「有內容／沒內容」改變時，資料夾旁的數量才需要更新
+}
+function memoEnterBodyEdit(atEnd){
+  const body=$('mmBody'); memoUI.editBody=true; renderBodyView(); body.focus();
+  if(atEnd){ const n=body.value.length; body.setSelectionRange(n,n); }
+}
+function memoInsert(kind){
+  const m=curMemo(); if(!m) return;
+  const body=$('mmBody'); memoUI.editBody=true; renderBodyView();
+  const v=body.value; let s=body.selectionStart, e=body.selectionEnd;
+  if(v==='' ){ s=e=0; }
+  let ins, caret;
+  if(kind==='check'){
+    const ls=v.lastIndexOf('\n',s-1)+1, le0=v.indexOf('\n',s), le=le0<0?v.length:le0;
+    const empty=v.slice(ls,le).trim()==='';
+    ins = empty ? '- [ ] ' : '\n- [ ] ';
+    body.value=v.slice(0,s)+ins+v.slice(e); caret=s+ins.length;
+  } else {
+    const sel=v.slice(s,e);
+    const pre = (s>0 && v[s-1]!=='\n') ? '\n' : '';
+    ins = pre+'```\n'+sel+'\n```\n';
+    body.value=v.slice(0,s)+ins+v.slice(e); caret=s+pre.length+4+sel.length;     // 游標放在程式碼內
+  }
+  body.focus(); body.setSelectionRange(caret,caret);
+  memoFromFields(); autosize(body);
+}
+function memoTogglePin(){ const m=curMemo(); if(!m) return; m.pinned=!m.pinned; queueSave(); renderMemoList(); renderMemoEditor(); }
+async function memoDelete(){
+  const m=curMemo(); if(!m) return;
+  const t=memoTitle(m).trim()||'這則 Note';
+  if(m.text.trim()!==''){
+    const ok=await uiConfirm('刪除「'+t.slice(0,30)+'」？','刪除後無法復原。','刪除',true);
+    if(!ok) return;
+  }
+  memos=memos.filter(x=>x!==m); queueSave();
+  const next=memoVisible()[0];
+  memoUI.sel = MQ_MOBILE.matches ? null : (next?next.id:null);
+  if(MQ_MOBILE.matches) closeMemoPage();
+  renderMemoFolders(); renderMemoList(); renderMemoEditor();
+}
+function createMemo(){
+  pruneEmptyMemos(null);
+  const m={id:newMemoId(), folder: memoUI.folder===MM_ALL?'':memoUI.folder, pinned:false, text:''};
+  memos.unshift(m); memoUI.sel=m.id; memoUI.editBody=false; memoUI.q=''; $('mmSearch').value='';
+  renderMemoFolders(); renderMemoList(); renderMemoEditor();
+  if(MQ_MOBILE.matches) openMemoPage();
+  setTimeout(()=>$('mmTitle').focus(),0);
+}
+
+/* --- 手機：編輯頁（滿版）與返回 --- */
+function openMemoPage(){
+  document.body.classList.add('memo-open');
+  if(!memoUI.pg) memoUI.pg=pushPage({close:()=>{ memoUI.pg=null; closeMemoPageUI(); }});
+  autosize($('mmTitle')); renderBodyView();      // 編輯頁剛顯示出來，輸入框高度要在「可見」之後才算得準
+}
+window.addEventListener('resize',()=>{ if(activeAppTab==='memo' && curMemo()){ autosize($('mmTitle')); if($('mmBody').style.display!=='none') autosize($('mmBody')); } });
+function closeMemoPage(){
+  if(memoUI.pg){ const pg=memoUI.pg; memoUI.pg=null; popPage(pg); }
+  closeMemoPageUI();
+}
+function closeMemoPageUI(){
+  document.body.classList.remove('memo-open');
+  const had=pruneEmptyMemos(null);
+  memoUI.sel=null; memoUI.editBody=false;
+  renderMemoFolders(); renderMemoList();
+  if(had) queueSave();
+}
+
+/* --- 事件 --- */
+$('mmSearch').addEventListener('input',e=>{ memoUI.q=e.target.value; scrollReset=true; renderMemoList(); });
+$('mmNew').onclick=createMemo; $('mmFab').onclick=createMemo;
+$('mmAddFolder').onclick=memoAddFolder;
+$('mmTitle').addEventListener('input',()=>{ autosize($('mmTitle')); memoFromFields(); });
+$('mmTitle').addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); memoEnterBodyEdit(false); $('mmBody').setSelectionRange(0,0); }
+});
+$('mmBody').addEventListener('input',()=>{ autosize($('mmBody')); memoFromFields(); });
+$('mmBody').addEventListener('keydown',e=>{
+  const body=$('mmBody');
+  if(e.key==='Backspace' && body.selectionStart===0 && body.selectionEnd===0){
+    e.preventDefault(); const t=$('mmTitle'); t.focus(); const n=t.value.length; t.setSelectionRange(n,n); return;
+  }
+  if(e.key==='Enter' && !e.isComposing && !e.shiftKey && body.selectionStart===body.selectionEnd){
+    const v=body.value, s=body.selectionStart, ls=v.lastIndexOf('\n',s-1)+1, line=v.slice(ls,s);
+    const mk=line.match(/^- \[[ xX]\] (.*)$/);
+    if(mk && v.slice(s).split('\n')[0]===''){     // 在核取項目行尾按 Enter：接續下一個核取項目；空項目再按 Enter 則結束清單
+      e.preventDefault();
+      if(mk[1].trim()===''){ body.value=v.slice(0,ls)+v.slice(s); body.setSelectionRange(ls,ls); }
+      else { const ins='\n- [ ] '; body.value=v.slice(0,s)+ins+v.slice(s); const c=s+ins.length; body.setSelectionRange(c,c); }
+      memoFromFields(); autosize(body);
+    }
+  }
+});
+$('mmBody').addEventListener('blur',()=>{ memoUI.editBody=false; setTimeout(renderBodyView,0); });
+$('mmRender').addEventListener('click',e=>{ if(e.target.closest('.mm-ck')) return; memoEnterBodyEdit(true); });
+$('mmRender').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); memoEnterBodyEdit(true); } });
+$('mmFolderSel').addEventListener('change',e=>{ const m=curMemo(); if(!m) return; m.folder=e.target.value; queueSave(); renderMemoFolders(); renderMemoList(); });
+['mmPin','mmPinM'].forEach(id=>$(id).onclick=memoTogglePin);
+['mmCheck','mmCheckM'].forEach(id=>{ $(id).addEventListener('mousedown',e=>e.preventDefault()); $(id).onclick=()=>memoInsert('check'); });
+['mmCode','mmCodeM'].forEach(id=>{ $(id).addEventListener('mousedown',e=>e.preventDefault()); $(id).onclick=()=>memoInsert('code'); });
+['mmDel','mmDelM'].forEach(id=>$(id).onclick=memoDelete);
+$('mmBack').onclick=closeMemoPage; $('mmDone').onclick=closeMemoPage;
+if(MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change',()=>{ if(!MQ_MOBILE.matches){ document.body.classList.remove('memo-open'); if(memoUI.pg){ const pg=memoUI.pg; memoUI.pg=null; popPage(pg); } } });
+function renderMemos(){
+  if(memoUI.folder!==MM_ALL && !memoFolders.includes(memoUI.folder)) memoUI.folder=MM_ALL;
+  if(memoUI.sel && !memos.some(m=>m.id===memoUI.sel)) memoUI.sel=null;
+  if(!memoUI.sel && !MQ_MOBILE.matches){ const f=memoVisible()[0]; if(f) memoUI.sel=f.id; }
+  renderMemoFolders(); renderMemoList(); renderMemoEditor();
+}
+
 /* ---------- 手機版：抽屜選單 + 底部分頁列 ---------- */
 const TB_ICON = {
   list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg>', notes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5"/></svg>', series:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg>', movie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>', watched:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>', stats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>', map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.2s-6.6-5.5-6.6-11.2a6.6 6.6 0 0113.2 0c0 5.7-6.6 11.2-6.6 11.2z"/><circle cx="12" cy="10" r="2.3"/></svg>', flist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>'
 };
 function tabbarDef(){
+  if(activeAppTab==='memo') return [];
   if(activeAppTab==='todo') return [{id:'list',label:'清單',icon:'list'},{id:'notes',label:'便利貼',icon:'notes'}];
   if(activeAppTab==='shows') return [{id:'series',label:'影集',icon:'series'},{id:'movie',label:'電影',icon:'movie'},{id:'watched',label:'已觀看',icon:'watched'},{id:'stats',label:'統計',icon:'stats'}];
   return [{id:'map',label:'地圖',icon:'map'},{id:'list',label:'列表',icon:'flist'}];
@@ -2622,7 +3399,7 @@ new MutationObserver(()=>{ $('drawerSync').textContent=$('fileName').textContent
 if(MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change',()=>{ if(!MQ_MOBILE.matches) setDrawer(false); });
 // 觸控裝置沒有 Alt+Enter：多行輸入框的 Enter 一律當換行，不觸發「儲存」（儲存靠按鈕或點外面）
 document.addEventListener('keydown',e=>{
-  if(COARSE && e.key==='Enter' && e.target.tagName==='TEXTAREA' && !e.ctrlKey && !e.metaKey) e.stopImmediatePropagation();
+  if(COARSE && e.key==='Enter' && e.target.tagName==='TEXTAREA' && !e.target.classList.contains('mm-keep') && !e.ctrlKey && !e.metaKey) e.stopImmediatePropagation();
 },true);
 
 /* ---------- 便利貼:拖到最後方 ---------- */
@@ -2659,6 +3436,7 @@ if(window.ResizeObserver){ const ro=new ResizeObserver(fitShowsHeight); ['.head'
   wrap('render',()=>null);
   wrap('renderNotes',()=>$('stickyList'));
   wrap('renderFoods',()=>$('foodList'));
+  wrap('renderMemoList',()=>{ const l=$('mmList'); return l ? l.closest('.mm-coll') : null; });
 })();
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
