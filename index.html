@@ -1037,6 +1037,71 @@ body.trip-edit .tv-edit { display: block; }
   .tv-ecard { padding: 20px 18px 18px; }
   .tv-ecrow .tv-pfx { width: 150px; }
 }
+
+/* ===== 旅遊：地點 ===== */
+.pl { display: none; }
+#travelView[data-pane="places"] .pl { display: block; }
+.pl-cols { display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 28px; align-items: start; }
+.pl-cols > * { min-width: 0; }
+.pl-side { display: flex; flex-direction: column; gap: 12px; }
+.pl-sh { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+.pl-sh .n { font-size: 13px; font-weight: 500; padding: 2px 10px; border-radius: 999px; background: #F0E8DA; color: #5E5446; }
+.pl-regions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pl-reg { appearance: none; width: 100%; font: inherit; color: var(--ink); text-align: left; display: flex; align-items: center; gap: 14px; padding: 12px 14px 12px 12px; background: var(--card); border: 1.5px solid var(--line); border-radius: 20px; cursor: pointer; box-shadow: 0 10px 28px -20px rgba(70,50,30,.3); }
+.pl-reg:hover { border-color: #D3C7B4; }
+.pl-reg.on { border-color: var(--accent); background: #FFF6EE; }
+.pl-reg .th { width: 58px; height: 58px; border-radius: 14px; overflow: hidden; flex: none; background: #EDE5D7; }
+.pl-reg .th .tv-cvr { height: 100%; }
+.pl-reg .tx { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.pl-reg .tx b { font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-size: 19px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-reg .tx span { font-size: 13px; color: var(--muted); }
+.pl-reg .chev { color: #B8AC9A; flex: none; display: none; }
+.pl-reg:focus-visible, .pl-spb:focus-visible, .pl-st button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+.pl-addreg { min-height: 64px; flex-direction: row; border-radius: 20px; }
+.pl-addreg svg { width: 22px; height: 22px; }
+.pl-main { background: var(--card); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 14px 40px -18px rgba(70,50,30,.18); padding: 28px 28px 24px; min-height: 240px; }
+.pl-mtop { display: none; }
+.pl-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.pl-hl { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pl-title { margin: 0; font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-weight: 700; font-size: 32px; line-height: 1.2; overflow-wrap: anywhere; }
+.pl-sub { font-size: 14px; color: var(--muted); }
+.pl-hact { display: flex; gap: 10px; flex-wrap: wrap; }
+.pl-filters { display: flex; gap: 8px; margin: 20px 0 6px; flex-wrap: wrap; }
+.pl-spots { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; }
+.pl-sp { display: flex; align-items: center; gap: 12px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.pl-sp:last-child { border-bottom: 0; }
+.pl-spb { appearance: none; border: 0; background: none; font: inherit; color: var(--ink); text-align: left; display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; padding: 10px 0; cursor: pointer; }
+.pl-spb .bub { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); }
+.pl-spb .tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pl-spb .tx b { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-spb .tx span { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-sp.been .pl-spb .tx b { color: #6B6259; }
+.pl-st { display: inline-flex; flex: none; padding: 3px; gap: 2px; background: #EDE5D7; border-radius: 999px; }
+.pl-st button { appearance: none; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; height: 32px; min-width: 52px; padding: 0 10px; border-radius: 999px; color: #6B6259; cursor: pointer; }
+.pl-st button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(60,40,20,.16); }
+.pl-st button.on.been { background: #5E8A55; color: #fff; }
+.pl-empty { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; padding: 56px 20px; color: var(--muted); }
+.pl-empty b { font-family: 'Noto Serif TC','Songti TC','PMingLiU','Yu Mincho',serif; font-size: 22px; color: var(--ink); }
+.pl-fab { display: none; }
+@media (max-width: 1100px) and (min-width: 721px) { .pl-cols { grid-template-columns: 280px minmax(0,1fr); gap: 20px; } }
+@media (max-width: 720px) {
+  .pl-cols { display: block; }
+  .pl-reg { padding: 12px 14px 12px 12px; }
+  .pl-reg .chev { display: block; }
+  .pl-reg.on { border-color: var(--line); background: var(--card); }
+  .pl-main { display: none; }
+  body.place-open .pl-main { display: block; position: fixed; inset: 0; z-index: 90; background: #F6F2EA; border: 0; border-radius: 0; box-shadow: none; padding: 0 0 calc(110px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+  .pl-mtop { display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 3; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; background: #F6F2EA; border-bottom: 1px solid var(--line); }
+  .pl-mtop .tv-rb { position: static; display: grid; width: 42px; height: 42px; box-shadow: 0 1px 6px rgba(60,40,20,.14); }
+  .pl-mt { font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: .08em; }
+  .pl-body { padding: 18px 18px 8px; }
+  .pl-title { font-size: 30px; }
+  .pl-hact, .pl-body .tv-dayact { display: none; }
+  .pl-filters { margin-top: 16px; }
+  .pl-spb .tx b { font-size: 15.5px; }
+  .pl-st button { min-width: 46px; padding: 0 8px; }
+  body.place-open .pl-fab { display: grid; position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; place-items: center; box-shadow: 0 10px 24px -6px rgba(181,83,47,.55); cursor: pointer; z-index: 92; }
+}
 </style>
 </head>
 <body>
@@ -1213,7 +1278,7 @@ body.trip-edit .tv-edit { display: block; }
           <button type="button" class="tv-add" id="tvAdd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增旅程</button>
         </div>
         <div id="tvTrips"></div>
-        <div id="tvPlaces" class="tv-soon"><div class="tv-soon-card"><b>地點</b><span>依地區整理想去的景點與美食，下一階段加入。</span></div></div>
+        <div id="tvPlaces" class="pl"></div>
         <section id="tvDetail" class="tv-detail" aria-label="旅程詳情"></section>
         <section id="tvEdit" class="tv-edit" aria-label="編輯旅程"></section>
         <button type="button" class="tv-fab" id="tvFab" aria-label="新增旅程"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -2707,6 +2772,7 @@ function switchAppTab(tab){
   if(tab!=='memo' && document.body.classList.contains('memo-open')) closeMemoPage();
   document.body.classList.toggle('tab-travel', tab==='travel');
   if(tab!=='travel' && document.body.classList.contains('trip-open')) closeTrip();
+  if(tab!=='travel' && document.body.classList.contains('place-open')) closePlace();
   const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.content = tab==='shows' ? '#141413' : '#F6F1E9';
   if(tab!=='shows') document.body.classList.remove('mstats');
   updateTabbar();
@@ -2956,7 +3022,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-01.18';
+const APP_VERSION='2026-11-01.19';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -3133,7 +3199,7 @@ function editingNow(){
   // 只要有輸入框／文字區／下拉選單正在聚焦，或有任何彈窗開著，就視為正在編輯，不做背景重新載入
   const a=document.activeElement;
   if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
-  return !!document.querySelector('.modal-bg, .smodal-bg') || document.body.classList.contains('trip-edit');
+  return !!document.querySelector('.modal-bg, .smodal-bg, .ui-ov') || document.body.classList.contains('trip-edit');
 }
 /* 雲端內容是否真的變了:優先比 md5(依內容計算);沒有 md5 才退回「版本號 + 內容比對」 */
 async function remoteChanged(meta){
@@ -4223,6 +4289,7 @@ function renderTravel(){
   if(tvUI.tripId && !curTrip()){ tvUI.tripId=null; document.body.classList.remove('trip-open'); }
   renderTripList();
   if(tvUI.tripId) renderTripDetail();
+  renderPlaces();
 }
 document.querySelectorAll('.tv-seg button').forEach(b=>b.onclick=()=>{ tvUI.pane=b.dataset.pane; renderTravel(); updateTabbar(); });
 $('tvAdd').onclick=tvNewTrip; $('tvFab').onclick=tvNewTrip;
@@ -4481,6 +4548,167 @@ function renderTripEdit(){
   }
   $$('#teDelTrip').onclick=tvDeleteTrip;
   window.scrollTo(0,sy); box.scrollTop=st;
+}
+
+/* ---------- 旅遊：地點（地區 → 景點／美食清單；不是實際行程，是想去／去過的資料庫）---------- */
+const plUI={sel:null, filter:'all', pg:null};
+const PL_KIND_COLOR={'景點':'#6B6259','吃':'#C9902B'};
+const PL_BACK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+const PL_PENCIL='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></svg>';
+const PL_PLUS='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+const curRegion=()=>regions.find(r=>r.name===plUI.sel)||null;
+function plStats(r){
+  const been=r.spots.filter(s=>s.status==='去過').length;
+  return {n:r.spots.length, been, want:r.spots.length-been};
+}
+const plStatLine=(r,full)=>{ const s=plStats(r); if(!s.n) return '還沒有地點'; return s.n+' 個地點'+(full?(s.want?' · '+s.want+' 個想去':'')+(s.been?' · '+s.been+' 個去過':''):(s.been?' · '+s.been+' 個去過':'')); };
+
+function openPlace(name){
+  plUI.sel=name; plUI.filter='all';
+  if(MQ_MOBILE.matches){
+    document.body.classList.add('place-open');
+    if(!plUI.pg) plUI.pg=pushPage({close:()=>{ plUI.pg=null; closePlaceUI(); }});
+  }
+  renderPlaces(); const m=$('plMain'); if(m) m.scrollTop=0; window.scrollTo(0,0);
+}
+function closePlaceUI(){ document.body.classList.remove('place-open'); renderPlaces(); }
+function closePlace(){ if(plUI.pg){ const p=plUI.pg; plUI.pg=null; popPage(p); } closePlaceUI(); }
+
+/* 共用對話框外殼（網頁＝對話框，手機＝底部面板；沿用項目編輯的樣式）*/
+function plDialog(o){
+  const ov=document.createElement('div'); ov.className='ui-ov tv-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label',o.title);
+  const dlg=document.createElement('div'); dlg.className='ui-dlg tv-idlg';
+  dlg.innerHTML='<div class="tv-ih"><h2>'+esc(o.title)+'</h2>'+(o.pill?'<span class="tv-pill">'+esc(o.pill)+'</span>':'')+'<button type="button" class="tv-x" aria-label="關閉">×</button></div>'+o.body
+    +'<div class="tv-ifoot">'+(o.del?'<button type="button" class="tv-idel" id="plDel">'+TV_TRASH_SVG+'<span>'+esc(o.del)+'</span></button>':'')+'<button type="button" class="ui-btn ghost" id="plCancel">取消</button><button type="button" class="ui-btn primary" id="plSave">儲存</button></div>';
+  ov.appendChild(dlg);
+  const q=s=>dlg.querySelector(s);
+  let pg=null;
+  const h={q, dlg,
+    close(keepHistory){ const p=pg; pg=null; document.removeEventListener('keydown',onKey,true); ov.remove(); if(p){ if(keepHistory) return p; popPage(p); } return null; }};
+  const onKey=e=>{ if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); h.close(); } else if(e.key==='Enter' && e.target.tagName==='INPUT'){ e.preventDefault(); o.onSave(h); } };
+  document.addEventListener('keydown',onKey,true);
+  if(MQ_MOBILE.matches) pg=pushPage({close:()=>{ pg=null; document.removeEventListener('keydown',onKey,true); ov.remove(); }});
+  q('.tv-x').onclick=()=>h.close(); q('#plCancel').onclick=()=>h.close(); q('#plSave').onclick=()=>o.onSave(h);
+  if(o.del) q('#plDel').onclick=()=>o.onDelete(h);
+  ov.addEventListener('mousedown',e=>{ if(e.target===ov) h.close(); });
+  document.body.appendChild(ov);
+  if(o.onMount) o.onMount(q,h);
+  const first=q('input'); if(first) first.focus();
+  return h;
+}
+
+/* --- 地區：新增／編輯 --- */
+function openRegionDialog(idx){
+  const isNew=idx==null, src=isNew?{name:'',cover:'builtin:hills'}:regions[idx];
+  const st={cover:src.cover||'builtin:hills'}; const isUrl=st.cover.startsWith('url:');
+  plDialog({
+    title:isNew?'新增地區':'編輯地區', del:isNew?'':'刪除地區',
+    body:'<label class="ui-fl"><span>地區名稱</span><input class="ui-in" id="rgName" maxlength="30" autocomplete="off" placeholder="例如：埔里、鹿港" value="'+esc(src.name)+'"></label>'
+      +'<div class="ui-fl"><span>封面</span><div class="tv-ecovers" id="rgCovers">'+TV_BUILTIN_KEYS.map(k=>'<button type="button" class="tv-ecov'+(!isUrl&&st.cover==='builtin:'+k?' on':'')+'" data-k="'+k+'" aria-label="內建封面：'+k+'">'+TV_COVERS[k]+'</button>').join('')+'</div></div>'
+      +'<label class="ui-fl"><span>或貼上封面圖片網址</span><input class="ui-in" id="rgUrl" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="https://" value="'+(isUrl?esc(st.cover.slice(4)):'')+'"></label>'
+      +'<div class="tv-ehint">只儲存連結，不會上傳檔案。網址打不開時會改用內建插圖。</div>',
+    onMount:(q)=>{
+      q('#rgCovers').querySelectorAll('.tv-ecov').forEach(b=>b.onclick=()=>{ st.cover='builtin:'+b.dataset.k; q('#rgUrl').value=''; q('#rgCovers').querySelectorAll('.tv-ecov').forEach(x=>x.classList.toggle('on',x===b)); });
+      q('#rgUrl').addEventListener('input',()=>{ if(q('#rgUrl').value.trim()) q('#rgCovers').querySelectorAll('.tv-ecov').forEach(x=>x.classList.remove('on')); });
+    },
+    onSave:h=>{
+      const name=noSep(h.q('#rgName').value).slice(0,30);
+      if(!name){ toast('請輸入地區名稱'); h.q('#rgName').focus(); return; }
+      if(regions.some((r,i)=>i!==idx && r.name===name)){ toast('已有同名的地區'); return; }
+      const u=h.q('#rgUrl').value.trim(); let cover=st.cover;
+      if(u){ if(!/^https?:\/\/[^\s]+$/i.test(u)){ toast('請貼上 http:// 或 https:// 開頭的網址'); return; } cover='url:'+u; }
+      else if(cover.startsWith('url:')) cover='builtin:hills';
+      if(isNew){ regions.push({name,cover,spots:[]}); plUI.sel=name; plUI.filter='all'; }
+      else { if(plUI.sel===regions[idx].name) plUI.sel=name; regions[idx].name=name; regions[idx].cover=cover; }
+      queueSave(); h.close(); renderPlaces(); toast(isNew?'已新增地區':'已儲存');
+      if(isNew && MQ_MOBILE.matches) openPlace(name);
+    },
+    onDelete:async h=>{
+      const r=regions[idx];
+      const ok=await uiConfirm('刪除「'+r.name+'」？', r.spots.length?'這個地區的 '+r.spots.length+' 個地點會一併刪除，且無法復原。':'這個地區會被刪除，且無法復原。','刪除地區',true); if(!ok) return;
+      regions.splice(idx,1); queueSave();
+      const dp=h.close(true);
+      if(MQ_MOBILE.matches){ const list=[dp,plUI.pg]; plUI.pg=null; tvPopMany(list); closePlaceUI(); }
+      plUI.sel=null; renderPlaces(); toast('已刪除地區');
+    }
+  });
+}
+
+/* --- 地點：新增／編輯 --- */
+function openSpotDialog(r,idx){
+  const isNew=idx==null, src=isNew?{name:'',kind:'景點',status:'想去',note:''}:r.spots[idx];
+  const st={kind:src.kind, status:src.status};
+  const chips=(id,opts,cur,colors)=>'<div class="tv-ichips" id="'+id+'">'+opts.map(o=>'<button type="button" class="tv-ichip'+(o===cur?' on':'')+'" data-v="'+o+'">'+(colors?'<i style="background:'+colors[o]+'"></i>':'')+o+'</button>').join('')+'</div>';
+  plDialog({
+    title:isNew?'新增地點':'編輯地點', pill:r.name, del:isNew?'':'刪除地點',
+    body:'<label class="ui-fl"><span>名稱</span><input class="ui-in" id="spName" maxlength="40" autocomplete="off" placeholder="例如：紙教堂" value="'+esc(src.name)+'"></label>'
+      +'<label class="ui-fl"><span>備註</span><input class="ui-in" id="spNote" autocomplete="off" placeholder="選填，例如：桃米社區" value="'+esc(src.note)+'"></label>'
+      +'<div class="ui-fl"><span>種類</span>'+chips('spKind',['景點','吃'],st.kind,PL_KIND_COLOR)+'</div>'
+      +'<div class="ui-fl"><span>狀態</span>'+chips('spStatus',['想去','去過'],st.status)+'</div>',
+    onMount:(q)=>{
+      const bind=(id,key)=>q('#'+id).querySelectorAll('.tv-ichip').forEach(b=>b.onclick=()=>{ st[key]=b.dataset.v; q('#'+id).querySelectorAll('.tv-ichip').forEach(x=>x.classList.toggle('on',x===b)); });
+      bind('spKind','kind'); bind('spStatus','status');
+    },
+    onSave:h=>{
+      const name=noSep(h.q('#spName').value).slice(0,40);
+      if(!name){ toast('請輸入地點名稱'); h.q('#spName').focus(); return; }
+      const rec={name,kind:st.kind,status:st.status,note:noSep(h.q('#spNote').value)};
+      if(isNew) r.spots.push(rec); else Object.assign(r.spots[idx],rec);
+      queueSave(); h.close(); renderPlaces(); toast(isNew?'已新增地點':'已儲存');
+    },
+    onDelete:async h=>{
+      const ok=await uiConfirm('刪除「'+src.name+'」？','這個地點會被刪除，無法復原。','刪除地點',true); if(!ok) return;
+      r.spots.splice(idx,1); queueSave(); h.close(); renderPlaces(); toast('已刪除地點');
+    }
+  });
+}
+
+/* --- 畫面 --- */
+function renderPlaces(){
+  const box=$('tvPlaces'); if(!box) return;
+  if(plUI.sel && !curRegion()){ plUI.sel=null; if(document.body.classList.contains('place-open')){ if(plUI.pg){ const p=plUI.pg; plUI.pg=null; popPage(p); } document.body.classList.remove('place-open'); } }
+  if(!plUI.sel && regions.length && !MQ_MOBILE.matches) plUI.sel=regions[0].name;
+  const r=curRegion(), main=$('plMain');
+  const sy=window.scrollY, st=main?main.scrollTop:0;
+  let h='<div class="pl-cols"><aside class="pl-side" aria-label="地區"><div class="pl-sh"><span class="tv-lbl">'+(MQ_MOBILE.matches?'想去的地區':'地區')+'</span><span class="n">'+regions.length+' 處</span></div><ul class="pl-regions">';
+  regions.forEach((x,i)=>{ h+='<li><button type="button" class="pl-reg'+(x===r?' on':'')+'" data-i="'+i+'"><span class="th" data-i="'+i+'"></span><span class="tx"><b>'+esc(x.name)+'</b><span>'+plStatLine(x)+'</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></li>'; });
+  h+='</ul><button type="button" class="tv-addcard pl-addreg" id="plAddReg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增地區</button></aside>';
+  h+='<section class="pl-main" id="plMain" aria-label="地點清單">';
+  if(!r){
+    h+='<div class="pl-empty"><b>還沒有地區</b><span>先新增一個地區，再把想去的景點與美食放進去。</span></div>';
+  } else {
+    const spots=r.spots, cnt={all:spots.length,'景點':spots.filter(s=>s.kind==='景點').length,'吃':spots.filter(s=>s.kind==='吃').length};
+    if(plUI.filter!=='all' && !cnt[plUI.filter]) plUI.filter='all';
+    h+='<div class="pl-mtop"><button type="button" class="tv-rb pl-back" id="plBack" aria-label="返回地區">'+PL_BACK+'</button><span class="pl-mt">地點</span><button type="button" class="tv-rb pl-medit" id="plEditM" aria-label="編輯地區">'+PL_PENCIL+'</button></div>';
+    h+='<div class="pl-body"><div class="pl-head"><div class="pl-hl"><h1 class="pl-title">'+esc(r.name)+'</h1><span class="pl-sub">'+plStatLine(r,true)+'</span></div><div class="pl-hact"><button type="button" class="tv-btn2" id="plEditD">'+PL_PENCIL+'編輯地區</button><button type="button" class="tv-btn2 pri" id="plAddSpotD">'+PL_PLUS+'新增地點</button></div></div>';
+    h+='<div class="pl-filters" role="tablist" aria-label="篩選">'+[['all','全部'],['景點','景點'],['吃','吃']].map(f=>'<button type="button" role="tab" class="tv-ichip'+(plUI.filter===f[0]?' on':'')+'" data-f="'+f[0]+'" aria-selected="'+(plUI.filter===f[0])+'">'+f[1]+' '+cnt[f[0]]+'</button>').join('')+'</div>';
+    const shown=spots.map((s,i)=>({s,i})).filter(x=>plUI.filter==='all'||x.s.kind===plUI.filter);
+    if(!shown.length) h+='<div class="tv-emptyday">'+(spots.length?'這個分類沒有地點。':'這個地區還沒有地點，按下面的按鈕新增第一個。')+'</div>';
+    else {
+      h+='<ul class="pl-spots">';
+      shown.forEach(x=>{
+        const s=x.s, c=PL_KIND_COLOR[s.kind]||PL_KIND_COLOR['景點'];
+        h+='<li class="pl-sp'+(s.status==='去過'?' been':'')+'" style="--c:'+c+'"><button type="button" class="pl-spb" data-i="'+x.i+'" aria-label="編輯：'+esc(s.name)+'"><span class="bub"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+TV_ICO[s.kind==='吃'?'eat':'spot']+'"/></svg></span><span class="tx"><b>'+esc(s.name)+'</b>'+(s.note?'<span>'+esc(s.note)+'</span>':'')+'</span></button>'
+          +'<span class="pl-st" role="group" aria-label="狀態：'+esc(s.name)+'"><button type="button" class="'+(s.status==='想去'?'on':'')+'" data-i="'+x.i+'" data-v="想去" aria-pressed="'+(s.status==='想去')+'">想去</button><button type="button" class="'+(s.status==='去過'?'on been':'')+'" data-i="'+x.i+'" data-v="去過" aria-pressed="'+(s.status==='去過')+'">去過</button></span></li>';
+      });
+      h+='</ul>';
+    }
+    h+='<div class="tv-dayact"><button type="button" class="tv-additem" id="plAddSpot">'+PL_PLUS+'新增地點</button></div></div>';
+  }
+  h+='</section></div><button type="button" class="pl-fab" id="plFab" aria-label="新增地點">'+PL_PLUS.replace('width="18" height="18"','width="24" height="24"')+'</button>';
+  box.innerHTML=h;
+  box.querySelectorAll('.pl-reg .th').forEach(el=>el.appendChild(buildCoverEl(regions[+el.dataset.i].cover,'tv-cvr')));
+  box.querySelectorAll('.pl-reg').forEach(b=>b.onclick=()=>openPlace(regions[+b.dataset.i].name));
+  $('plAddReg').onclick=()=>openRegionDialog(null);
+  if(r){
+    const ri=regions.indexOf(r);
+    $('plBack').onclick=closePlace; $('plEditM').onclick=()=>openRegionDialog(ri); $('plEditD').onclick=()=>openRegionDialog(ri);
+    const add=()=>openSpotDialog(r,null); $('plAddSpot').onclick=add; $('plAddSpotD').onclick=add; $('plFab').onclick=add;
+    box.querySelectorAll('.pl-filters .tv-ichip').forEach(b=>b.onclick=()=>{ plUI.filter=b.dataset.f; renderPlaces(); });
+    box.querySelectorAll('.pl-spb').forEach(b=>b.onclick=()=>openSpotDialog(r,+b.dataset.i));
+    box.querySelectorAll('.pl-st button').forEach(b=>b.onclick=()=>{ const s=r.spots[+b.dataset.i]; if(s.status===b.dataset.v) return; s.status=b.dataset.v; queueSave(); renderPlaces(); });
+  } else { $('plFab').style.display='none'; }
+  const m2=$('plMain'); if(m2) m2.scrollTop=st; window.scrollTo(0,sy);
 }
 
 /* --- 啟動:依上次使用的方式自動連線 --- */
