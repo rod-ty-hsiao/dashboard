@@ -665,10 +665,9 @@ body.connected .file-out { display: inline-block; }
 .mmb-ck input { flex: none; width: 22px; height: 22px; margin: 7px 0 0; accent-color: var(--accent); cursor: pointer; }
 .mmb-cktext { font-size: 17px; line-height: 1.95; min-height: 1.95em; }
 .mmb-ck.done .mmb-cktext { color: #857A6E; text-decoration: line-through; }
-.mmb-code { position: relative; margin: 12px 0; }
-.mmb-bar { height: 7px; border-top: 2px solid #BFB3A1; border-bottom: 2px solid #BFB3A1; margin: 0 var(--br) 0 var(--bl); }   /* 左右滿版的「＝＝＝」分隔線 */
-.mmb-codetext { font: 14px/1.7 ui-monospace, 'Cascadia Mono', Consolas, monospace; padding: 12px 0; min-height: 2.6em; color: #3C342D; white-space: pre; overflow-x: auto; overflow-y: hidden; overflow-wrap: normal; }
-.mmb-del { position: absolute; right: 0; top: 14px; width: 28px; height: 28px; border-radius: 8px; border: 0; background: #F0E8DA; color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer; opacity: .7; }
+.mmb-code { position: relative; margin: 10px 0; background: #F6F1E6; border-radius: 14px; padding: 12px 46px 12px 18px; }
+.mmb-codetext { font: 14px/1.7 ui-monospace, 'Cascadia Mono', Consolas, monospace; padding: 0; min-height: 1.7em; color: #3C342D; white-space: pre; overflow-x: auto; overflow-y: hidden; overflow-wrap: normal; }
+.mmb-del { position: absolute; right: 10px; top: 10px; width: 28px; height: 28px; border-radius: 8px; border: 0; background: rgba(255,255,255,.7); color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer; opacity: .75; }
 .mmb-del:hover, .mmb-del:focus-visible { opacity: 1; background: #F3E4DA; color: var(--accent); }
 .mm-empty { display: none; color: #8A8074; font-size: 15px; padding: 40px 0; text-align: center; }
 .mm-cole.mm-none > :not(.mm-empty) { display: none !important; }
@@ -1760,7 +1759,7 @@ function smodalShell(extraClass){
   const m=document.createElement('div'); m.className='smodal'+(extraClass?' '+extraClass:'');
   bg.appendChild(m); document.body.appendChild(bg);
   if(MQ_MOBILE.matches) pg=pushPage({close:()=>{ pg=null; realClose(); }, guard:()=>!state.locked,
-    blocked:()=>{ uiConfirm('放棄尚未儲存的修改？','編輯到一半的內容會遺失。','放棄修改',true).then(ok=>{ if(ok){ state.locked=false; close(); } }); }});   // iPhone 左緣右滑 = 返回（編輯中先問，用自製對話框；iOS 在返回手勢裡會直接擋掉內建 confirm）
+    blocked:decide=>{ uiConfirm('放棄尚未儲存的修改？','編輯到一半的內容會遺失。','放棄修改',true).then(ok=>{ if(ok) state.locked=false; decide(ok); }); }});   // iPhone 左緣右滑 = 返回（編輯中先問，用自製對話框；iOS 在返回手勢裡會直接擋掉內建 confirm）
   return {m, close, state};
 }
 function bannerUrls(item){
@@ -2627,7 +2626,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-01.14';
+const APP_VERSION='2026-11-01.15';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -2985,9 +2984,24 @@ function popPage(entry){         // 由程式（按返回鈕、按 ×）關閉�
 window.addEventListener('popstate',()=>{
   if(suppressPop>0){ suppressPop--; return; }
   const e=pageStack[pageStack.length-1]; if(!e) return;
-  if(e.guard && !e.guard()){            // 還不能關（例如編輯中）：先把歷史紀錄補回去讓畫面留在原地，再用「自製對話框」問使用者（iOS 在返回手勢裡會直接擋掉 confirm()）
-    try{ history.pushState({dashPage:pageStack.length},''); }catch(_){}
-    if(e.blocked) e.blocked();
+  if(e.guard && !e.guard()){
+    // 還不能關（例如編輯中）→ 用「自製對話框」立刻詢問（iOS 在返回手勢裡會直接擋掉 confirm()）。
+    // 重點：不能在 popstate 裡立刻 pushState。iOS 會把「返回手勢的上一頁截圖」留到下一次重繪完成，
+    //       在這裡補歷史紀錄會讓截圖多停 2～3 秒，對話框就被蓋住。所以改成：先問、使用者決定（或 0.7 秒後）才補。
+    if(e.asking) return;
+    e.asking=true; e.restored=false;
+    const restore=()=>{ if(!e.restored){ e.restored=true; try{ history.pushState({dashPage:pageStack.length},''); }catch(_){} } };
+    const timer=setTimeout(restore,700);
+    const decide=ok=>{
+      e.asking=false; clearTimeout(timer);
+      if(ok){
+        const i=pageStack.indexOf(e); if(i>=0) pageStack.splice(i,1);
+        e.closed=true;
+        if(e.restored){ suppressPop++; try{ history.back(); }catch(_){ suppressPop--; } }     // 已經補過歷史紀錄就退回去
+        e.close();
+      } else restore();
+    };
+    if(e.blocked) e.blocked(decide); else decide(false);
     return;
   }
   pageStack.pop(); e.closed=true; e.close();
@@ -3265,12 +3279,10 @@ function renderBlocks(focus){
       el.append(cb,ta);
     } else {
       el=document.createElement('div'); el.className='mmb mmb-code';
-      const top=document.createElement('div'); top.className='mmb-bar'; top.setAttribute('aria-hidden','true');
       const ta=document.createElement('textarea'); ta.className='mmb-codetext mm-keep'; ta.rows=1; ta.value=b.v; ta.spellcheck=false; ta.setAttribute('aria-label','程式碼');
-      const bot=document.createElement('div'); bot.className='mmb-bar'; bot.setAttribute('aria-hidden','true');
       const del=document.createElement('button'); del.type='button'; del.className='mmb-del'; del.setAttribute('aria-label','移除程式碼區塊'); del.title='移除程式碼區塊'; del.textContent='×';
       del.onclick=()=>{ const idx=+el.dataset.i; memoUI.blocks.splice(idx,1); commitBlocks(); renderBlocks({i:Math.max(0,idx-1),pos:'end'}); };
-      el.append(top,ta,bot,del);
+      el.append(ta,del);
     }
     el.dataset.i=i; box.appendChild(el);
   });
