@@ -1102,6 +1102,34 @@ body.trip-edit .tv-edit { display: block; }
   .pl-st button { min-width: 46px; padding: 0 8px; }
   body.place-open .pl-fab { display: grid; position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; place-items: center; box-shadow: 0 10px 24px -6px rgba(181,83,47,.55); cursor: pointer; z-index: 92; }
 }
+
+/* ===== 既有功能優化（影集順序／即將開播、美食地圖定位與手機列表）===== */
+#sortRevBtn { white-space: nowrap; }
+#sortRevBtn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.show-sec { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin: 20px 0 4px; color: #9a9992; font-size: 13px; letter-spacing: .08em; }
+.show-sec b { color: #f5f4ef; font-size: 15px; font-weight: 600; letter-spacing: .1em; }
+.show-sec i { flex: 1; height: 1px; background: #3a3934; }
+.show-list > .show-sec { margin-top: 18px; }
+.show-card.upcoming .show-poster, .show-row.upcoming .row-thumb { filter: saturate(.55) brightness(.92); }
+.smodal-in[type="date"] { -webkit-appearance: none; appearance: none; display: flex; align-items: center; justify-content: flex-start; min-width: 0; max-width: 100%; box-sizing: border-box; line-height: normal; }
+.smodal-in[type="date"]::-webkit-date-and-time-value { text-align: left; min-width: 0; margin: 0; display: flex; align-items: center; min-height: 1.4em; line-height: normal; }
+.addr-row { display: flex; gap: 8px; }
+.addr-row .smodal-in { flex: 1; min-width: 0; }
+.addr-go { flex: none; padding: 0 18px; white-space: nowrap; }
+.addr-msg { font-size: 12.5px; line-height: 1.65; color: #9a9992; margin-top: 8px; white-space: pre-line; overflow-wrap: anywhere; }
+.addr-msg.ok { color: #8fcf9a; }
+.addr-msg.warn { color: #e0b46a; }
+.addr-msg.bad { color: #f08a7a; }
+.food-row-pin { display: none; }
+@media (max-width: 720px) {
+  /* 沒有橫幅圖的全螢幕編輯頁：標題往下讓出返回鍵的位置 */
+  .smodal > .smodal-close + .smodal-body { padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  #showSearch { flex: 1 1 calc(100% - 108px); min-width: 0; }
+  #sortRevBtn { order: 1; flex: 0 0 96px; width: 96px; padding: 11px 4px; border-radius: 12px; font-size: 13px; }
+  .food-row-pin { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: #b0afab; flex: none; cursor: pointer; }
+  .food-row-pin:active { background: rgba(255,255,255,.08); }
+  .show-sec { margin: 16px 0 2px; }
+}
 </style>
 </head>
 <body>
@@ -1306,6 +1334,7 @@ body.trip-edit .tv-edit { display: block; }
             <input id="filterYear" type="text" placeholder="年分" autocomplete="off">
             <select id="filterGenre"></select>
             <input id="showSearch" type="text" placeholder="搜尋片名、演員或備註…（模糊搜尋）" autocomplete="off">
+            <button class="tool-btn" id="sortRevBtn" type="button" aria-pressed="false">↓ 正序</button>
             <button class="tool-btn" id="importBtn" title="匯入 CSV（與匯出格式相同）">⬆ 匯入</button>
             <button class="tool-btn" id="exportBtn" title="匯出 Excel 可開啟的 CSV">⬇ 匯出</button>
             <button class="tool-btn" id="selectModeBtn" title="批量選取：點選單張，或先點第一張、再 Shift+點最後一張選整段範圍">☑ 批量選取</button>
@@ -1375,6 +1404,15 @@ const GENRE_MIGRATE = {'台劇':'臺灣','韓劇':'韓國','美劇':'美國','�
 let showFilter = { series:{year:'',genre:'',q:'',wdate:''}, movie:{year:'',genre:'',q:'',wdate:''}, watched:{year:'',genre:'',q:'',wdate:''} };
 let selectMode=false, selectedItems=new Set(), selectAnchor=null;
 let showViewMode = localStorage.getItem('shows-view') || 'grid';
+const showRev=(()=>{ try{ return JSON.parse(localStorage.getItem('shows-rev')||'{}')||{}; }catch(e){ return {}; } })();   // 每個頁籤各自記住「倒序」
+const todayYmd=()=>nowStr().slice(0,10);
+const isUpcoming=it=>activeShowTab!=='watched' && /^\d{4}-\d{2}-\d{2}$/.test(it.airDate||'') && it.airDate>todayYmd();
+function updateSortBtn(){
+  const b=document.getElementById('sortRevBtn'); if(!b) return;
+  const r=!!showRev[activeShowTab];
+  b.textContent=(r?'↑ 倒序':'↓ 正序'); b.setAttribute('aria-pressed',String(r)); b.classList.toggle('active',r);
+  b.title='把目前這一頁的排列順序上下倒過來（只影響顯示，不會改動檔案裡的順序）';
+}
 let statsGenreScope = localStorage.getItem('stats-genre-scope') || 'all';
 const $ = id => document.getElementById(id);
 let scrollReset = false;   // true = 下一次重繪後回到頂端；預設保留捲動位置（編輯、刪除、移動、拖曳、選取…）
@@ -1510,7 +1548,7 @@ function attachDrag(el, list, item, onDrop, opts){
     if(dragItems.includes(item)) return; // 不對被拖動的項目自己顯示插入線
     const r=el.getBoundingClientRect();
     const before = grid ? (e.clientX < r.left+r.width/2) : (e.clientY < r.top+r.height/2);
-    dragTarget={item, before};
+    dragTarget={item, before:(opts&&opts.reverse)?!before:before};
     placeMarkerAt(el.parentNode, el, before, grid);
   });
   el.addEventListener('drop', e=>{
@@ -1524,11 +1562,12 @@ function attachDrag(el, list, item, onDrop, opts){
 }
 
 // 容器空白處（清單最後方）的拖放：讓「拖到最後一項之後」也能精確落在最尾端
-function attachDropZoneEnd(container, getList, onDrop, isGrid){
+function attachDropZoneEnd(container, getList, onDrop, isGrid, isRev){
   container.addEventListener('dragover', e=>{
     if(!dragList || dragList!==getList()) return;
     e.preventDefault();
     dragTarget=null;
+    if(isRev && isRev()){ const f=getList().find(x=>!(dragItems||[]).includes(x)); if(f) dragTarget={item:f,before:true}; }   // 倒序：畫面最後面 = 陣列最前面
     const vertical=isGrid();
     const kids=Array.from(container.children).filter(c=>c!==dragMarker);
     const last=kids[kids.length-1];
@@ -1870,7 +1909,7 @@ function parseShows(md){
       const g=parts[5]||'';
       out[cur].push({ title:parts[0]||'', note:unescNote(parts[1]||''), poster:parts[2]||'',
         type:parts[3]!==undefined?parts[3]:(cur==='watched'?'':cur), year:parts[4]||'',
-        genre:GENRE_MIGRATE[g]||g, banner:parts[6]||'', cast:parts[7]||'', watchedDate:parts[8]||'' });
+        genre:GENRE_MIGRATE[g]||g, banner:parts[6]||'', cast:parts[7]||'', watchedDate:parts[8]||'', airDate:parts[9]||'' });
     }
   });
   return out;
@@ -1878,7 +1917,7 @@ function parseShows(md){
 function serializeShows(){
   let md='# Shows\n';
   const line=t=>{
-    const parts=[t.title, escNote(t.note), t.poster||'', t.type||'', t.year||'', t.genre||'', t.banner||'', t.cast||'', t.watchedDate||''];
+    const parts=[t.title, escNote(t.note), t.poster||'', t.type||'', t.year||'', t.genre||'', t.banner||'', t.cast||'', t.watchedDate||'', t.airDate||''];
     while(parts.length>1 && parts[parts.length-1]==='') parts.pop();
     return '- '+parts.join(' :: ')+'\n';
   };
@@ -1994,6 +2033,7 @@ function renderShows(){
 function renderShowsCore(){
   renderStats();
   updateSelectUI();
+  updateSortBtn();
   const grid=$('showGrid');
   grid.className = showViewMode==='list' ? 'show-list' : 'show-grid';
   grid.innerHTML='';
@@ -2007,7 +2047,21 @@ function renderShowsCore(){
     e.textContent = hasFilter ? '沒有符合篩選條件的項目' : '目前沒有項目';
     grid.appendChild(e); return;
   }
-  filtered.forEach(item=>grid.appendChild(showViewMode==='list' ? showRow(item,list,filtered) : showCard(item,list,filtered)));
+  let disp = showRev[activeShowTab] ? filtered.slice().reverse() : filtered;
+  let upcoming=[];
+  if(activeShowTab!=='watched'){
+    upcoming=disp.filter(isUpcoming).sort((a,b)=>a.airDate<b.airDate?-1:(a.airDate>b.airDate?1:0));   // 即將開播：開播日近的在前
+    disp=disp.filter(it=>!isUpcoming(it));
+  }
+  const all=disp.concat(upcoming);
+  const mk=item=>grid.appendChild(showViewMode==='list' ? showRow(item,list,all) : showCard(item,list,all));
+  disp.forEach(mk);
+  if(upcoming.length){
+    const h=document.createElement('div'); h.className='show-sec';
+    h.innerHTML='<b>即將開播</b><span>'+upcoming.length+' 部</span><i></i>';
+    grid.appendChild(h);
+    upcoming.forEach(mk);
+  }
 }
 
 /* ---------- 批量選取（點選 / Shift+點選範圍） ---------- */
@@ -2043,6 +2097,10 @@ function metaBadges(item, large){
   else if(large){ const y=document.createElement('span'); y.className=cls; y.style.opacity=.5; y.textContent='年分未填'; wrap.appendChild(y); }
   if(item.genre){ const g=document.createElement('span'); g.className=cls; g.textContent=item.genre; wrap.appendChild(g); }
   else if(large){ const g=document.createElement('span'); g.className=cls; g.style.opacity=.5; g.textContent='類型未選'; wrap.appendChild(g); }
+  if(activeShowTab!=='watched' && /^\d{4}-\d{2}-\d{2}$/.test(item.airDate||'')){
+    const up=item.airDate>todayYmd();
+    if(up||large){ const a=document.createElement('span'); a.className=cls+(up?' accent':''); a.textContent=(up&&!large)?((+item.airDate.slice(5,7))+'/'+(+item.airDate.slice(8,10))+' 開播'):'開播 '+item.airDate; wrap.appendChild(a); }
+  }
   if(activeShowTab==='watched'&&item.type){ const t=document.createElement('span'); t.className=cls+' accent'; t.textContent=showLabel(item.type); wrap.appendChild(t); }
   if(activeShowTab==='watched'){
     const d=document.createElement('span'); d.className=cls; d.textContent = item.watchedDate ? '看完於 '+item.watchedDate : '';
@@ -2070,7 +2128,7 @@ function showActions(item, list, rowMode){
 
 function showCard(item, list, displayList){
   const card=document.createElement('div'); card.className='show-card';
-  attachDrag(card, list, item, renderShows, {grid:true});
+  if(isUpcoming(item)) card.classList.add('upcoming'); else attachDrag(card, list, item, renderShows, {grid:true, reverse:!!showRev[activeShowTab]});
   card.onclick=e=>{ if(selectMode){ handleSelectClick(item, displayList, e); return; } openShowModal(item); };
 
   if(selectMode){
@@ -2097,7 +2155,7 @@ function showCard(item, list, displayList){
 
 function showRow(item, list, displayList){
   const row=document.createElement('div'); row.className='show-row';
-  attachDrag(row, list, item, renderShows);
+  if(isUpcoming(item)) row.classList.add('upcoming'); else attachDrag(row, list, item, renderShows, {reverse:!!showRev[activeShowTab]});
   row.onclick=e=>{ if(selectMode){ handleSelectClick(item, displayList, e); return; } openShowModal(item); };
 
   if(selectMode){
@@ -2282,6 +2340,8 @@ function openShowModal(item){
       const isWatched = activeShowTab==='watched';
       const di=isWatched ? document.createElement('input') : null;
       if(di){ di.type='date'; di.className='smodal-in'; di.value=item.watchedDate||''; }
+      const ai=isWatched ? null : document.createElement('input');
+      if(ai){ ai.type='date'; ai.className='smodal-in'; ai.value=item.airDate||''; }
       const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.value=item.note||''; na.placeholder=NOTE_PH('儲存');
 
       // 橫幅圖片：可自行增減的多列網址
@@ -2335,6 +2395,7 @@ function openShowModal(item){
         item.poster=pi.value.trim();
         item.banner=bannerEdit.map(s=>s.trim()).filter(Boolean).join('|');
         if(di) item.watchedDate=di.value;
+        if(ai) item.airDate=ai.value;
         item.note=na.value.trim();
         queueSave(); renderShows(); editing=false; draw();
       };
@@ -2351,7 +2412,7 @@ function openShowModal(item){
       const ygRow=document.createElement('div'); ygRow.className='field-row';
       ygRow.append(smodalField('年分',yi), smodalField('類型',gs));
       if(di) ygRow.appendChild(smodalField('加入已觀看日期',di));
-      body.append(smodalField('名稱',ti), ygRow, smodalField('主要演員',ci), smodalField('卡片圖片網址',pi), smodalField('橫幅圖片網址（可多張，輪播顯示）',bannerRows), smodalField('備註',na), btns);
+      body.append(smodalField('名稱',ti), ygRow, smodalField('主要演員',ci), ...(ai?[smodalField('開播日（選填，還沒開播的會放在下方「即將開播」）',ai)]:[]), smodalField('卡片圖片網址',pi), smodalField('橫幅圖片網址（可多張，輪播顯示）',bannerRows), smodalField('備註',na), btns);
       m.append(x, banner, body);
       ti.focus();
     }
@@ -2361,7 +2422,7 @@ function openShowModal(item){
 
 function openAddModal(){
   if(activeShowTab==='watched') return;
-  const draft={title:'',note:'',poster:'',type:activeShowTab,year:'',genre:'',banner:'',cast:'',watchedDate:''};
+  const draft={title:'',note:'',poster:'',type:activeShowTab,year:'',genre:'',banner:'',cast:'',watchedDate:'',airDate:''};
   const {m, close, state}=smodalShell();
   state.locked=true; // 新增表單整個是輸入狀態，點背景/Esc 不關閉，只能按「新增」「取消」或 ×
   const x=document.createElement('button'); x.className='smodal-close'; x.textContent='×'; x.onclick=close;
@@ -2370,13 +2431,14 @@ function openAddModal(){
   const ti=document.createElement('input'); ti.className='smodal-in'; ti.placeholder=activeShowTab==='series'?'影集名稱':'電影名稱';
   const yi=document.createElement('input'); yi.className='smodal-in'; yi.placeholder='例如 2024';
   const gs=buildGenreSelect('');
+  const ai=document.createElement('input'); ai.type='date'; ai.className='smodal-in';
   const ci=document.createElement('input'); ci.className='smodal-in'; ci.placeholder='例如 朴敘俊、金多美';
   const pi=document.createElement('input'); pi.className='smodal-in'; pi.placeholder='圖片網址（卡片與橫幅共用，之後可分開改）';
   const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=4; na.placeholder=NOTE_PH('新增');
   const add=()=>{
     const v=ti.value.trim(); if(!v){ toast('請輸入名稱'); ti.focus(); return; }
     draft.title=v; draft.year=yi.value.trim(); draft.genre=gs.value; draft.cast=ci.value.trim(); draft.note=na.value.trim();
-    draft.poster=pi.value.trim();
+    draft.poster=pi.value.trim(); draft.airDate=ai.value;
     // 新增時卡片圖帶入橫幅（banner 留空 = 沿用 poster），除非已在橫幅另外貼過圖
     shows[activeShowTab].unshift(draft);
     queueSave(); renderShows(); close();
@@ -2392,15 +2454,15 @@ function openAddModal(){
   btns.append(ab,cb);
   const ygRow=document.createElement('div'); ygRow.className='field-row';
   ygRow.append(smodalField('年分',yi), smodalField('類型',gs));
-  body.append(smodalField('名稱',ti), ygRow, smodalField('主要演員',ci), smodalField('圖片網址',pi), smodalField('備註',na), btns);
+  body.append(smodalField('名稱',ti), ygRow, smodalField('主要演員',ci), smodalField('開播日（選填，還沒開播的會放在下方「即將開播」）',ai), smodalField('圖片網址',pi), smodalField('備註',na), btns);
   m.append(x, banner, body);
   ti.focus();
 }
 
 /* ---------- 匯出 Excel (CSV) ---------- */
 function exportExcel(){
-  const rows=[['清單','名稱','年分','類型','主要演員','加入已觀看日期','備註','原始分類','卡片圖片網址','橫幅圖片網址']];
-  const push=(label,list)=>list.forEach(it=>rows.push([label, it.title, it.year||'', it.genre||'', it.cast||'', it.watchedDate||'', it.note||'', showLabel(it.type)||'', it.poster||'', it.banner||'']));
+  const rows=[['清單','名稱','年分','類型','主要演員','加入已觀看日期','備註','原始分類','卡片圖片網址','橫幅圖片網址','開播日']];
+  const push=(label,list)=>list.forEach(it=>rows.push([label, it.title, it.year||'', it.genre||'', it.cast||'', it.watchedDate||'', it.note||'', showLabel(it.type)||'', it.poster||'', it.banner||'', it.airDate||'']));
   push('影集',shows.series); push('電影',shows.movie); push('已觀看',shows.watched);
   const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
@@ -2442,7 +2504,7 @@ function importCSV(text){
   if(iList<0||iTitle<0){ toast('格式不符：需要「清單」與「名稱」欄'); return; }
   const iYear=col('年分'), iGenre=col('類型'), iCast=col('主要演員'), iDate=col('加入已觀看日期'), iNote=col('備註'), iOrig=col('原始分類');
   let iPoster=col('卡片圖片網址'); if(iPoster<0) iPoster=col('海報網址'); // 相容最早版本的匯出
-  const iBanner=col('橫幅圖片網址');
+  const iBanner=col('橫幅圖片網址'), iAir=col('開播日');
   const LIST_MAP={'影集':'series','電影':'movie','已觀看':'watched'};
   const TYPE_MAP={'影集':'series','電影':'movie'};
   const existingByKey={};
@@ -2466,7 +2528,7 @@ function importCSV(text){
       note:get(r,iNote), poster:get(r,iPoster),
       type: key==='watched' ? (TYPE_MAP[get(r,iOrig)]||'') : key,
       year:get(r,iYear), genre:GENRE_MIGRATE[g]||g,
-      banner:get(r,iBanner), cast:get(r,iCast), watchedDate:get(r,iDate)
+      banner:get(r,iBanner), cast:get(r,iCast), watchedDate:get(r,iDate), airDate:get(r,iAir)
     };
     const dup=existingByKey[key].get(title);
     if(dup){
@@ -2615,16 +2677,28 @@ function renderFoods(){
       const b=document.createElement('span'); b.className='meta-badge'; b.textContent=v; meta.appendChild(b);
     });
     main.append(name,meta);
-    const del=document.createElement('button'); del.className='food-row-del'; del.textContent='×';
-    del.onclick=e=>{ e.stopPropagation(); foods=foods.filter(x=>x!==it); queueSave(); renderFoods(); };
-    row.append(thumb,main,del);
-    row.onclick=()=>{
+    const locate=()=>{
       const c=parseCoords(it.lat+','+it.lng);
       if(!c||!foodMap){ toast(c?'地圖尚未載入':'這筆資料沒有座標'); return; }
       foodMap.flyTo([c.lat,c.lng],16,{duration:.8});
       const mk=foodMarkerByItem.get(it);
       if(mk) setTimeout(()=>mk.openPopup(),850);
     };
+    const pin=document.createElement('button'); pin.type='button'; pin.className='food-row-pin'; pin.setAttribute('aria-label','在地圖上看'); pin.title='在地圖上看';
+    pin.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+    pin.onclick=e=>{
+      e.stopPropagation();
+      if(MQ_MOBILE.matches){ $('foodView').dataset.pane='map'; updateTabbar(); window.scrollTo(0,0); if(foodMap) foodMap.invalidateSize(); setTimeout(locate,150); }
+      else locate();
+    };
+    const del=document.createElement('button'); del.className='food-row-del'; del.textContent='×'; del.setAttribute('aria-label','刪除店家');
+    del.onclick=async e=>{
+      e.stopPropagation();
+      if(MQ_MOBILE.matches){ const ok=await uiConfirm('刪除「'+it.name+'」？','這家店會從美食地圖移除，無法復原。','刪除',true); if(!ok) return; }
+      foods=foods.filter(x=>x!==it); queueSave(); renderFoods();
+    };
+    row.append(thumb,main,pin,del);
+    row.onclick=()=>{ if(MQ_MOBILE.matches) openFoodModal(it); else locate(); };
     listEl.appendChild(row);
   });
 }
@@ -2635,6 +2709,66 @@ function buildOptSelect(options, value, emptyLabel){
   options.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; s.appendChild(o); });
   s.value=options.includes(value)?value:'';
   return s;
+}
+
+/* ---------- 美食地圖：用地址／Google 地圖連結定位 ---------- */
+// 1) 直接輸入「緯度, 經度」 2) 貼 Google 地圖的完整連結（含座標） 3) 貼地址 → 送到 OpenStreetMap 的免費查詢服務（Nominatim）
+const normTw=s=>String(s||'').replace(/台/g,'臺');
+function cityFromText(s){
+  const t=normTw(s);
+  return CITIES.filter(c=>t.includes(c)).sort((a,b)=>b.length-a.length)[0]||'';
+}
+function parseGoogleMapsUrl(u){
+  if(!/^https?:\/\//i.test(u)) return null;
+  if(/maps\.app\.goo\.gl|goo\.gl\/maps|g\.co\/kgs/i.test(u)) return {short:true};
+  if(!/google\.[a-z.]+\/maps|maps\.google\./i.test(u)) return null;
+  let d; try{ d=decodeURIComponent(u); }catch(e){ d=u; }
+  let m=d.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || d.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || d.match(/[?&](?:q|ll|query|center)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+  if(!m) return {noCoord:true};
+  const out={lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  const pn=d.match(/\/maps\/place\/([^\/@?]+)/);
+  if(pn) out.name=pn[1].replace(/\+/g,' ').trim();
+  return out;
+}
+const geoWait=ms=>new Promise(r=>setTimeout(r,ms));
+async function nominatim(q){
+  const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=tw&accept-language=zh-TW&addressdetails=1&q='+encodeURIComponent(q);
+  const res=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  return j&&j[0] ? j[0] : null;
+}
+async function geocodeTw(raw){
+  let s=String(raw||'').trim().replace(/^\s*\d{3,6}\s*/,'').replace(/^(臺灣|台灣|Taiwan)[,，\s]*/i,'').replace(/\s+/g,'');
+  const noFloor=s.replace(/[（(].*?[)）]/g,'').replace(/(?:\d+|[一二三四五六七八九十]+)樓.*$/,'').replace(/B\d.*$/i,'');
+  const roadOnly=noFloor.replace(/\d+(?:之\d+)?號.*$/,'');
+  const tries=[{q:s,approx:false},{q:noFloor,approx:false},{q:roadOnly,approx:true}].filter((t,i,a)=>t.q && a.findIndex(x=>x.q===t.q)===i);
+  for(let i=0;i<tries.length;i++){
+    if(i>0) await geoWait(1100);     // Nominatim 使用規範：每秒最多 1 次請求
+    const r=await nominatim(tries[i].q);
+    if(r){
+      const a=r.address||{};
+      return {lat:parseFloat(r.lat), lng:parseFloat(r.lon), label:r.display_name, approx:tries[i].approx||(/號/.test(s)&&!a.house_number),
+        city:cityFromText([a.city,a.county,a.state,a['ISO3166-2-lvl4'],r.display_name,s].filter(Boolean).join(' '))};
+    }
+  }
+  return null;
+}
+/* 回傳 {lat,lng,city,name,label,approx} 或 {error:'訊息'} */
+async function resolveLocationInput(text){
+  const t=String(text||'').trim();
+  if(!t) return {error:'請先貼上地址、Google 地圖連結或座標'};
+  const g=parseGoogleMapsUrl(t);
+  const c=(!g && /^-?\d+(?:\.\d+)?\s*[,，]\s*-?\d+(?:\.\d+)?$/.test(t)) ? parseCoords(t) : null;   // 整串只有座標才算；網址裡夾帶的數字不算
+  if(c) return {lat:c.lat,lng:c.lng,label:'已使用輸入的座標'};
+  if(g){
+    if(g.short) return {error:'這是 Google 地圖的「短連結」，網頁無法展開。請在 Google 地圖複製店家的地址貼上，或改貼瀏覽器網址列的完整連結。'};
+    if(g.noCoord) return {error:'這個連結裡沒有座標。請改貼店家的地址，或在 Google 地圖對地點按右鍵複製座標。'};
+    return {lat:g.lat,lng:g.lng,name:g.name,label:'由 Google 地圖連結取得座標'};
+  }
+  const r=await geocodeTw(t);
+  if(!r) return {error:'找不到這個地址。可以試試去掉樓層，或改貼 Google 地圖的完整連結、直接輸入座標。'};
+  return r;
 }
 
 function openFoodModal(item, prefill){
@@ -2654,6 +2788,28 @@ function openFoodModal(item, prefill){
   const hi=document.createElement('input'); hi.className='smodal-in'; hi.value=item?item.hours:''; hi.placeholder='例如 11:00–21:00（週一公休）';
   const ii=document.createElement('input'); ii.className='smodal-in'; ii.value=item?item.img:''; ii.placeholder='圖片網址';
   const na=document.createElement('textarea'); na.className='smodal-in'; na.rows=3; na.value=item?item.note:''; na.placeholder=NOTE_PH('儲存');
+
+  const ai=document.createElement('input'); ai.className='smodal-in'; ai.placeholder='貼上地址或 Google 地圖連結';
+  ai.autocomplete='off'; ai.setAttribute('autocapitalize','off');
+  const locBtn=document.createElement('button'); locBtn.type='button'; locBtn.className='smodal-btn addr-go'; locBtn.textContent='定位';
+  const locMsg=document.createElement('div'); locMsg.className='addr-msg'; locMsg.textContent='會把地址送到 OpenStreetMap 的免費查詢服務來找座標；找到後會自動填入下方座標與縣市。';
+  const addrWrap=document.createElement('div'); const addrRow=document.createElement('div'); addrRow.className='addr-row'; addrRow.append(ai,locBtn); addrWrap.append(addrRow,locMsg);
+  const say=(t,k)=>{ locMsg.textContent=t; locMsg.className='addr-msg'+(k?' '+k:''); };
+  const doLocate=async()=>{
+    if(locBtn.disabled) return;
+    locBtn.disabled=true; locBtn.textContent='定位中…'; say('查詢中…');
+    try{
+      const r=await resolveLocationInput(ai.value);
+      if(r.error){ say(r.error,'bad'); return; }
+      gi.value=r.lat.toFixed(6)+', '+r.lng.toFixed(6);
+      if(r.city && cs.value!==r.city) cs.value=r.city;
+      if(r.name && !ni.value.trim()) ni.value=r.name;
+      say((r.approx?'只找到大約的位置（路段），儲存後請在地圖上確認，必要時再拖正座標。':'已定位並填入座標。')+(r.label&&r.label!==ai.value?'\n'+r.label:''), r.approx?'warn':'ok');
+    }catch(err){ say('查詢失敗（需要網路連線，或查詢服務暫時忙碌）。稍後再試，或直接輸入座標。','bad'); }
+    finally{ locBtn.disabled=false; locBtn.textContent='定位'; }
+  };
+  locBtn.onclick=doLocate;
+  ai.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doLocate(); } });
 
   const saveIt=()=>{
     const name=ni.value.trim(); if(!name){ toast('請輸入店家名稱'); ni.focus(); return; }
@@ -2681,7 +2837,7 @@ function openFoodModal(item, prefill){
 
   const row1=document.createElement('div'); row1.className='field-row';
   row1.append(smodalField('縣市',cs), smodalField('類型',ts), smodalField('時段',ms));
-  body.append(title, smodalField('名稱',ni), smodalField('座標（緯度, 經度）',gi), row1,
+  body.append(title, smodalField('名稱',ni), smodalField('地址或 Google 地圖連結（選填，按「定位」自動找座標）',addrWrap), smodalField('座標（緯度, 經度）',gi), row1,
     smodalField('營業時間',hi), smodalField('圖片網址',ii), smodalField('備註',na), btns);
   m.append(x, body);
   ni.focus();
@@ -2829,7 +2985,13 @@ $('selectModeBtn').onclick=()=>{
   if(!selectMode){ selectedItems.clear(); selectAnchor=null; }
   renderShows();
 };
-attachDropZoneEnd($('showGrid'), ()=>shows[activeShowTab], renderShows, ()=>showViewMode==='grid');
+attachDropZoneEnd($('showGrid'), ()=>shows[activeShowTab], renderShows, ()=>showViewMode==='grid', ()=>!!showRev[activeShowTab]);
+$('sortRevBtn').onclick=()=>{
+  showRev[activeShowTab]=!showRev[activeShowTab];
+  try{ localStorage.setItem('shows-rev',JSON.stringify(showRev)); }catch(e){}
+  scrollReset=true; renderShows();
+  toast(showRev[activeShowTab]?'已倒序排列':'已恢復正序');
+};
 $('importFile').addEventListener('change', async e=>{
   const f=e.target.files[0]; e.target.value='';
   if(!f) return;
@@ -3026,7 +3188,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-01.21';
+const APP_VERSION='2026-11-02.1';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
