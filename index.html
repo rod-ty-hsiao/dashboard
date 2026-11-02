@@ -1135,6 +1135,11 @@ body.trip-edit .tv-edit { display: block; }
 .food-row-gm { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: #b0afab; flex: none; cursor: pointer; }
 .food-row-gm:hover { color: var(--accent); background: rgba(255,255,255,.06); }
 .food-popup-btns button { white-space: nowrap; }
+.smodal-in[type="date"], .smodal-in[type="time"] { color-scheme: dark; }
+.smodal-in[type="date"]::-webkit-calendar-picker-indicator, .smodal-in[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.1); opacity: .85; cursor: pointer; }
+.smodal-in[type="date"]:disabled::-webkit-calendar-picker-indicator { opacity: .35; }
+.ui-in[type="date"], .ui-in[type="time"] { color-scheme: dark; }
+.ui-in[type="date"]::-webkit-calendar-picker-indicator, .ui-in[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.1); opacity: .85; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -3160,7 +3165,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-02.2';
+const APP_VERSION='2026-11-02.3';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
