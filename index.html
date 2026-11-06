@@ -1140,6 +1140,50 @@ body.trip-edit .tv-edit { display: block; }
 .smodal-in[type="date"]:disabled::-webkit-calendar-picker-indicator { opacity: .35; }
 .ui-in[type="date"], .ui-in[type="time"] { color-scheme: dark; }
 .ui-in[type="date"]::-webkit-calendar-picker-indicator, .ui-in[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.1); opacity: .85; cursor: pointer; }
+
+/* ===== 影集分區可收合、旅遊行程地圖 ===== */
+.show-sec.foldable { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; border-radius: 10px; padding: 4px 6px; margin-left: -6px; margin-right: -6px; transition: background .15s; }
+.show-sec.foldable:hover { background: rgba(255,255,255,.04); }
+.show-sec.foldable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.show-sec .chev { flex: none; width: 18px; height: 18px; color: #9a9992; transition: transform .2s; }
+.show-sec.closed .chev { transform: rotate(-90deg); }
+.show-sec.foldable.first, .show-list > .show-sec.foldable.first { margin-top: 2px; }
+.show-sec.closed b { color: #bdbcb6; }
+
+.tv-mapbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.tv-maptog { display: inline-flex; align-items: center; gap: 7px; }
+.tv-maptog .chev { transition: transform .2s; }
+.tv-maptog.on .chev { transform: rotate(180deg); }
+.tv-maptog.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tv-mapseg { display: inline-flex; padding: 3px; border-radius: 999px; background: #F3ECDF; gap: 2px; }
+.tv-mapseg button { appearance: none; border: 0; font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 16px; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; }
+.tv-mapseg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(70,50,30,.18); }
+.tv-mapseg button:focus-visible, .tv-lgchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tv-mapbox { margin-top: 12px; }
+.tv-map { height: 340px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #EDE6D8; z-index: 0; position: relative; }
+.tv-mapmsg { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+.tv-mapnote { margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.tv-maplg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.tv-maplg:empty { display: none; }
+.tv-lgchip { appearance: none; font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+.tv-lgchip i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.tv-lgchip em { font-style: normal; font-weight: 500; color: var(--muted); font-size: 12px; }
+.tv-lgchip.off { opacity: .45; }
+.tv-lgchip.off i { background: #bbb !important; }
+.tv-pin { background: none; border: 0; }
+.tv-pin span { display: grid; place-items: center; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; color: #fff; font: 700 14px/1 system-ui, -apple-system, 'Noto Sans TC', sans-serif; border: 2.5px solid #fff; box-shadow: 0 2px 7px rgba(0,0,0,.4); }
+.tv-pop { display: flex; flex-direction: column; gap: 4px; min-width: 120px; font-family: inherit; }
+.tv-pop b { font-size: 15px; color: #2B2620; }
+.tv-pop span { font-size: 12.5px; color: #7a6f63; }
+.tv-pop a { font-size: 13px; color: #B5532F; font-weight: 600; }
+.tv-geon { display: inline-grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; color: #fff; font: 700 11px/1 system-ui, sans-serif; font-style: normal; margin-right: 7px; vertical-align: 1px; }
+.tv-georow { display: flex; gap: 8px; }
+.tv-georow .ui-in { flex: 1; min-width: 0; }
+.tv-georow .ui-btn { flex: none; white-space: nowrap; }
+@media (max-width: 720px) {
+  .tv-map { height: 300px; border-radius: 16px; }
+  .tv-mapbar { margin-top: 12px; }
+}
 </style>
 </head>
 <body>
@@ -1414,6 +1458,7 @@ const GENRE_MIGRATE = {'台劇':'臺灣','韓劇':'韓國','美劇':'美國','�
 let showFilter = { series:{year:'',genre:'',q:'',wdate:''}, movie:{year:'',genre:'',q:'',wdate:''}, watched:{year:'',genre:'',q:'',wdate:''} };
 let selectMode=false, selectedItems=new Set(), selectAnchor=null;
 let showViewMode = localStorage.getItem('shows-view') || 'grid';
+const showFold=(()=>{ try{ return JSON.parse(localStorage.getItem('shows-fold')||'{}')||{}; }catch(e){ return {}; } })();   // 每個頁籤各自記住哪些區塊收起來
 const showRev=(()=>{ try{ return JSON.parse(localStorage.getItem('shows-rev')||'{}')||{}; }catch(e){ return {}; } })();   // 每個頁籤各自記住「倒序」
 const todayYmd=()=>nowStr().slice(0,10);
 const isTba=it=>(it.airDate||'')==='未定';
@@ -1721,8 +1766,12 @@ let focusTask=null; // 勾選後整頁重繪，用來把鍵盤焦點還給剛勾
 
 // 讓 textarea 高度跟著內容長：所有行都看得到，不會被內部捲動吃掉上面幾行
 function autosize(ta){
+  const saved=[]; for(let e=ta.parentElement; e; e=e.parentElement){ if(e.scrollTop>0) saved.push([e,e.scrollTop]); }
+  const wx=window.scrollX, wy=window.scrollY;
   ta.style.height='auto';
   ta.style.height=(ta.scrollHeight+(ta.offsetHeight-ta.clientHeight))+'px';
+  saved.forEach(([e,t])=>{ if(e.scrollTop!==t) e.scrollTop=t; });
+  if(window.scrollY!==wy || window.scrollX!==wx) window.scrollTo(wx,wy);
 }
 
 // 備註每一行 → 一顆編號小圓標。若每一行都已自帶「1.」「2、」之類編號，顯示時去掉避免跟圓標重複（只影響顯示，不改存檔內容）
@@ -2057,6 +2106,22 @@ function renderShows(){
   renderShowsCore();
   if(keep){ if(g) g.scrollTop=t; if(window.scrollY!==y) restoreWinScroll(y); }
 }
+function showSecHead(key,label,count,first){
+  const fold=showFold[activeShowTab]||(showFold[activeShowTab]={});
+  const closed=!!fold[key];
+  const h=document.createElement('div'); h.className='show-sec foldable'+(first?' first':'')+(closed?' closed':'');
+  h.dataset.k=key; h.setAttribute('role','button'); h.tabIndex=0; h.setAttribute('aria-expanded',String(!closed)); h.title=closed?'展開':'收合';
+  h.innerHTML='<b>'+label+'</b><span>'+count+' 部</span><i></i><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  const tog=kb=>{
+    if(fold[key]) delete fold[key]; else fold[key]=1;
+    try{ localStorage.setItem('shows-fold',JSON.stringify(showFold)); }catch(e){}
+    renderShows();
+    if(kb){ const n=$('showGrid').querySelector('[data-k="'+key+'"]'); if(n) n.focus(); }
+  };
+  h.onclick=()=>tog(false);
+  h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(true); } };
+  return h;
+}
 function renderShowsCore(){
   renderStats();
   updateSelectUI();
@@ -2080,14 +2145,16 @@ function renderShowsCore(){
     upcoming=disp.filter(isUpcoming).sort((a,b)=>airKey(a)<airKey(b)?-1:(airKey(a)>airKey(b)?1:0));   // 即將開播：開播日近的在前
     disp=disp.filter(it=>!isUpcoming(it));
   }
-  const all=disp.concat(upcoming);
+  const split=upcoming.length>0 && disp.length>0;      // 兩區都有的時候才加「已開播」標題；只有一區時畫面和以前完全一樣
+  const fold=showFold[activeShowTab]||{};
+  const airedOpen=!(split && fold.aired), upOpen=!(upcoming.length && fold.upcoming);
+  const all=(airedOpen?disp:[]).concat(upOpen?upcoming:[]);
   const mk=item=>grid.appendChild(showViewMode==='list' ? showRow(item,list,all) : showCard(item,list,all));
-  disp.forEach(mk);
+  if(split) grid.appendChild(showSecHead('aired','已開播',disp.length,true));
+  if(airedOpen) disp.forEach(mk);
   if(upcoming.length){
-    const h=document.createElement('div'); h.className='show-sec';
-    h.innerHTML='<b>即將開播</b><span>'+upcoming.length+' 部</span><i></i>';
-    grid.appendChild(h);
-    upcoming.forEach(mk);
+    grid.appendChild(showSecHead('upcoming','即將開播',upcoming.length,false));
+    if(upOpen) upcoming.forEach(mk);
   }
 }
 
@@ -3084,7 +3151,7 @@ function parseTrips(md){
       else if(k==='cats'){ const o=parseKV(v); Object.keys(o).forEach(n=>t.cats.push({name:n,color:o[n]})); }
     } else {
       const p=body.split(' :: ');
-      day.items.push({time:(p[0]||'').trim(), name:(p[1]||'').trim(), cat:(p[2]||'').trim(), cost:numOrNull(p[3]), note:(p[4]||'').trim()});
+      day.items.push({time:(p[0]||'').trim(), name:(p[1]||'').trim(), cat:(p[2]||'').trim(), cost:numOrNull(p[3]), note:(p[4]||'').trim(), geo:tvParseGeo(p[5])});
     }
   });
   out.forEach((t,i)=>{
@@ -3114,7 +3181,7 @@ function serializeTrips(){
     if((t.cats||[]).length) md+='- cats: '+t.cats.map(c=>noSep(c.name).replace(/[|=]/g,'')+'='+c.color).join(' | ')+'\n';
     t.days.forEach((d,i)=>{
       md+='### Day '+(i+1)+'\n';
-      d.items.forEach(it=>{ md+='- '+noSep(it.time)+' :: '+noSep(it.name)+' :: '+noSep(it.cat)+' :: '+(it.cost==null?'':it.cost)+' :: '+noSep(it.note)+'\n'; });
+      d.items.forEach(it=>{ md+='- '+noSep(it.time)+' :: '+noSep(it.name)+' :: '+noSep(it.cat)+' :: '+(it.cost==null?'':it.cost)+' :: '+noSep(it.note)+(it.geo?' :: '+it.geo:'')+'\n'; });
     });
   });
   return md;
@@ -3165,7 +3232,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-02.3';
+const APP_VERSION='2026-11-06.1';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -4103,7 +4170,7 @@ if(window.ResizeObserver){ const ro=new ResizeObserver(fitShowsHeight); ['.head'
 })();
 
 /* ---------- 旅遊：旅程列表／詳情／項目編輯 ---------- */
-const tvUI={pane:'trips', tripId:null, day:0, pg:null};
+const tvUI={pane:'trips', tripId:null, day:0, pg:null, mapFor:null, mapOpen:false, mapScope:'day', mapHide:new Set()};
 const TV_SPOT_COLOR='#6B6259';
 const TV_SWATCHES=['#7A5C99','#2F8F9D','#C2587A','#8A7A2F','#4D6BA6','#8F8579'];
 const TV_ICO={
@@ -4285,14 +4352,99 @@ async function tvDeleteTrip(){
   if(!ok) return;
   trips=trips.filter(x=>x!==t); queueSave(); closeTrip(); toast('已刪除旅程');
 }
+/* ---------- 旅遊：行程地圖（項目可填座標；地圖上依順序標 1、2、3…，可看「當天」或「整趟」）---------- */
+function tvParseGeo(s){
+  const m=String(s||'').match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*[,，]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if(!m) return '';
+  const a=parseFloat(m[1]), b=parseFloat(m[2]);
+  return (isNaN(a)||isNaN(b)||Math.abs(a)>90||Math.abs(b)>180) ? '' : (a+','+b);
+}
+const tvGeoOf=it=>{ const m=String(it.geo||'').match(/^(-?[\d.]+),(-?[\d.]+)$/); return m ? {lat:+m[1], lng:+m[2]} : null; };
+const TV_DAY_COLORS=['#B5532F','#3D6E8F','#5E8A55','#C9902B','#7A5C99','#B0486A','#2F8F8A','#6B7A3A'];
+const tvDayColor=i=>TV_DAY_COLORS[i%TV_DAY_COLORS.length];
+let tvMapInst=null;
+function tvMapCleanup(){ if(tvMapInst){ try{ tvMapInst.remove(); }catch(e){} tvMapInst=null; } }
+function tvMapStops(t,di){          // 這一天有座標的項目，依行程順序編號 1、2、3…（沒填座標的跳過，不佔號碼）
+  const out=[]; let n=0;
+  (t.days[di]?t.days[di].items:[]).forEach((it,idx)=>{ const g=tvGeoOf(it); if(g) out.push({it,idx,g,n:++n}); });
+  return out;
+}
+const TV_PIN_SVG='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+const TV_CHEV_SVG='<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+function tvMapBarHtml(){
+  const open=!!tvUI.mapOpen, sc=tvUI.mapScope;
+  let h='<div class="tv-mapbar"><button type="button" class="tv-btn2 tv-maptog'+(open?' on':'')+'" id="tvMapTog" aria-expanded="'+open+'" aria-controls="tvMapBox">'+TV_PIN_SVG+'地圖'+TV_CHEV_SVG+'</button>';
+  if(open) h+='<div class="tv-mapseg" role="group" aria-label="地圖範圍"><button type="button" data-s="day" class="'+(sc==='day'?'on':'')+'" aria-pressed="'+(sc==='day')+'">當天</button><button type="button" data-s="all" class="'+(sc==='all'?'on':'')+'" aria-pressed="'+(sc==='all')+'">整趟</button></div>';
+  h+='</div>';
+  if(open) h+='<div class="tv-mapbox" id="tvMapBox"><div class="tv-maplg" id="tvMapLg"></div><div class="tv-map" id="tvMap" role="region" aria-label="行程地圖"></div><div class="tv-mapnote" id="tvMapNote"></div></div>';
+  return h;
+}
+function tvDrawMap(t,di){
+  const el=$('tvMap'); if(!el) return;
+  const lg=$('tvMapLg'), note=$('tvMapNote'), scope=tvUI.mapScope;
+  if(typeof L==='undefined'){ el.innerHTML='<div class="tv-mapmsg">地圖元件載入失敗，請確認網路連線後重新整理。</div>'; return; }
+  const dayIdx=scope==='all' ? t.days.map((_,i)=>i) : [di];
+  const by=dayIdx.map(i=>({i, stops:tvMapStops(t,i), total:(t.days[i]?t.days[i].items.length:0)}));
+  const withPts=by.filter(d=>d.stops.length);
+  // 整趟模式：每天一種顏色，圖例可點選開關
+  lg.innerHTML='';
+  if(scope==='all'){
+    withPts.forEach(d=>{
+      const off=tvUI.mapHide.has(d.i);
+      const b=document.createElement('button'); b.type='button'; b.className='tv-lgchip'+(off?' off':''); b.setAttribute('aria-pressed',String(!off));
+      b.innerHTML='<i style="background:'+tvDayColor(d.i)+'"></i>Day '+(d.i+1)+'<em>'+d.stops.length+'</em>';
+      b.onclick=()=>{ if(tvUI.mapHide.has(d.i)) tvUI.mapHide.delete(d.i); else tvUI.mapHide.add(d.i); renderTripDetail(); };
+      lg.appendChild(b);
+    });
+  }
+  const shown=withPts.filter(d=>!(scope==='all' && tvUI.mapHide.has(d.i)));
+  const stopCount=shown.reduce((s,d)=>s+d.stops.length,0);
+  const missing=by.reduce((s,d)=>s+d.total-d.stops.length,0);
+  const map=L.map(el,{scrollWheelZoom:false}).setView([23.75,120.96],8);
+  tvMapInst=map;
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+  const pts=[];
+  shown.forEach(d=>{
+    const color=tvDayColor(d.i), line=d.stops.map(s=>[s.g.lat,s.g.lng]);
+    if(line.length>1) L.polyline(line,{color,weight:4,opacity:.75,lineJoin:'round'}).addTo(map);
+    d.stops.forEach(s=>{
+      const ic=L.divIcon({className:'tv-pin', html:'<span style="background:'+color+'">'+s.n+'</span>', iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-15]});
+      const mk=L.marker([s.g.lat,s.g.lng],{icon:ic, title:s.it.name}).addTo(map);
+      const url='https://www.google.com/maps/search/?api=1&query='+s.g.lat+','+s.g.lng;
+      mk.bindPopup('<div class="tv-pop"><b>'+esc(s.it.name)+'</b><span>Day '+(d.i+1)+' · 第 '+s.n+' 站'+(s.it.time?' · '+esc(s.it.time):'')+'</span><a href="'+url+'" target="_blank" rel="noopener noreferrer">在 Google 地圖開啟</a></div>');
+      pts.push([s.g.lat,s.g.lng]);
+    });
+  });
+  const fit=()=>{
+    map.invalidateSize();
+    if(pts.length>1) map.fitBounds(pts,{padding:[34,34],maxZoom:16});
+    else if(pts.length===1) map.setView(pts[0],15);
+  };
+  fit(); setTimeout(()=>{ if(tvMapInst===map) fit(); },80);
+  let msg;
+  if(!withPts.length) msg=(scope==='all'?'這趟旅程':'這一天')+'還沒有項目填座標。編輯項目時在「座標」欄填上緯度, 經度，就會依順序出現在地圖上。';
+  else if(!shown.length) msg='所有天數都被隱藏了，點上方的 Day 標籤可以重新顯示。';
+  else msg='地圖上 '+stopCount+' 個地點'+(missing>0?'，另有 '+missing+' 個項目還沒填座標':'')+'。';
+  note.textContent=msg;
+}
+function tvWireMap(t,di){
+  const tog=$('tvMapTog'); if(!tog) return;
+  tog.onclick=()=>{ tvUI.mapOpen=!tvUI.mapOpen; renderTripDetail(); };
+  document.querySelectorAll('.tv-mapseg button').forEach(b=>b.onclick=()=>{ tvUI.mapScope=b.dataset.s; renderTripDetail(); });
+  if(tvUI.mapOpen) tvDrawMap(t,di);
+}
+
 function renderTripDetail(){
+  tvMapCleanup();
   const t=curTrip(), box=$('tvDetail'); if(!t){ box.innerHTML=''; return; }
+  if(tvUI.mapFor!==t.id){ tvUI.mapFor=t.id; tvUI.mapOpen=false; tvUI.mapScope='day'; tvUI.mapHide=new Set(); }   // 換一趟旅程：地圖預設收起來
   if(tvUI.day>=t.days.length) tvUI.day=Math.max(0,t.days.length-1);
   const total=tvTotal(t), parts=tvParts(t), di=tvUI.day, day=t.days[di];
   const dd=tripDayDate(t,di);
   const dayTitle='Day '+(di+1)+(dd?' · '+fmtMD(dd):'');
   const dayTotal=tvDayTotal(t,di);
   const showCost=t.mode==='item';
+  const geoN={}; if(tvUI.mapOpen) tvMapStops(t,di).forEach(x=>{ geoN[x.idx]=x.n; });
   const BACK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
   const TRASH='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7M10 11v5M14 11v5"/></svg>';
   const PENCIL='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></svg>';
@@ -4303,13 +4455,14 @@ function renderTripDetail(){
   h+='<div class="tv-cols"><section class="tv-card tv-main" aria-label="行程"><span class="tv-lbl">行程</span><div class="tv-days" role="tablist" aria-label="選擇日期">';
   t.days.forEach((d,i)=>{ const x=tripDayDate(t,i); h+='<button type="button" role="tab" class="tv-dtab'+(i===di?' is-on':'')+'" data-d="'+i+'" aria-selected="'+(i===di)+'"><b>Day '+(i+1)+'</b><span>'+(x?fmtMD(x):'—')+'</span></button>'; });
   h+='</div><div class="tv-dayhead"><span class="tv-daytitle">'+esc(dayTitle)+'</span><span class="tv-daysum">'+(showCost?'當日花費 <b>'+(dayTotal>0?fmtMoney(dayTotal):'—')+'</b>':'')+'</span></div>';
+  h+=tvMapBarHtml();
   if(!day.items.length) h+='<div class="tv-emptyday">這天還沒有行程，按下面的按鈕新增第一個項目。</div>';
   else {
     h+='<ul class="tv-tl">';
     day.items.forEach((it,i)=>{
       const color=tvColor(t,it.cat), cost=(showCost && it.cat && it.cost>0)?fmtMoney(it.cost):'';
       h+='<li class="tv-it" style="--c:'+color+'"><button type="button" class="tv-itb" data-i="'+i+'" aria-label="編輯：'+esc(it.name)+'"><span class="tv-tm">'+esc(it.time)+'</span><span class="tv-bub"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+tvIconPath(it.cat)+'"/></svg></span>'
-        +'<span class="tv-ct"><span class="tv-tmm">'+esc(it.time)+'</span><span class="tv-tt">'+esc(it.name)+'</span>'+(it.note?'<span class="tv-nt">'+esc(it.note)+'</span>':'')+'</span><span class="tv-co">'+cost+'</span></button></li>';
+        +'<span class="tv-ct"><span class="tv-tmm">'+esc(it.time)+'</span><span class="tv-tt">'+(geoN[i]?'<i class="tv-geon" style="background:'+tvDayColor(di)+'">'+geoN[i]+'</i>':'')+esc(it.name)+'</span>'+(it.note?'<span class="tv-nt">'+esc(it.note)+'</span>':'')+'</span><span class="tv-co">'+cost+'</span></button></li>';
     });
     h+='</ul>';
   }
@@ -4329,6 +4482,7 @@ function renderTripDetail(){
   }
   h+='</div></div>';
   box.innerHTML=h;
+  tvWireMap(t,di);
   box.querySelector('#tvHero').insertBefore(buildCoverEl(t.cover,'tv-herocvr'), box.querySelector('#tvHero').firstChild);
   box.querySelector('#tvBack').onclick=closeTrip; box.querySelector('#tvMBack').onclick=closeTrip;
   box.querySelector('#tvEditTrip').onclick=openTripEdit; box.querySelector('#tvMEdit').onclick=openTripEdit;
@@ -4347,7 +4501,7 @@ function tvSortDay(t,di){
 /* --- 項目編輯（網頁＝對話框，手機＝底部面板）--- */
 function openItemDialog(t,dayIdx,itemIdx,hooks){   // hooks（編輯旅程頁用）：{onChange(newDay)}；有的話不直接存檔，交給編輯頁的草稿
   const isNew=itemIdx==null;
-  const src=isNew ? {time:'',name:'',cat:'',cost:null,note:''} : t.days[dayIdx].items[itemIdx];
+  const src=isNew ? {time:'',name:'',cat:'',cost:null,note:'',geo:''} : t.days[dayIdx].items[itemIdx];
   const st={cat:src.cat||'', extra:[], adding:false, newColor:TV_SWATCHES[0]};
   const ov=document.createElement('div'); ov.className='ui-ov tv-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label',isNew?'新增項目':'編輯項目');
   const dlg=document.createElement('div'); dlg.className='ui-dlg tv-idlg';
@@ -4359,6 +4513,7 @@ function openItemDialog(t,dayIdx,itemIdx,hooks){   // hooks（編輯旅程頁用
     +'<label class="ui-fl"><span>時間</span><input class="ui-in" id="tiTime" type="time" value="'+(timeOk?src.time.padStart(5,'0'):'')+'"></label>'
     +'<label class="ui-fl" id="tiCostWrap"><span>花費</span><span class="tv-pfx"><i>NT$</i><input class="ui-in" id="tiCost" inputmode="numeric" value="'+(src.cost!=null?src.cost.toLocaleString('en-US'):'')+'" placeholder="—" autocomplete="off"></span></label></div>'
     +'<label class="ui-fl"><span>備註</span><input class="ui-in" id="tiNote" value="'+esc(src.note)+'" placeholder="選填" autocomplete="off"></label>'
+    +'<div class="ui-fl"><span>座標 <em>· 選填，填了就會在行程地圖上依順序標號</em></span><span class="tv-georow"><input class="ui-in" id="tiGeo" value="'+esc(src.geo||'')+'" placeholder="緯度, 經度　例如 23.5712, 119.5793" autocomplete="off" autocapitalize="off"><button type="button" class="ui-btn ghost" id="tiGeoGo">開啟</button></span></div>'
     +'<div class="ui-fl"><span>類別 <em>· 選「景點」代表不計花費</em></span><div class="tv-ichips" id="tiChips"></div></div><div id="tiNew"></div>'
     +'<div class="tv-ifoot">'+(isNew?'':'<button type="button" class="tv-idel" id="tiDel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7"/></svg><span>刪除項目</span></button>')
     +'<button type="button" class="ui-btn ghost" id="tiCancel">取消</button><button type="button" class="ui-btn primary" id="tiSave">儲存</button></div>';
@@ -4401,16 +4556,19 @@ function openItemDialog(t,dayIdx,itemIdx,hooks){   // hooks（編輯旅程頁用
   function save(){
     const name=q('#tiName').value.trim();
     if(!name){ toast('請輸入名稱'); q('#tiName').focus(); return; }
+    const gv=q('#tiGeo').value.trim(); let geo='';
+    if(gv){ const c=parseCoords(gv); if(!c){ toast('座標格式不對，請填「緯度, 經度」，例如 23.5712, 119.5793'); q('#tiGeo').focus(); return; } geo=c.lat+','+c.lng; }
     st.extra.forEach(c=>{ if(!tvCats(t).some(x=>x.name===c.name)) t.cats.push(c); });
     const newDay=+q('#tiDay').value;
     const tv=q('#tiTime').value;
-    const rec={ time: (timeTouched||timeOk||src.time==='') ? tv : src.time, name:noSep(name), cat:st.cat, cost: costShown() ? numOrNull(q('#tiCost').value) : src.cost, note:noSep(q('#tiNote').value) };
+    const rec={ time: (timeTouched||timeOk||src.time==='') ? tv : src.time, name:noSep(name), cat:st.cat, cost: costShown() ? numOrNull(q('#tiCost').value) : src.cost, note:noSep(q('#tiNote').value), geo };
     if(isNew){ t.days[newDay].items.push(rec); }
     else if(newDay===dayIdx){ Object.assign(t.days[dayIdx].items[itemIdx],rec); }
     else { t.days[dayIdx].items.splice(itemIdx,1); t.days[newDay].items.push(rec); }
     if(hooks){ closeDlg(); hooks.onChange(newDay); toast(isNew?'已新增項目':'已儲存'); return; }
     queueSave(); tvUI.day=newDay; closeDlg(); renderTripDetail(); renderTripList(); toast(isNew?'已新增項目':'已儲存');
   }
+  q('#tiGeoGo').onclick=()=>{ const c=parseCoords(q('#tiGeo').value); if(!c){ toast('先填好座標，才能在 Google 地圖開啟'); q('#tiGeo').focus(); return; } openInGoogleMaps({lat:c.lat, lng:c.lng, name:q('#tiName').value}); };
   q('.tv-x').onclick=closeDlg; q('#tiCancel').onclick=closeDlg; q('#tiSave').onclick=save;
   if(!isNew) q('#tiDel').onclick=async()=>{
     const ok=await uiConfirm('刪除「'+src.name+'」？','這個行程項目會被刪除，無法復原。','刪除項目',true); if(!ok) return;
