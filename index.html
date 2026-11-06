@@ -1160,7 +1160,7 @@ body.trip-edit .tv-edit { display: block; }
 .tv-mapseg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(70,50,30,.18); }
 .tv-mapseg button:focus-visible, .tv-lgchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tv-mapbox { margin-top: 12px; }
-.tv-map { height: 340px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #EDE6D8; z-index: 0; position: relative; }
+.tv-map { height: clamp(440px, 64vh, 680px); border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #EDE6D8; z-index: 0; position: relative; }
 .tv-mapmsg { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; }
 .tv-mapnote { margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--muted); }
 .tv-maplg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
@@ -3232,7 +3232,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-06.1';
+const APP_VERSION='2026-11-06.2';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -4400,13 +4400,12 @@ function tvDrawMap(t,di){
   const shown=withPts.filter(d=>!(scope==='all' && tvUI.mapHide.has(d.i)));
   const stopCount=shown.reduce((s,d)=>s+d.stops.length,0);
   const missing=by.reduce((s,d)=>s+d.total-d.stops.length,0);
-  const map=L.map(el,{scrollWheelZoom:false}).setView([23.75,120.96],8);
+  const map=L.map(el,{scrollWheelZoom:true}).setView([23.75,120.96],8);
   tvMapInst=map;
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
   const pts=[];
   shown.forEach(d=>{
-    const color=tvDayColor(d.i), line=d.stops.map(s=>[s.g.lat,s.g.lng]);
-    if(line.length>1) L.polyline(line,{color,weight:4,opacity:.75,lineJoin:'round'}).addTo(map);
+    const color=tvDayColor(d.i);
     d.stops.forEach(s=>{
       const ic=L.divIcon({className:'tv-pin', html:'<span style="background:'+color+'">'+s.n+'</span>', iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-15]});
       const mk=L.marker([s.g.lat,s.g.lng],{icon:ic, title:s.it.name}).addTo(map);
