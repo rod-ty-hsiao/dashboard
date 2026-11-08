@@ -1,0 +1,28 @@
+# 每週自動抓一次價格，存成 prices.json 放回網站（儀表板的投資分頁會讀它）。
+# 要改頻率就改 cron：'0 1 * * 1' = 每週一；'0 1 1 * *' = 每月 1 號；'0 1 1,16 * *' = 每月 1 號和 16 號。
+name: update-prices
+on:
+  schedule:
+    - cron: '0 1 * * 1'      # 每週一 09:00（台灣時間；GitHub 用 UTC，01:00 UTC = 09:00）
+  workflow_dispatch:         # 也可以到 Actions 頁面手動按「Run workflow」
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 抓價格
+        run: python fetch_prices.py
+      - name: 有變動就存回網站
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add prices.json
+          git diff --cached --quiet || git commit -m "update prices"
+          git push
+
+
