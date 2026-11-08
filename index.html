@@ -3186,7 +3186,7 @@ function switchAppTab(tab){
   updateTabbar();
   if(tab==='memo'){ scrollReset=true; renderMemos(); }
   if(tab==='travel'){ scrollReset=true; renderTravel(); }
-  if(tab==='invest'){ scrollReset=true; renderInvest(); }
+  if(tab==='invest'){ scrollReset=true; ivUI.autoWant=true; renderInvest(); }
   if(tab==='shows'){ scrollReset=true; renderShows(); }
   if(tab==='food'){ initFoodMap(); scrollReset=true; renderFoods(); }
 }
@@ -3441,7 +3441,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-08.1';
+const APP_VERSION='2026-11-08.2';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -5673,8 +5673,8 @@ function ivCompare(flows,bid,endOpts){
   return out;
 }
 /* ================= 投資模組：價格資料（自動取得 → 按鈕更新 → 手動輸入，全部存成歷史）=================
-   1. 瀏覽器可以直接取得的：台股 ETF 收盤價（證交所）、加權指數（證交所）、美元匯率 —— 每個月第一次開啟投資分頁時自動更新，也可以按「更新價格」。
-   2. 瀏覽器被 CORS 擋住的（基金淨值、櫃買的 00719B、S&P 500、MSCI ACWI）：由 GitHub Actions 每月抓好存成 prices.json（同網站、不受 CORS 限制），App 讀它。
+   1. 瀏覽器可以直接取得的：台股 ETF 收盤價（證交所）、加權指數（證交所）、美元匯率 —— 每次開啟投資分頁時自動更新（10 分鐘內不重複），也可以按「更新價格」。
+   2. 瀏覽器被 CORS 擋住的（基金淨值、櫃買的 00719B、S&P 500、MSCI ACWI）：由 GitHub Actions 定期（每週）抓好存成 prices.json（同網站、不受 CORS 限制），App 讀它。
    3. 兩者都沒有的：手動輸入。手動輸入、自動取得的每一筆都存進價格資料庫（TASKS.md 的 ## prices），保留歷史。 */
 const ivRocToIso=s=>{ const m=String(s).match(/^(\d{2,3})\/(\d{2})\/(\d{2})$/); return m?((+m[1]+1911)+'-'+m[2]+'-'+m[3]):null; };
 const ivNumStr=s=>{ const n=parseFloat(String(s).replace(/,/g,'')); return isNaN(n)?null:n; };
@@ -5764,9 +5764,10 @@ async function ivAutoUpdate(opt){
   if(feed){ okAny=true; const n=ivMergeFeed(); changed+=n; log.push('prices.json：'+(feed.updated?feed.updated.slice(0,10)+' 更新，':'')+'併入 '+n+' 筆'); }
   else log.push('prices.json：找不到（還沒設定 GitHub Actions），基金淨值、00719B、S&P 500、MSCI ACWI 請手動輸入');
   ivPruneSort();
+  const sig=()=>[iv.settings.lastAuto,iv.settings.lastAutoAt,iv.settings.lastAutoNote].join('|'); const before=sig();
   if(okAny){ iv.settings.lastAuto=today.slice(0,7); iv.settings.lastAutoAt=today; }
   iv.settings.lastAutoNote=today+' '+log.join('；');
-  if(changed||opt.manual||okAny) queueSave();
+  if(changed||sig()!==before) queueSave();      // 每次開啟都會跑；沒有任何變動就不寫檔，避免一直觸發雲端同步
   return {log,changed};
 }
 
@@ -5811,7 +5812,7 @@ const IV_ICO={
   refresh:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 00-14.5-4M4 4v4h4M4 13a8 8 0 0014.5 4M20 20v-4h-4"/></svg>'
 };
 const IV_PANES=[['overview','總覽'],['holdings','持股明細'],['perf','績效分析'],['rebal','再平衡'],['dca','定期定額'],['report','年度健檢']];
-const ivUI={ pane:'overview', sub:'perf', trend:null, autoDone:false, busy:false,
+const ivUI={ pane:'overview', sub:'perf', trend:null, autoWant:true, autoAt:0, busy:false,
   hold:{mode:'gross', pid:null, type:'all', range:'all', edit:null},
   cmp:{pid:null, manual:false, bench:'b_spx', rows:'', res:null},
   rb:{mode:'monthly', monthly:{}, lump:{}, months:{}},
@@ -5962,7 +5963,7 @@ function ivPriceHistoryDialog(){
   };
   if(!keys.length){ d.body.innerHTML='<div class="iv-empty">還沒有價格資料</div>'; return; } draw();
 }
-const IV_SRC={manual:'手動輸入',twse:'證交所',feed:'prices.json（每月自動）','er-api':'匯率 API',spec:'規格文件',app:'中信 App 畫面',user:'使用者提供','spec-intraday':'規格文件（盤中）','spec-sub':'規格文件（以 7/13 代替）',tx:'交易紀錄'};
+const IV_SRC={manual:'手動輸入',twse:'證交所',feed:'prices.json（GitHub 定期抓取）','er-api':'匯率 API',spec:'規格文件',app:'中信 App 畫面',user:'使用者提供','spec-intraday':'規格文件（盤中）','spec-sub':'規格文件（以 7/13 代替）',tx:'交易紀錄'};
 
 /* ---------- 新增交易 ---------- */
 function ivRemainText(p,units){ if(units==null) return ''; return ivFmtDec(units,p.kind==='fund'?3:0); }
@@ -6556,7 +6557,8 @@ function renderInvest(){
   }
   body.innerHTML=h; if(window.scrollY!==y) window.scrollTo(0,y);
   if(typeof updateTabbar==='function') updateTabbar();
-  if(!ivUI.autoDone){ ivUI.autoDone=true; if(iv.settings.lastAuto!==ivToday().slice(0,7)) setTimeout(()=>ivRunAuto(false),400); }
+  // 每次打開投資分頁就自動更新一次（資料載入後才跑；10 分鐘內重複切換不會再抓，避免被證交所限流）
+  if(ivUI.autoWant && iv.products.length){ ivUI.autoWant=false; const now=Date.now(); if(now-ivUI.autoAt>=600000){ ivUI.autoAt=now; setTimeout(()=>ivRunAuto(false),400); } }
 }
 function ivGo(pane){ ivUI.pane=pane; if(ivUI.hold.edit&&pane!=='holdings'){ ivUI.hold.edit=null; document.body.classList.remove('iv-edit-all'); } renderInvest(); window.scrollTo(0,0); }
 function ivTargetField(el){
