@@ -1404,6 +1404,9 @@ select.iv-in { text-align: left; }
 .iv-pk:first-child { border-top: 0; }
 label.iv-pk { cursor: pointer; justify-content: flex-start; }
 .iv-pk input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+
+/* 表格裡非第一欄的靠左欄位，和前一欄之間留出空隙（以前是 0，會貼在一起） */
+.iv-tbl td.l:not(:first-child), .iv-tbl th.l:not(:first-child) { padding-left: 16px; }
 </style>
 </head>
 <body>
@@ -3475,7 +3478,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-09.1';
+const APP_VERSION='2026-11-09.2';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -5734,6 +5737,7 @@ function ivCompare(flows,bid,endOpts){
    2. 瀏覽器被 CORS 擋住的（基金淨值、櫃買的 00719B、S&P 500、MSCI ACWI）：由 GitHub Actions 定期（每週）抓好存成 prices.json（同網站、不受 CORS 限制），App 讀它。
    3. 兩者都沒有的：手動輸入。手動輸入、自動取得的每一筆都存進價格資料庫（TASKS.md 的 ## prices），保留歷史。 */
 const ivRocToIso=s=>{ const m=String(s).match(/^(\d{2,3})\/(\d{2})\/(\d{2})$/); return m?((+m[1]+1911)+'-'+m[2]+'-'+m[3]):null; };
+const ivRocCompact=s=>{ s=String(s).trim(); if(!/^\d{6,7}$/.test(s)) return null; return (+s.slice(0,-4)+1911)+'-'+s.slice(-4,-2)+'-'+s.slice(-2); };   // 1151109 → 2026-11-09
 const ivNumStr=s=>{ const n=parseFloat(String(s).replace(/,/g,'')); return isNaN(n)?null:n; };
 const ivSleep=ms=>new Promise(r=>setTimeout(r,ms));
 let ivFeed=null, ivFeedTried=false;
@@ -5762,6 +5766,19 @@ async function ivTwiiMonth(ym){
   if(j.stat!=='OK'||!j.data) return [];
   return j.data.map(r=>({d:ivRocToIso(r[0]),v:ivNumStr(r[4])})).filter(x=>x.d&&x.v>0);
 }
+// 證交所所有上市證券的最新收盤價（一個請求；瀏覽器可直接取得）。新增 ETF／股票只要有代號，這裡就查得到。
+async function ivTwseAll(){
+  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),20000); const map=new Map();
+  try{
+    const r=await fetch('https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json',{signal:ctl.signal,cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status);
+    const txt=(await r.text()).replace(/^\uFEFF/,'');
+    if(txt.trim().startsWith('{')){ const j=JSON.parse(txt); const ds=String(j.date||''); const d=ds.length===8?ds.replace(/^(\d{4})(\d{2})(\d{2})$/,'$1-$2-$3'):ivRocCompact(ds);
+      (j.data||[]).forEach(f=>{ const v=ivNumStr(f[7]); if(d&&f[0]&&v>0) map.set(String(f[0]).trim(),{d,v}); }); }
+    else txt.split(/\r?\n/).forEach(line=>{ const m=line.match(/"([^"]*)"/g); if(!m||m.length<9) return; const f=m.map(x=>x.slice(1,-1)); const d=ivRocCompact(f[0]), v=ivNumStr(f[8]); if(d&&f[1]&&v>0) map.set(f[1].trim(),{d,v}); });
+    if(!map.size) throw new Error('沒有資料');
+    return map;
+  } finally{ clearTimeout(t); }
+}
 async function ivFxLatestFetch(){           // 美元兌台幣；open.er-api.com 允許瀏覽器直接呼叫
   const j=await ivFetchJson('https://open.er-api.com/v6/latest/USD'); const v=j&&j.rates&&j.rates.TWD;
   if(!(v>0)) throw new Error('沒有 TWD 匯率');
@@ -5788,6 +5805,8 @@ function ivMergeFeed(){
   // 產品：最新一筆 + 自己有交易的日期（畫走勢圖用）；大盤：只存最新一筆，要比較時再依需要補齊（避免 TASKS.md 變太大）
   iv.products.forEach(p=>{ if(p.feed) take(p.id, ivFeedSeries(p.feed), own[p.id]); });
   IV_BENCH.forEach(b=>take(b.id, ivFeedSeries(b.feed)));
+  // 沒有指定序列、但有代號的證券（例如你新增的 ETF）：用 prices.json 裡「全部 ETF 最新收盤」依代號查
+  const qs=ivFeed.quotes; if(qs) iv.products.forEach(p=>{ if(p.kind==='sec'&&p.code&&!p.feed&&qs[p.code]){ const q=qs[p.code]; if(ivAddPrice(p.id,q[0],q[1],'feed')) n++; } });
   const fx=ivFeedSeries('yf:TWD=X'); if(fx) take('fx:USDTWD',fx);
   return n;
 }
@@ -5796,21 +5815,21 @@ async function ivAutoUpdate(opt){
   opt=opt||{}; const log=[]; let changed=0;
   const today=ivToday(), ymNow=today.slice(0,7).replace('-','');
   const prevYm=(()=>{ const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-1); return d.getFullYear()+ivPad(d.getMonth()+1); })();
-  // 1) 證交所：要追蹤的台股 ETF（持有中＋有目標比例的證券，且在證交所掛牌）
-  const codes=[...new Set(iv.products.filter(p=>p.kind==='sec'&&p.code&&!p.otc&&(ivHolding(p.id).status==='held'||iv.targets.items.some(t=>t.pid===p.id))).map(p=>p.code))];
-  const twseDone=[], twseFail=[]; let okAny=false;
-  for(const code of codes){
-    const p=iv.products.find(x=>x.code===code);
-    try{
-      let rows=await ivTwseMonth(code,ymNow); if(!rows.length){ await ivSleep(500); rows=await ivTwseMonth(code,prevYm); }
-      if(!rows.length) throw new Error('沒有資料（可能在櫃買）');
-      const last=rows[rows.length-1]; if(ivAddPrice(p.id,last.d,last.v,'twse')) changed++;
-      twseDone.push(code+' '+last.v+'（'+last.d.slice(5).replace('-','/')+'）'); okAny=true;
-    }catch(e){ twseFail.push(code); }
-    await ivSleep(450);
+  // 1) 證交所：持有中、有目標比例或有定期定額的證券，用代號查最新收盤（一次抓全部上市證券）
+  const tracked=iv.products.filter(p=>p.kind==='sec'&&p.code&&(ivHolding(p.id).status==='held'||iv.targets.items.some(t=>t.pid===p.id)||iv.dca.some(x=>x.pid===p.id)));
+  const twseDone=[]; let okAny=false, twseAll=null;
+  try{ twseAll=await ivTwseAll(); okAny=true; }catch(e){ log.push('證交所：取不到全部上市證券報價（'+(e.message||e)+'），改逐檔查詢'); }
+  const pending=[];
+  for(const p of tracked){
+    const hit=twseAll&&twseAll.get(p.code);
+    if(hit){ if(ivAddPrice(p.id,hit.d,hit.v,'twse')) changed++; twseDone.push(p.code+' '+hit.v+'（'+hit.d.slice(5).replace('-','/')+'）'); }
+    else if(!twseAll&&!p.otc){       // 整批失敗時才逐檔查
+      try{ let rows=await ivTwseMonth(p.code,ymNow); if(!rows.length){ await ivSleep(500); rows=await ivTwseMonth(p.code,prevYm); }
+        if(rows.length){ const last=rows[rows.length-1]; if(ivAddPrice(p.id,last.d,last.v,'twse')) changed++; twseDone.push(p.code+' '+last.v+'（'+last.d.slice(5).replace('-','/')+'）'); okAny=true; } else pending.push(p); }catch(e){ pending.push(p); }
+      await ivSleep(450);
+    } else pending.push(p);
   }
   if(twseDone.length) log.push('證交所：'+twseDone.join('、'));
-  if(twseFail.length) log.push('證交所取不到：'+twseFail.join('、')+'（櫃買的 ETF 瀏覽器無法直接取得，需靠 prices.json 或手動輸入）');
   // 2) 匯率
   if(iv.products.some(ivIsUSD)){
     try{ const fx=await ivFxLatestFetch(); if(ivAddPrice('fx:USDTWD',fx.d,fx.v,'er-api')) changed++; okAny=true; log.push('匯率：USD/TWD '+fx.v.toFixed(3)+'（'+fx.d.slice(5).replace('-','/')+'，市場中價，和銀行牌告會有些微差距）'); }
@@ -5820,6 +5839,7 @@ async function ivAutoUpdate(opt){
   const feed=await ivLoadFeed(true);
   if(feed){ okAny=true; const n=ivMergeFeed(); changed+=n; log.push('prices.json：'+(feed.updated?feed.updated.slice(0,10)+' 更新，':'')+'併入 '+n+' 筆'); }
   else log.push('prices.json：找不到（還沒設定 GitHub Actions），基金淨值、00719B、S&P 500、MSCI ACWI 請手動輸入');
+  if(pending.length){ const still=pending.filter(p=>{ const px=ivLatestPrice(p.id); return !px||ivDays(px.d,today)>10; }); if(still.length) log.push('查不到最新報價：'+still.map(p=>p.code+' '+p.name).join('、')+'（可能是上櫃商品且 prices.json 還沒有，或剛上市；請手動輸入）'); }
   ivPruneSort();
   const sig=()=>[iv.settings.lastAuto,iv.settings.lastAutoAt,iv.settings.lastAutoNote].join('|'); const before=sig();
   if(okAny){ iv.settings.lastAuto=today.slice(0,7); iv.settings.lastAutoAt=today; }
@@ -6281,7 +6301,7 @@ function ivEditTable(E,p){
       +'<td class="l"><select class="iv-in w110" data-f="type"><option value="buy"'+(t.type==='buy'?' selected':'')+'>買進</option><option value="redeem"'+(t.type==='redeem'?' selected':'')+'>賣出／贖回</option><option value="div"'+(t.type==='div'?' selected':'')+'>配息</option></select>'+(t.type==='redeem'?'<label style="display:flex;gap:5px;align-items:center;font-size:12px;color:var(--muted);margin-top:4px"><input type="checkbox" data-f="full"'+(t.full?' checked':'')+'>全部贖回</label>':'')+'</td>'
       +'<td class="l"><select class="iv-in w80" data-f="board"'+(p.kind==='fund'||t.type==='div'?' disabled':'')+'><option value="">—</option><option value="round"'+(t.board==='round'?' selected':'')+'>整股</option><option value="odd"'+(t.board==='odd'?' selected':'')+'>零股</option></select></td>'
       +'<td><input class="iv-in w110" data-f="u" inputmode="decimal" value="'+(t.u!=null?t.u:'')+'"'+(t.type==='div'?' disabled':'')+'></td><td><input class="iv-in w110" data-f="p" inputmode="decimal" value="'+(t.p!=null?t.p:'')+'"'+(t.type==='div'?' disabled':'')+'></td>'
-      +'<td class="l">'+(t.type==='div'?'—':(usd?'美元':'台幣'))+(usd&&t.type!=='div'?'<input class="iv-in w80" data-f="fx" inputmode="decimal" placeholder="匯率" value="'+(t.fx!=null?t.fx:'')+'" style="margin-top:4px">':'')+'</td>'
+      +'<td class="l">'+(t.type==='div'?'—':(usd?'美元':'台幣'))+(usd&&t.type!=='div'?'<input class="iv-in w80" data-f="fx" inputmode="decimal" placeholder="匯率" value="'+(t.fx!=null?t.fx:'')+'" style="display:block;margin-top:4px">':'')+'</td>'
       +'<td><input class="iv-in w110" data-f="amt" inputmode="decimal" value="'+(t.amt!=null?t.amt:'')+'"></td><td><input class="iv-in w80" data-f="fee" inputmode="decimal" value="'+(t.fee!=null?t.fee:'')+'"'+(t.type==='div'?' disabled':'')+'></td><td><input class="iv-in w80" data-f="tax" inputmode="decimal" value="'+(t.tax!=null?t.tax:'')+'"'+(t.type!=='redeem'?' disabled':'')+'></td>'
       +'<td class="l"><input class="iv-in l" data-f="note" style="min-width:180px" value="'+esc(t.note||'')+'"></td><td><button type="button" class="iv-ib rm" data-act="edit-del" data-i="'+i+'" aria-label="刪除這筆">'+IV_ICO.trash+'</button></td></tr>';
   });
@@ -6511,14 +6531,21 @@ function ivCmpCsv(){
 }
 
 /* ---------- 再平衡 ---------- */
+const ivSrcShort=s=>({twse:'證交所',feed:'GitHub 定期抓取',manual:'手動輸入','er-api':'匯率 API',tx:'交易紀錄','tx-implied':'交易紀錄'}[s]||'');
+function ivRbPriceCell(r,i){
+  const px=ivLatestPrice(r.p.id), editing=ivUI.rb.editPx&&ivUI.rb.editPx[r.p.id];
+  const tp=r.held?r.price:ivManualPriceTwd(r.p.id);
+  if(tp!=null&&px&&!editing) return ivFmtDec(tp,2)+'<small>'+esc(ivSrcShort(px.s)||'價格資料')+' '+ivMD(px.d)+(r.held?'':'・未持有也會自動更新')+'</small>'+(r.held?'':'<button type="button" class="iv-ib" data-act="rb-px-edit" data-id="'+r.p.id+'" aria-label="手動修改現價" style="width:28px;height:28px">'+IV_ICO.pen+'</button>');
+  return '<input class="iv-in w110" data-rb="price" data-i="'+i+'" inputmode="decimal" value="'+(tp!=null?ivFmtDec(tp,2).replace(/,/g,''):'')+'" placeholder="現價">'+(tp==null?'<small>'+(r.p.code?'查不到自動報價，請手動輸入':'基金沒有代號，請手動輸入')+'</small>':'');
+}
 function ivRenderRebal(){
   const T=iv.targets; const rows=ivRebalRows(); const sum=rows.reduce((s,r)=>s+r.pct,0);
   let h='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">目標設定</h2><span class="iv-chip '+(Math.round(sum*100)===10000?'ok':'warn')+'">比例合計 '+(Math.round(sum*10)/10)+'%</span></div>'
     +'<label class="iv-fl" style="max-width:340px"><span>目標總投入金額（希望總資產達到）</span><span class="iv-row" style="flex-wrap:nowrap"><input class="iv-in" data-rb="total" inputmode="numeric" style="text-align:right" value="'+ivFmt(T.total||0)+'"><span class="iv-sub">元</span></span></label>'
     +'<div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">產品</th><th class="l">狀態</th><th>現價（元）</th><th>目標比例（%）</th><th>目標金額</th><th></th></tr></thead><tbody>';
   rows.forEach((r,i)=>{
-    h+='<tr><td class="l">'+ivPCell(r.p)+'</td><td class="l"><span class="iv-chip '+(r.held?'ok':'info')+'">'+(r.held?'持有中':'自行輸入')+'</span></td>'
-      +'<td>'+(r.held?(r.price!=null?ivFmtDec(r.price,2):'—')+'<small>取自持股明細</small>':'<input class="iv-in w110" data-rb="price" data-i="'+i+'" inputmode="decimal" value="'+(ivManualPriceTwd(r.p.id)!=null?ivFmtDec(ivManualPriceTwd(r.p.id),2).replace(/,/g,''):'')+'" placeholder="現價">')+'</td>'
+    h+='<tr><td class="l">'+ivPCell(r.p)+'</td><td class="l"><span class="iv-chip '+(r.held?'ok':'info')+'">'+(r.held?'持有中':'未持有')+'</span></td>'
+      +'<td>'+ivRbPriceCell(r,i)+'</td>'
       +'<td><input class="iv-in w80" data-rb="pct" data-i="'+i+'" inputmode="decimal" value="'+r.pct+'"></td><td class="mono">'+ivFmt((T.total||0)*r.pct/100)+'</td><td><button type="button" class="iv-ib rm" data-act="rb-del" data-i="'+i+'" aria-label="移除">'+IV_ICO.trash+'</button></td></tr>';
   });
   if(!rows.length) h+='<tr><td colspan="6" class="iv-empty">還沒有目標產品</td></tr>';
@@ -6695,7 +6722,7 @@ function ivRenderReport(){
   const recs=iv.checkups.slice().sort((a,b)=>a.date<b.date?1:-1);
   h+='<div><div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">健檢紀錄</h2><span class="iv-chip">'+recs.length+' 次</span></div>'
     +(recs.length?recs.map((c,i)=>'<div class="iv-saved"><div class="h"><span><span class="mono">'+ivDateShow(c.date)+'</span>　'+esc(c.note||'')+'</span><span class="iv-row" style="gap:6px">'+(i===0?'<span class="iv-chip">最近</span>':'')+'<button type="button" class="iv-ib rm" data-act="chk-del" data-id="'+c.id+'" aria-label="刪除">'+IV_ICO.trash+'</button></span></div></div>').join(''):'<div class="iv-empty">還沒有健檢紀錄</div>')
-    +'<div class="iv-row" style="flex-wrap:nowrap"><input class="iv-in w140" type="date" id="ckD" value="'+ivToday()+'"><input class="iv-in l" id="ckN" placeholder="備註（選填）"><button type="button" class="iv-btn" data-act="chk-add" style="flex:none">'+IV_ICO.plus+'新增紀錄</button></div>'
+    +'<div class="iv-row" style="gap:10px"><input class="iv-in" type="date" id="ckD" value="'+ivToday()+'" style="flex:0 0 172px;width:172px" aria-label="健檢日期"><input class="iv-in l" id="ckN" placeholder="備註（選填）" style="flex:1 1 150px;width:auto"><button type="button" class="iv-btn" data-act="chk-add" style="flex:none">'+IV_ICO.plus+'新增紀錄</button></div>'
     +'<div class="iv-fnote">「上次健檢 → 今天」從最近一筆紀錄日算起；「自投資起」從第一筆交易日算起。</div></div>';
   const rep=ivBuildReport(); const txt=ivUI.rep.tab==='md'?ivReportMd(rep):JSON.stringify(rep,null,2);
   h+='<div class="iv-card" style="margin-top:22px"><div class="iv-ch"><h2 class="iv-ct">匯出預覽</h2><div class="iv-seg sm"><button type="button" class="'+(ivUI.rep.tab==='json'?'on':'')+'" data-act="rep-tab" data-v="json">JSON</button><button type="button" class="'+(ivUI.rep.tab==='md'?'on':'')+'" data-act="rep-tab" data-v="md">Markdown</button></div></div><pre class="iv-code">'+esc(txt.length>6000?txt.slice(0,6000)+'\n…（預覽只顯示前段，下載與複製是完整內容）':txt)+'</pre>'
@@ -6733,7 +6760,7 @@ function ivGo(pane){ ivUI.pane=pane; if(ivUI.hold.edit&&pane!=='holdings'){ ivUI
 function ivTargetField(el){
   const i=+el.dataset.i, t=iv.targets.items[i], v=el.value.replace(/,/g,'');
   if(el.dataset.rb==='pct'&&t){ const n=parseFloat(v); t.pct=isNaN(n)?0:Math.max(0,Math.min(100,n)); }
-  else if(el.dataset.rb==='price'&&t){ const n=parseFloat(v); const p=ivProd(t.pid); if(n>0){ const fx=ivIsUSD(p)?(ivFxLatest()||1):1; ivAddPrice(t.pid,ivToday(),n/fx,'manual',false); } }
+  else if(el.dataset.rb==='price'&&t){ if(ivUI.rb.editPx) delete ivUI.rb.editPx[t.pid]; const n=parseFloat(v); const p=ivProd(t.pid); if(n>0){ const fx=ivIsUSD(p)?(ivFxLatest()||1):1; ivAddPrice(t.pid,ivToday(),n/fx,'manual',false); } }
 }
 document.addEventListener('click',e=>{
   const root=$('investView'); if(!root||!root.contains(e.target)) return;
@@ -6776,6 +6803,7 @@ document.addEventListener('click',e=>{
     case 'rb-addheld': { const held=ivAllHoldings().filter(h=>h.status==='held'&&!iv.targets.items.some(t=>t.pid===h.p.id)); if(!held.length){ toast('持有中的產品都已經在目標裡了'); break; }
       uiMenu('從持有中新增',held.map(h=>({label:h.p.name,value:h.p.id}))).then(v=>{ if(!v) return; iv.targets.items.push({pid:v,pct:0}); queueSave(); renderInvest(); }); break; }
     case 'rb-addother': ivRbAddOther(); break;
+    case 'rb-px-edit': (ivUI.rb.editPx=ivUI.rb.editPx||{})[el.dataset.id]=true; renderInvest(); break;
     case 'dca-edit': ivUI.dca.plan=!ivUI.dca.plan; ivUI.dca.batchRows=null; renderInvest(); break;
     case 'dca-new': ivDcaNew(); break;
     case 'dca-del': uiConfirm('刪除這個定期定額計畫？','只刪除計畫，不影響已寫入的交易紀錄。','刪除',true).then(ok=>{ if(!ok) return; iv.dca=iv.dca.filter(p=>p.id!==el.dataset.id); ivUI.dca.batchRows=null; queueSave(); renderInvest(); }); break;
