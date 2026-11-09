@@ -1230,7 +1230,7 @@ body.trip-edit .tv-edit { display: block; }
 .iv-pn { display: flex; align-items: center; gap: 10px; font-weight: 500; }
 .iv-pn small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
 .iv-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.iv-chip { font-size: 12.5px; font-weight: 500; padding: 2px 10px; border-radius: 999px; background: #F0E8DA; color: #5E5446; white-space: nowrap; display: inline-block; }
+.iv-chip { font-size: 12.5px; font-weight: 500; padding: 0 10px; height: 24px; line-height: 1; border-radius: 999px; background: #F0E8DA; color: #5E5446; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; align-self: center; }
 .iv-chip.warn { background: #F7E3D9; color: #8A3A1C; }
 .iv-chip.ok { background: #E3EFE7; color: #24604A; }
 .iv-chip.info { background: #E4ECF2; color: #2F5876; }
@@ -1246,7 +1246,8 @@ body.trip-edit .tv-edit { display: block; }
 .iv-in.l { text-align: left; }
 .iv-in:disabled { background: #F3EEE4; color: #A39887; }
 .iv-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(181,83,47,.16); }
-.iv-in[type="date"] { text-align: left; }
+.iv-in[type="date"] { -webkit-appearance: none; appearance: none; display: flex; align-items: center; justify-content: flex-start; min-width: 0; max-width: 100%; box-sizing: border-box; line-height: normal; text-align: left; }
+.iv-in[type="date"]::-webkit-date-and-time-value { text-align: left; min-width: 0; }
 .iv-in.w80 { width: 84px; } .iv-in.w110 { width: 112px; } .iv-in.w140 { width: 140px; }
 .iv-ib { appearance: none; border: 0; background: transparent; color: var(--muted); width: 36px; height: 36px; border-radius: 10px; display: inline-grid; place-items: center; cursor: pointer; flex: none; }
 .iv-ib:hover { background: #F0E8DA; color: var(--ink); }
@@ -1279,12 +1280,12 @@ body.trip-edit .tv-edit { display: block; }
 .iv-rem { border: 1px solid var(--iv-bd); border-radius: 16px; padding: 14px 16px; display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; background: #fff; }
 .iv-rem.fired { background: #FBEDE4; border-color: #F0D5C6; }
 .iv-rem .tt { font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.iv-rem .tags { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 1; }
+.iv-rem .tags { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 1; align-items: center; align-self: start; }
 .iv-rem .nt { font-size: 13.5px; color: var(--muted); grid-column: 1; line-height: 1.6; }
 .iv-rem .acts { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: flex-start; }
 .iv-rems { display: flex; flex-direction: column; gap: 12px; }
 /* 走勢圖 */
-.iv-chart { width: 100%; height: 340px; display: block; }
+.iv-chart { width: 100%; height: auto; display: block; touch-action: pan-y; }
 .iv-chart text { font-size: 12px; fill: #6B6259; }
 .iv-leg { display: inline-flex; gap: 14px; align-items: center; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
 .iv-leg i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
@@ -1299,9 +1300,11 @@ body.trip-edit .tv-edit { display: block; }
 /* 再平衡 */
 .iv-sumrow { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13.5px; color: var(--muted); }
 /* 彈窗 */
-.ui-ov.iv-ov { z-index: 160; }
+.ui-ov.iv-ov { z-index: 150; }   /* 和 uiConfirm 同層，後開的在上面，確認視窗才不會被蓋住 */
 .iv-dlg { width: min(680px,100%); max-height: calc(100vh - 48px); overflow-y: auto; padding: 24px 28px 22px; gap: 14px; }
 .iv-dlg.wide { width: min(1020px,100%); }
+.iv-dbody { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.iv-dbody > :empty { display: none; }
 .iv-dh { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .iv-dh h2 { margin: 0; }
 .iv-x { appearance: none; border: 0; background: transparent; font-size: 26px; line-height: 1; color: var(--muted); cursor: pointer; width: 36px; height: 36px; border-radius: 10px; }
@@ -1312,6 +1315,8 @@ body.trip-edit .tv-edit { display: block; }
 .iv-sg button { flex: 1 1 0; appearance: none; border: 0; background: transparent; font: inherit; font-size: 14.5px; font-weight: 500; height: 40px; border-radius: 999px; color: var(--muted); cursor: pointer; padding: 0 10px; white-space: nowrap; }
 .iv-sg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(60,40,20,.14); }
 .iv-sg.sm button { height: 34px; font-size: 13.5px; }
+.iv-grid2.keep2 { align-items: end; }
+.iv-grid2.keep2 .iv-sg button { height: 32px; }
 .iv-total { display: flex; align-items: center; justify-content: space-between; background: #F4EEE1; border-radius: 14px; padding: 14px 16px; font-size: 14px; color: #5E5446; }
 .iv-total b { font-size: 22px; color: var(--ink); font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
 .iv-hint { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
@@ -1338,7 +1343,6 @@ body.tab-invest.iv-edit-all .iv-fab { display: none; }
   .iv-donuts { gap: 8px; flex-wrap: nowrap; }
   .iv-drow { grid-template-columns: minmax(0,1fr) minmax(0,1fr) 62px; gap: 8px; font-size: 14px; }
   .iv-drow .st { display: none; }
-  .iv-chart { height: 260px; }
   .iv-dlg { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 28px 28px 0 0; padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px)); }
   .ui-ov.iv-ov { align-items: end; padding: 0; }
   .iv-grid3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -1370,6 +1374,36 @@ select.iv-in { text-align: left; }
 .iv-rtx .l1 b { font-size: 17px; }
 .iv-rtx .l2 { font-size: 13px; color: var(--muted); }
 .iv-rtx .r { display: inline-flex; align-items: center; gap: 8px; }
+
+/* ---- 第二批調整 ---- */
+.iv-g3 .iv-sub { font-size: 12.5px; }
+.iv-dhead { margin-bottom: -6px; }
+.iv-dax { position: relative; height: 16px; font-size: 11.5px; color: var(--muted); }
+.iv-dax span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.iv-sel { width: auto; max-width: 62%; min-width: 0; height: 38px; text-align: left; padding: 0 8px; font-weight: 500; }
+.iv-rtabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--iv-bd); margin: -4px -4px 0; padding: 0 4px; }
+.iv-rtabs::-webkit-scrollbar { display: none; }
+.iv-rtabs button { appearance: none; border: 0; background: transparent; font: inherit; font-size: 15px; color: var(--muted); padding: 10px 13px 12px; white-space: nowrap; flex: none; position: relative; cursor: pointer; }
+.iv-rtabs button.on { color: var(--ink); font-weight: 700; }
+.iv-rtabs button.on::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px; background: var(--accent); }
+.iv-read { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 13.5px; min-height: 22px; }
+.iv-read .d { color: var(--muted); }
+.iv-read i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.iv-chartw { width: 100%; min-height: 236px; cursor: crosshair; touch-action: pan-y; }
+.iv-pill.sm { height: 32px; padding: 0 13px; font-size: 13.5px; }
+.iv-pill.ghost { border-style: dashed; color: var(--muted); background: transparent; }
+.iv-pillx { padding: 0; gap: 0; overflow: hidden; }
+.iv-pillx button { appearance: none; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; height: 100%; }
+.iv-pillx button:first-child { padding: 0 6px 0 14px; }
+.iv-pillx .x { padding: 0 11px 0 4px; opacity: .6; font-size: 17px; line-height: 1; }
+.iv-pillx .x:hover { opacity: 1; }
+.iv-link { appearance: none; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0 4px; height: 32px; }
+.iv-btn.danger { color: #A8321F; border-color: #E7C3B6; }
+.iv-pklist { display: flex; flex-direction: column; border: 1px solid var(--iv-bd); border-radius: 14px; overflow: hidden; max-height: 52vh; overflow-y: auto; background: #fff; }
+.iv-pk { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-top: 1px solid #EFE8DB; cursor: default; }
+.iv-pk:first-child { border-top: 0; }
+label.iv-pk { cursor: pointer; justify-content: flex-start; }
+.iv-pk input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -3441,7 +3475,7 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-08.2';
+const APP_VERSION='2026-11-09.1';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -5544,43 +5578,66 @@ function ivProdXirr(H){
 }
 
 /* ---------- 總覽與績效合計 ---------- */
-function ivSummary(){
-  const hs=ivAllHoldings(); const S={ hs, assets:0, invested:0, back:0, capital:0, gain:0, perfValue:0, cost:0, plGross:0, flows:[], valDate:ivValDate(hs) };
+function ivSummary(list){
+  const hs=list||ivAllHoldings(); const S={ hs, assets:0, invested:0, back:0, capital:0, gain:0, perfValue:0, cost:0, plGross:0, flows:[], valDate:ivValDate(hs) };
   hs.forEach(h=>{ S.assets+=h.value; S.invested+=h.R.invested; S.back+=h.R.back; S.perfValue+=h.perfValue; S.flows.push(...h.R.flows); if(h.status==='held'){ S.cost+=h.R.cost; S.plGross+=h.plGross; } });
-  S.capital=S.invested-S.back; S.gain=S.assets-S.capital;           // 總資產 = 投入本金 + 總收益
+  // 總覽只看「目前持有中」：投入本金 = 持有中產品的剩餘成本；總收益 = 總資產 − 投入本金（未實現）。
+  // 已結清產品的損益、部分贖回已實現的損益，不計入這兩個數字（贖回的錢多半再投入別的產品，加進來會重複計算）；它們在「績效分析」看。
+  S.capital=S.cost; S.gain=S.assets-S.cost; S.gainRet=S.cost>0?S.gain/S.cost:null;
+  S.netPrincipal=S.invested-S.back;                                    // 歷來累計投入 − 累計拿回（只給年度健檢報表用）
   S.pl=S.perfValue-S.invested; S.ret=S.invested>0?S.pl/S.invested:null;
   const fl=S.flows.slice(); if(S.assets>0) fl.push({d:S.valDate,v:S.assets});
   const first=fl.length?fl.reduce((m,x)=>x.d<m?x.d:m,fl[0].d):''; S.xirr = (first && ivDays(first,S.valDate)>=60) ? ivXirr(fl) : null;
   return S;
 }
 
-/* ---------- 走勢（累計投入 vs 市值含已拿回）---------- */
-function ivTrend(pids){
-  const ids=pids&&pids.length?pids:iv.products.map(p=>p.id);
-  const dates=new Set(); const per=ids.map(id=>{ const p=ivProd(id); const txs=iv.tx.filter(t=>t.pid===id).sort(ivTxSort); txs.forEach(t=>dates.add(t.cf||t.d)); return {id,p,txs,ser:ivSeries(id)}; });
-  const hs=per.map(x=>ivHolding(x.id)); const end=ivValDate(hs);
-  dates.add(end); const ds=[...dates].sort();
-  const pts=ds.map(d=>{
-    let inv=0, val=0;
-    per.forEach((x,i)=>{
-      let units=0, unitsKnown=true, cost=0, back=0, closed=false;
-      x.txs.forEach(t=>{ if((t.cf||t.d)>d) return; const fee=t.fee||0;
-        if(t.type==='buy'){ inv+=t.amt+fee; cost+=t.amt+fee; if(t.u!=null) units+=t.u; else unitsKnown=false; closed=false; }
-        else if(t.type==='redeem'){ const net=t.amt-(t.fee||0)-(t.tax||0); back+=net; const full=!!t.full||(t.u!=null&&unitsKnown&&units>0&&t.u>=units-1e-6);
-          if(full){ cost=0; units=0; closed=true; } else { const cout=t.cost!=null?t.cost:(t.u!=null&&unitsKnown&&units>0?cost*t.u/units:0); cost-=cout; if(t.u!=null&&unitsKnown) units-=t.u; } }
-        else if(t.type==='div') back+=t.amt;
-      });
-      let v=0;
-      if(!closed && (cost>0||units>0)){
-        if(d===end && hs[i].status==='held') v=hs[i].value;
-        else if(unitsKnown && units>0){ let pr=null; for(const s of x.ser){ if(s.d<=d) pr=s; else break; } const fx=ivIsUSD(x.p)?(ivFxAt(d)||ivFxLatest()):1; v=(pr&&fx)?units*pr.v*fx:cost; }
-        else v=cost;
-      }
-      val+=v+back;
-    });
-    return {d, inv, val};
+/* ---------- 走勢（投入本金 vs 市值：只看當時「持有中」的部位，贖回會讓兩條線一起往下）---------- */
+function ivAddMonths(d,n){ const p=ivDateParts(d); let y=p.y, m=p.m+n; while(m<1){ m+=12; y--; } while(m>12){ m-=12; y++; } return y+'-'+ivPad(m)+'-'+ivPad(ivClampDay(y,m,p.d)); }
+function ivStateUpTo(x,d,incl){            // 到 d 為止（incl=含當天的交易）的剩餘成本、單位數、是否已結清
+  let units=0, unitsKnown=true, cost=0, closed=false;
+  x.txs.forEach(t=>{ const td=t.cf||t.d; if(incl?td>d:td>=d) return; const fee=t.fee||0;
+    if(t.type==='buy'){ cost+=t.amt+fee; if(t.u!=null) units+=t.u; else unitsKnown=false; closed=false; }
+    else if(t.type==='redeem'){ const full=!!t.full||(t.u!=null&&unitsKnown&&units>0&&t.u>=units-1e-6);
+      if(full){ cost=0; units=0; closed=true; } else { const cout=t.cost!=null?t.cost:(t.u!=null&&unitsKnown&&units>0?cost*t.u/units:0); cost-=cout; if(t.u!=null&&unitsKnown) units=Math.max(0,units-t.u); } }
   });
-  return pts;
+  return {units,unitsKnown,cost,closed};
+}
+function ivValueAt(x,s,d,incl,endD){
+  if(s.closed||(s.cost<=0&&!(s.units>0))) return 0;
+  if(incl&&x.H.status==='held'&&d>=endD) return x.H.value;      // 最新一天直接用持股明細的市值
+  if(s.unitsKnown&&s.units>0){ let pr=null; for(const q of x.ser){ if(q.d<=d) pr=q; else break; } const fx=ivIsUSD(x.p)?(ivFxAt(d)||ivFxLatest()):1; return (pr&&fx)?s.units*pr.v*fx:s.cost; }
+  return s.cost;
+}
+// opts: {range:'all'|'1m'|'3m'|'6m'|'ytd'|'1y'|'custom', cFrom, cTo}
+function ivTrend(pids,opts){
+  opts=opts||{}; const ids=pids&&pids.length?pids:iv.products.map(p=>p.id);
+  const per=ids.map(id=>({id,p:ivProd(id),txs:iv.tx.filter(t=>t.pid===id).sort(ivTxSort),ser:ivSeries(id),H:ivHolding(id)})).filter(x=>x.p&&x.txs.length);
+  const out={pts:[],from:'',to:'',frozen:false}; if(!per.length) return out;
+  const evs=new Set(); per.forEach(x=>x.txs.forEach(t=>evs.add(t.cf||t.d)));
+  const evList=[...evs].sort(), firstD=evList[0], lastEv=evList[evList.length-1];
+  const heldAny=per.some(x=>x.H.status==='held');
+  let endD=heldAny?ivValDate(per.map(x=>x.H)):lastEv; if(heldAny&&lastEv>endD) endD=lastEv;
+  out.frozen=!heldAny;                      // 都已結清：停在結清當天，不再延伸
+  let from=firstD, to=endD; const r=opts.range||'all', rel={'1m':1,'3m':3,'6m':6,'1y':12};
+  if(rel[r]) from=ivAddMonths(endD,-rel[r]); else if(r==='ytd') from=endD.slice(0,4)+'-01-01';
+  else if(r==='custom'){ if(opts.cFrom) from=opts.cFrom; if(opts.cTo&&opts.cTo<endD) to=opts.cTo; }
+  if(from<firstD) from=firstD; if(from>=to){ from=firstD; if(to<=from) to=endD; }
+  if(to<endD) out.frozen=false;
+  const dset=new Set([from,to]); evList.forEach(d=>{ if(d>from&&d<to) dset.add(d); });
+  per.forEach(x=>x.ser.forEach(q=>{ if(q.d>from&&q.d<to) dset.add(q.d); }));
+  const pointAt=(d,incl)=>{ let cap=0,val=0; per.forEach(x=>{ const s=ivStateUpTo(x,d,incl); if(s.closed) return; cap+=Math.max(0,s.cost); val+=ivValueAt(x,s,d,incl,endD); }); return {d,cap,val}; };
+  const ds=[...dset].sort(), pts=[];
+  ds.forEach(d=>{
+    const isEv=evs.has(d);
+    if(d===from){ pts.push(pointAt(d,true)); return; }
+    if(isEv){ const b=pointAt(d,false); const lastP=pts[pts.length-1];
+      if(d===to&&out.frozen){ pts.push(b); return; }          // 已結清：停在結清前一刻的市值
+      const a=pointAt(d,true);
+      if(Math.abs(b.cap-a.cap)>0.5||Math.abs(b.val-a.val)>0.5){ if(!lastP||Math.abs(b.cap-lastP.cap)>0.5||Math.abs(b.val-lastP.val)>0.5||lastP.d!==d) pts.push(b); }
+      pts.push(a); return; }
+    pts.push(pointAt(d,true));
+  });
+  out.pts=pts; out.from=from; out.to=to; out.per=per; return out;
 }
 
 /* ---------- 再平衡 ---------- */
@@ -5812,7 +5869,7 @@ const IV_ICO={
   refresh:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 00-14.5-4M4 4v4h4M4 13a8 8 0 0014.5 4M20 20v-4h-4"/></svg>'
 };
 const IV_PANES=[['overview','總覽'],['holdings','持股明細'],['perf','績效分析'],['rebal','再平衡'],['dca','定期定額'],['report','年度健檢']];
-const ivUI={ pane:'overview', sub:'perf', trend:null, autoWant:true, autoAt:0, busy:false,
+const ivUI={ pane:'overview', sub:'perf', trend:'all', pc:{range:'all',from:'',to:''}, pf:{status:'all',pids:null}, chartData:null, chart:null, autoWant:true, autoAt:0, busy:false,
   hold:{mode:'gross', pid:null, type:'all', range:'all', edit:null},
   cmp:{pid:null, manual:false, bench:'b_spx', rows:'', res:null},
   rb:{mode:'monthly', monthly:{}, lump:{}, months:{}},
@@ -6088,14 +6145,14 @@ function ivRenderOverview(){
   const S=ivSummary(); const held=S.hs.filter(h=>h.status==='held'&&h.value>0);
   const tgt=iv.targets.items.map(t=>({t,p:ivProd(t.pid)})).filter(x=>x.p);
   const legendIds=[]; tgt.forEach(x=>legendIds.push(x.p.id)); held.forEach(h=>{ if(!legendIds.includes(h.p.id)) legendIds.push(h.p.id); });
-  let h='<div class="iv-g3"><div class="iv-card"><span class="iv-k">總資產</span><span class="v num">NT$ '+ivFmt(S.assets)+'</span></div><div class="iv-card"><span class="iv-k">投入本金</span><span class="v num">NT$ '+ivFmt(S.capital)+'</span></div><div class="iv-card"><span class="iv-k">總收益</span><span class="v num '+ivCls(S.gain)+'">'+(Math.round(S.gain)>0?'+ ':(Math.round(S.gain)<0?'− ':''))+'NT$ '+ivFmt(Math.abs(S.gain))+'</span></div></div>';
+  let h='<div class="iv-g3"><div class="iv-card"><span class="iv-k">總資產</span><span class="v num">NT$ '+ivFmt(S.assets)+'</span><span class="iv-sub">持有中 '+held.length+' 項產品的市值</span></div><div class="iv-card"><span class="iv-k">投入本金</span><span class="v num">NT$ '+ivFmt(S.capital)+'</span><span class="iv-sub">持有中產品的剩餘成本</span></div><div class="iv-card"><span class="iv-k">總收益</span><span class="v num '+ivCls(S.gain)+'">'+(Math.round(S.gain)>0?'+ ':(Math.round(S.gain)<0?'− ':''))+'NT$ '+ivFmt(Math.abs(S.gain))+'</span><span class="iv-sub">未實現'+(S.gainRet!=null?'・報酬率 '+ivFmtPct(S.gainRet):'')+'</span></div></div>';
   const tgtTotal=iv.targets.total||0, pctSum=tgt.reduce((s,x)=>s+(+x.t.pct||0),0);
   h+='<div class="iv-g2"><div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">資產配置</h2></div><div class="iv-donuts">'
     +ivDonut(held.map(x=>({v:x.value,c:x.p.color})),ivFmt(S.assets),'實際')
     +ivDonut(tgt.filter(x=>x.t.pct>0).map(x=>({v:+x.t.pct,c:x.p.color})),ivFmt(tgtTotal),'目標總額')+'</div>'
     +'<div class="iv-legend">'+legendIds.map(id=>{ const p=ivProd(id); return '<span>'+ivDot(p.color)+esc(p.name)+'</span>'; }).join('')+'</div>';
   if(tgt.length){
-    h+='<div class="iv-drift"><div class="iv-row" style="justify-content:space-between"><span class="iv-sub">偏離目標（灰底為 ±'+iv.settings.drift+' pp 門檻）</span><span class="iv-sub num">−20 　　 0 　　 +20 pp</span></div>';
+    h+='<div class="iv-drift"><div class="iv-sub">偏離目標，單位 pp（灰底為 ±'+iv.settings.drift+' pp 門檻）</div><div class="iv-drow iv-dhead" aria-hidden="true"><span></span><div class="iv-dax"><span style="left:0">−20</span><span style="left:25%">−10</span><span style="left:50%">0</span><span style="left:75%">+10</span><span style="left:100%">+20</span></div><span></span><span class="st"></span></div>';
     tgt.forEach(x=>{
       const hh=S.hs.find(z=>z.p.id===x.p.id); const act=S.assets>0&&hh?hh.value/S.assets*100:0; const dr=act-(+x.t.pct||0); const over=Math.abs(dr)>=iv.settings.drift;
       const w=Math.min(50,Math.abs(dr)/20*50), th=iv.settings.drift/20*50;
@@ -6119,11 +6176,28 @@ function ivRenderOverview(){
 /* ---------- 持股明細 ---------- */
 function ivTxRangeOk(t,range){
   if(range==='all') return true; if(range==='3m') return t.d>=ivAddDays(ivToday(),-92);
-  return t.d.slice(0,4)===range;
+  if(/^\d{4}$/.test(range)) return t.d.slice(0,4)===range;
+  if(String(range).startsWith('r:')){ const r=(iv.settings.txRanges||[]).find(x=>'r:'+x.id===range); if(!r) return true; return (!r.from||t.d>=r.from)&&(!r.to||t.d<=r.to); }
+  return true;
+}
+const ivRangeLabel=r=>(r.from?ivDateShow(r.from):'起')+' – '+(r.to?ivDateShow(r.to):'今');
+function ivDateRangeDialog(o){
+  const d=ivOverlay(o.title||'自訂區間');
+  d.body.innerHTML='<label class="iv-fl"><span>開始日期</span><input class="iv-in" type="date" id="drF" value="'+esc(o.from||'')+'"></label><label class="iv-fl"><span>結束日期</span><input class="iv-in" type="date" id="drT" value="'+esc(o.to||'')+'"></label>'+(o.hint?'<div class="iv-hint">'+o.hint+'</div>':'')
+    +'<div class="ui-acts"><button type="button" class="ui-btn ghost" id="drC">取消</button><button type="button" class="ui-btn primary" id="drS">'+esc(o.ok||'套用')+'</button></div>';
+  d.body.querySelector('#drC').onclick=d.close;
+  d.body.querySelector('#drS').onclick=()=>{ const f=d.body.querySelector('#drF').value, t=d.body.querySelector('#drT').value;
+    if(!o.allowOpen&&(!f||!t)){ toast('請選擇開始與結束日期'); return; } if(!f&&!t){ toast('至少選一個日期'); return; } if(f&&t&&f>t){ toast('開始日期不能晚於結束日期'); return; }
+    d.close(); o.onApply(f,t); };
+}
+function ivRangeDialog(){
+  ivDateRangeDialog({title:'自訂交易區間',from:'',to:'',allowOpen:true,ok:'加入條件',hint:'兩個日期可以只填一個：只填開始日期＝從那天到現在；只填結束日期＝從頭到那天。加入後會成為一個篩選條件，不需要時可以按 × 移除。',onApply:(f,t)=>{
+    const list=iv.settings.txRanges=iv.settings.txRanges||[]; let r=list.find(x=>(x.from||'')===f&&(x.to||'')===t);
+    if(!r){ r={id:ivUid('g'),from:f||'',to:t||''}; list.push(r); queueSave(); } ivUI.hold.range='r:'+r.id; renderInvest(); }});
 }
 function ivRenderHoldings(){
   const hs=ivAllHoldings(); const held=hs.filter(h=>h.status==='held'), closed=hs.filter(h=>h.status==='closed'); const net=ivUI.hold.mode==='net';
-  let h='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">持有中</h2><div class="iv-pills"><button type="button" class="iv-pill'+(!net?' on':'')+'" data-act="hold-mode" data-m="gross">未實現損益（毛）</button><button type="button" class="iv-pill'+(net?' on':'')+'" data-act="hold-mode" data-m="net">未實現損益（淨）</button></div></div>';
+  let h='<div class="iv-row" style="justify-content:flex-end;margin:-6px 0 12px"><button type="button" class="iv-btn ghost sm" data-act="prod-manage">管理產品</button></div><div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">持有中</h2><div class="iv-pills"><button type="button" class="iv-pill'+(!net?' on':'')+'" data-act="hold-mode" data-m="gross">未實現損益（毛）</button><button type="button" class="iv-pill'+(net?' on':'')+'" data-act="hold-mode" data-m="net">未實現損益（淨）</button></div></div>';
   h+='<div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">產品</th><th>原始投資</th><th>數量</th><th>平均成本</th><th>現價</th><th>市值</th>'+(net?'<th>預估賣出手續費</th><th>預估證交稅</th>':'')+'<th>未實現損益（'+(net?'淨':'毛')+'）</th><th>報酬率</th></tr></thead><tbody>';
   let tc=0,tv=0,tp=0;
   held.forEach(x=>{
@@ -6153,13 +6227,16 @@ function ivRenderTxCard(hs){
   let h='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">交易紀錄</h2><span class="iv-sub">點上方產品，或在這裡切換</span></div><div class="iv-pills">'
     +prods.map(x=>{ const s=hs.find(z=>z.p.id===x.id).status; return '<button type="button" class="iv-pill'+(x.id===pid?' on':'')+'" data-act="tx-pid" data-id="'+x.id+'">'+ivDot(x.color)+esc(x.name)+'<small>'+(s==='held'?'持有中':'已結清')+'</small></button>'; }).join('')+'</div>';
   h+='<div class="iv-ch"><div class="iv-row" style="gap:10px"><span style="display:inline-flex;align-items:center;gap:10px">'+ivDot(p.color)+'<b class="iv-serif" style="font-size:22px">'+esc(p.name)+'</b></span><span class="iv-chip">'+esc(ivSubLabel(p))+'</span><span class="iv-chip '+(st==='held'?'ok':'')+'">'+(st==='held'?'持有中':'已結清')+'</span><span class="iv-chip info">共 '+counts[pid]+' 筆</span></div>'
-    +'<div class="iv-row" style="gap:10px">'+(E?'<button type="button" class="iv-btn ghost" data-act="edit-cancel">取消</button><button type="button" class="iv-btn" data-act="edit-save">儲存變更</button>':'<button type="button" class="iv-btn ghost" data-act="tx-csv">'+IV_ICO.dl+'匯出 CSV</button><button type="button" class="iv-btn ghost" data-act="edit-start">'+IV_ICO.pen+'編輯全部紀錄</button>')+'</div></div>';
+    +'<div class="iv-row" style="gap:10px">'+(E?'<button type="button" class="iv-btn ghost" data-act="edit-cancel">取消</button><button type="button" class="iv-btn" data-act="edit-save">儲存變更</button>':'<button type="button" class="iv-btn ghost" data-act="tx-csv">'+IV_ICO.dl+'匯出 CSV</button><button type="button" class="iv-btn ghost" data-act="edit-start">'+IV_ICO.pen+'編輯全部紀錄</button><button type="button" class="iv-btn ghost danger" data-act="prod-del" data-id="'+pid+'">'+IV_ICO.trash+'刪除產品</button>')+'</div></div>';
   if(E) h+=ivEditTable(E,p);
   else {
     const years=[...new Set(iv.tx.filter(t=>t.pid===pid).map(t=>t.d.slice(0,4)))].sort().reverse();
-    const f=ivUI.hold;
+    const f=ivUI.hold; const hidden=iv.settings.txHideYears||[], customs=iv.settings.txRanges||[]; const ys=years.filter(y=>!hidden.includes(y));
+    if(f.range!=='all'&&f.range!=='3m'&&!ys.includes(f.range)&&!customs.some(r=>'r:'+r.id===f.range)) f.range='all';
+    const pill=(key,label,del)=>del?'<span class="iv-pill iv-pillx'+(f.range===key?' on':'')+'"><button type="button" data-act="tx-range" data-v="'+key+'">'+esc(label)+'</button><button type="button" class="x" data-act="tx-range-del" data-v="'+key+'" aria-label="移除篩選條件 '+esc(label)+'">×</button></span>':'<button type="button" class="iv-pill'+(f.range===key?' on':'')+'" data-act="tx-range" data-v="'+key+'">'+esc(label)+'</button>';
     h+='<div class="iv-row" style="gap:10px 22px"><span class="iv-row" style="gap:8px"><span class="iv-sub">類型</span>'+[['all','全部'],['buy','買進'],['redeem','賣出／贖回'],['div','配息']].map(x=>'<button type="button" class="iv-pill'+(f.type===x[0]?' on':'')+'" data-act="tx-type" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</span>'
-      +'<span class="iv-row" style="gap:8px"><span class="iv-sub">時段</span>'+[['all','全部'],['3m','近 3 個月']].concat(years.map(y=>[y,y])).map(x=>'<button type="button" class="iv-pill'+(f.range===x[0]?' on':'')+'" data-act="tx-range" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</span></div>';
+      +'<span class="iv-row" style="gap:8px"><span class="iv-sub">時段</span>'+pill('all','全部')+pill('3m','近 3 個月')+ys.map(y=>pill(y,y,true)).join('')+customs.map(r=>pill('r:'+r.id,ivRangeLabel(r),true)).join('')
+      +'<button type="button" class="iv-pill ghost" data-act="tx-range-new">＋ 自訂區間</button>'+(hidden.length?'<button type="button" class="iv-link" data-act="tx-range-restore">還原已移除的年度（'+hidden.length+'）</button>':'')+'</span></div>';
     const kinds=H.R.kinds;
     const rows=iv.tx.map((t,i)=>({t,i})).filter(x=>x.t.pid===pid&&(f.type==='all'||x.t.type===f.type)&&ivTxRangeOk(x.t,f.range)).sort((a,b)=>a.t.d<b.t.d?1:(a.t.d>b.t.d?-1:b.i-a.i));
     h+='<div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">成交日</th><th class="l">類型</th><th class="l">盤別</th><th>單位</th><th>價格</th><th class="l">幣別</th><th>金額</th><th>手續費</th><th>預估交易稅</th><th class="l">備註</th></tr></thead><tbody>'
@@ -6168,6 +6245,32 @@ function ivRenderTxCard(hs){
     if(H.R.warn.length) h+='<div class="iv-warnbox">'+H.R.warn.map(esc).join('<br>')+'</div>';
   }
   return h+'</div>';
+}
+function ivDeleteProduct(pid){
+  const p=ivProd(pid); if(!p) return Promise.resolve(false);
+  const n=iv.tx.filter(t=>t.pid===pid).length, np=iv.prices.filter(x=>x.k===pid).length, inT=iv.targets.items.some(t=>t.pid===pid), nd=iv.dca.filter(x=>x.pid===pid).length;
+  const parts=[]; if(n) parts.push(n+' 筆交易紀錄'); if(np) parts.push(np+' 筆價格紀錄'); if(inT) parts.push('再平衡裡的目標比例'); if(nd) parts.push(nd+' 個定期定額計畫');
+  return uiConfirm('刪除「'+p.name+'」？',(parts.length?'會一併刪除：'+parts.join('、')+'。\n':'')+'刪除後無法復原，總覽、績效與走勢的數字會重新計算。','刪除',true).then(ok=>{
+    if(!ok) return false;
+    iv.products=iv.products.filter(x=>x.id!==pid); iv.tx=iv.tx.filter(t=>t.pid!==pid); iv.prices=iv.prices.filter(x=>x.k!==pid);
+    iv.targets.items=iv.targets.items.filter(t=>t.pid!==pid); iv.dca=iv.dca.filter(x=>x.pid!==pid); ivUI.dca.batchRows=null;
+    if(ivUI.hold.pid===pid) ivUI.hold.pid=null; if(ivUI.hold.edit&&ivUI.hold.edit.pid===pid){ ivUI.hold.edit=null; document.body.classList.remove('iv-edit-all'); }
+    if(ivUI.trend===pid) ivUI.trend='all'; if(ivUI.cmp.pid===pid) ivUI.cmp.pid=null;
+    if(ivUI.pf.pids){ ivUI.pf.pids=ivUI.pf.pids.filter(id=>id!==pid); if(!ivUI.pf.pids.length) ivUI.pf.pids=null; }
+    queueSave(); renderInvest(); toast('已刪除「'+p.name+'」'); return true;
+  });
+}
+function ivProdManageDialog(){
+  const d=ivOverlay('管理產品');
+  const draw=()=>{
+    const hs=ivAllHoldings();
+    d.body.innerHTML='<div class="iv-hint">這裡列出所有產品（包含還沒有交易的）。刪除會連同該產品的交易、價格、目標比例與定期定額計畫一併移除，無法復原。新增產品請在「新增交易」裡的「＋ 新增產品」。</div>'
+      +'<div class="iv-pklist">'+(hs.length?hs.map(x=>'<div class="iv-pk"><span class="iv-pn">'+ivDot(x.p.color)+'<span>'+esc(x.p.name)+'<small>'+esc(ivSubLabel(x.p))+' · '+(x.status==='held'?'持有中':(x.status==='closed'?'已結清':'尚無交易'))+' · '+x.R.n+' 筆交易</small></span></span><button type="button" class="iv-ib rm" data-del="'+x.p.id+'" aria-label="刪除 '+esc(x.p.name)+'">'+IV_ICO.trash+'</button></div>').join(''):'<div class="iv-empty">目前沒有產品</div>')+'</div>'
+      +'<div class="ui-acts"><button type="button" class="ui-btn primary" id="pmDone">完成</button></div>';
+    d.body.querySelector('#pmDone').onclick=d.close;
+    d.body.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ ivDeleteProduct(b.dataset.del).then(ok=>{ if(ok&&!d.closed) draw(); }); });
+  };
+  draw();
 }
 function ivEditTable(E,p){
   const usd=E.ccy==='USD';
@@ -6226,40 +6329,105 @@ function ivTxCsv(){
   ivDownload('交易紀錄-'+p.name+'.csv',ivCsv(rows),'text/csv;charset=utf-8'); toast('已匯出 CSV');
 }
 /* ================= 投資模組：畫面（2）績效、比較、再平衡、定期定額、年度健檢、路由 ================= */
-const ivNice=mx=>{ const steps=[1e3,2e3,5e3,1e4,2e4,5e4,1e5,2e5,5e5,1e6,2e6,5e6,1e7]; for(const s of steps){ if(mx/s<=5) return s; } return 1e7; };
-const ivAxis=v=>v===0?'0':(v>=10000?(v/10000)+' 萬':ivFmt(v));
-function ivChartSvg(pts){
-  if(pts.length<2) return '<div class="iv-empty">交易紀錄不足，畫不出走勢圖</div>';
-  const W=1000,H=340,L=64,Rr=20,T=18,B=36; const t0=pts[0].d, t1=pts[pts.length-1].d, span=Math.max(1,ivDays(t0,t1));
-  const mx=Math.max(1,...pts.map(p=>Math.max(p.inv,p.val))); const step=ivNice(mx), top=Math.ceil(mx/step)*step;
-  const X=d=>L+(ivDays(t0,d)/span)*(W-L-Rr), Y=v=>T+(1-v/top)*(H-T-B);
-  let s='<svg class="iv-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="累計投入與市值走勢">';
-  for(let v=0;v<=top;v+=step) s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#EDE5D7" stroke-width="1"/><text x="'+(L-10)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+ivAxis(v)+'</text>';
-  for(let i=0;i<5;i++){ const dd=ivAddDays(t0,Math.round(span*i/4)); s+='<text x="'+X(dd)+'" y="'+(H-10)+'" text-anchor="'+(i===0?'start':(i===4?'end':'middle'))+'">'+dd.slice(0,7).replace('-','/')+'</text>'; }
-  let inv='M'+X(pts[0].d)+' '+Y(pts[0].inv); for(let i=1;i<pts.length;i++) inv+=' L'+X(pts[i].d)+' '+Y(pts[i-1].inv)+' L'+X(pts[i].d)+' '+Y(pts[i].inv);
-  let val='M'+X(pts[0].d)+' '+Y(pts[0].val); for(let i=1;i<pts.length;i++) val+=' L'+X(pts[i].d)+' '+Y(pts[i].val);
-  s+='<path d="'+val+' L'+X(t1)+' '+Y(pts[pts.length-1].inv)+' '+(function(){ let r=''; for(let i=pts.length-1;i>=1;i--) r+=' L'+X(pts[i].d)+' '+Y(pts[i-1].inv)+' L'+X(pts[i-1].d)+' '+Y(pts[i-1].inv); return r; })()+' Z" fill="rgba(181,83,47,.10)" stroke="none"></path>';
-  s+='<path d="'+inv+'" fill="none" stroke="#8F8579" stroke-width="2.5" vector-effect="non-scaling-stroke"></path><path d="'+val+'" fill="none" stroke="#B5532F" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>';
-  const lp=pts[pts.length-1]; s+='<circle cx="'+X(lp.d)+'" cy="'+Y(lp.val)+'" r="6" fill="#B5532F"></circle>';
-  return s+'</svg>';
+const ivNiceStep=x=>{ if(!(x>0)) return 1; const m=Math.pow(10,Math.floor(Math.log10(x))); for(const k of [1,2,2.5,5,10]){ if(k*m>=x-1e-9) return k*m; } return 10*m; };
+const ivAxis=v=>{ if(v===0) return '0'; return Math.abs(v)>=10000?(+(v/10000).toFixed(2))+' 萬':ivFmt(v); };
+const IV_RANGES=[['1m','近 1 月'],['3m','近 3 月'],['6m','近 6 月'],['ytd','今年以來'],['1y','近 1 年'],['all','自投資起'],['custom','自訂']];
+function ivTrendSel(){
+  const hs=ivAllHoldings().filter(x=>x.status!=='none'); const t=ivUI.trend;
+  if(t==='held') return {pids:hs.filter(x=>x.status==='held').map(x=>x.p.id),label:'持有中產品（合計）',key:'held'};
+  const h=hs.find(x=>x.p.id===t); if(h) return {pids:[h.p.id],label:h.p.name,key:h.p.id};
+  return {pids:hs.map(x=>x.p.id),label:'全部產品',key:'all'};
+}
+function ivReadout(p){
+  const el=$('ivRead'); if(!el) return; if(!p){ el.innerHTML=''; return; }
+  const pl=p.val-p.cap, rt=p.cap>0?pl/p.cap:null;
+  el.innerHTML='<span class="d mono">'+ivDateShow(p.d)+'</span><span><i style="background:#B5532F"></i>市值 <b class="mono">'+ivFmt(p.val)+'</b></span><span><i style="background:#8F8579"></i>投入本金 <b class="mono">'+ivFmt(p.cap)+'</b></span><span>損益 <b class="mono '+ivCls(pl)+'">'+ivFmtSigned(pl)+(rt!=null?'（'+ivFmtPct(rt)+'）':'')+'</b></span>';
+}
+function ivDrawChart(){
+  const box=$('ivChartBox'), T=ivUI.chartData; if(!box||!T) return;
+  const pts=T.pts;
+  if(pts.length<2){ box.innerHTML='<div class="iv-empty">這段期間沒有足夠的資料畫走勢圖</div>'; ivUI.chart=null; ivReadout(null); return; }
+  const W=Math.max(260,Math.round(box.clientWidth)||340), mob=W<520, H=mob?236:300;
+  let lo=Infinity, hi=0; pts.forEach(p=>{ lo=Math.min(lo,p.cap,p.val); hi=Math.max(hi,p.cap,p.val); }); if(hi<=0) hi=1;
+  let base=0; if(lo>hi*0.55) base=Math.max(0,lo-(hi-lo)*0.3);           // 區間內變動小時放大，避免兩條線貼在一起
+  const step=ivNiceStep((hi-base)/(mob?4:5)), bottom=Math.max(0,Math.floor(base/step+1e-9)*step); let top=Math.ceil(hi/step-1e-9)*step; if(top<=bottom) top=bottom+step;
+  const ticks=[]; for(let v=bottom;v<=top+step*1e-6;v+=step) ticks.push(v);
+  const labs=ticks.map(ivAxis); const L=Math.round(Math.max(36,Math.max(...labs.map(s=>s.length))*(mob?6.6:7.4)+12)), Rr=mob?12:18, Tt=10, B=26;
+  const t0=T.from, t1=T.to, span=Math.max(1,ivDays(t0,t1));
+  const X=d=>L+Math.min(1,Math.max(0,ivDays(t0,d)/span))*(W-L-Rr), Y=v=>Tt+(1-(v-bottom)/(top-bottom))*(H-Tt-B);
+  let s='<svg class="iv-chart" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="投入本金與市值走勢">';
+  ticks.forEach((v,i)=>{ s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+Y(v).toFixed(1)+'" y2="'+Y(v).toFixed(1)+'" stroke="#EDE5D7" stroke-width="1"/><text x="'+(L-8)+'" y="'+(Y(v)+4).toFixed(1)+'" text-anchor="end">'+labs[i]+'</text>'; });
+  const nx=mob?3:5, fmtX=d=>span<=62?d.slice(5).replace('-','/'):d.slice(0,7).replace('-','/');
+  for(let i=0;i<nx;i++){ const dd=ivAddDays(t0,Math.round(span*i/(nx-1))); s+='<text x="'+X(dd).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+(i===0?'start':(i===nx-1?'end':'middle'))+'">'+fmtX(dd)+'</text>'; }
+  const path=k=>pts.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+Y(p[k]).toFixed(1)).join(' ');
+  const area=pts.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+Y(p.val).toFixed(1)).join(' ')+' '+pts.slice().reverse().map(p=>'L'+X(p.d).toFixed(1)+' '+Y(p.cap).toFixed(1)).join(' ')+' Z';
+  s+='<path d="'+area+'" fill="rgba(181,83,47,.10)" stroke="none"/>'
+    +'<path d="'+path('cap')+'" fill="none" stroke="#8F8579" stroke-width="2" stroke-linejoin="round"/><path d="'+path('val')+'" fill="none" stroke="#B5532F" stroke-width="2.6" stroke-linejoin="round"/>';
+  const lp=pts[pts.length-1]; s+='<circle cx="'+X(lp.d).toFixed(1)+'" cy="'+Y(lp.val).toFixed(1)+'" r="4.5" fill="#B5532F"/>';
+  s+='<line id="ivGuide" x1="0" x2="0" y1="'+Tt+'" y2="'+(H-B)+'" stroke="#2B2622" stroke-opacity=".35" stroke-width="1" visibility="hidden"/><circle id="ivGv" r="5" fill="#fff" stroke="#B5532F" stroke-width="2.4" visibility="hidden"/><circle id="ivGc" r="4" fill="#fff" stroke="#8F8579" stroke-width="2" visibility="hidden"/></svg>';
+  box.innerHTML=s; ivUI.chart={pts,X,Y,W,L,Rr};
+  ivReadout(lp);
+}
+function ivChartMove(e,box){
+  const C=ivUI.chart; if(!C) return; const svg=box.querySelector('svg'); if(!svg) return;
+  const r=svg.getBoundingClientRect(); const x=(e.clientX-r.left)*(C.W/(r.width||C.W));
+  let idx=0; for(let i=0;i<C.pts.length;i++){ if(C.X(C.pts[i].d)<=x+0.5) idx=i; else break; }
+  const p=C.pts[idx], px=C.X(p.d);
+  const g=svg.querySelector('#ivGuide'), a=svg.querySelector('#ivGv'), b=svg.querySelector('#ivGc');
+  g.setAttribute('x1',px); g.setAttribute('x2',px); a.setAttribute('cx',px); a.setAttribute('cy',C.Y(p.val)); b.setAttribute('cx',px); b.setAttribute('cy',C.Y(p.cap));
+  [g,a,b].forEach(el=>el.setAttribute('visibility','visible')); ivReadout(p);
+}
+function ivChartLeave(box){
+  const C=ivUI.chart; const svg=box.querySelector('svg'); if(!C||!svg) return;
+  ['#ivGuide','#ivGv','#ivGc'].forEach(q=>{ const el=svg.querySelector(q); if(el) el.setAttribute('visibility','hidden'); }); ivReadout(C.pts[C.pts.length-1]);
+}
+function ivPerfRows(){                       // 「各產品績效」的篩選結果
+  const hs=ivAllHoldings().filter(x=>x.status!=='none'); const pf=ivUI.pf;
+  let list=hs.filter(x=>pf.status==='all'||x.status===pf.status); if(pf.pids) list=list.filter(x=>pf.pids.includes(x.p.id));
+  return {hs,list};
 }
 function ivRenderPerf(){
   let h='<div class="iv-seg sm" style="margin-bottom:18px"><button type="button" class="'+(ivUI.sub==='perf'?'on':'')+'" data-act="sub" data-v="perf">績效總覽</button><button type="button" class="'+(ivUI.sub==='compare'?'on':'')+'" data-act="sub" data-v="compare">和大盤比較</button></div>';
   if(ivUI.sub==='compare') return h+ivRenderCompare();
-  const hs=ivAllHoldings().filter(x=>x.status!=='none'); const sel=hs.find(x=>x.p.id===ivUI.trend)?ivUI.trend:null;
-  const pts=ivTrend(sel?[sel]:hs.map(x=>x.p.id));
-  h+='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">走勢・'+(sel?esc(ivName(sel)):'全部產品')+'</h2><span class="iv-leg"><span><i style="background:#8F8579"></i>累計投入</span><span><i style="background:#B5532F"></i>市值</span></span></div>'
-    +'<div class="iv-pills"><button type="button" class="iv-pill'+(!sel?' on':'')+'" data-act="trend" data-id="">全部產品</button>'+hs.map(x=>'<button type="button" class="iv-pill'+(sel===x.p.id?' on':'')+'" data-act="trend" data-id="'+x.p.id+'">'+ivDot(x.p.color)+esc(x.p.name)+'</button>').join('')+'</div>'
-    +ivChartSvg(pts)+'<div class="iv-fnote">市值 = 目前市值 + 累計已拿回。歷史市值以各交易日前最近一筆價格估算；缺少價格或單位數的日期，暫以剩餘成本代替。</div></div>';
-  h+='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">各產品績效</h2><span class="iv-sub">點產品列，上方走勢圖會切換成該產品</span></div><div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">產品</th><th class="l">狀態</th><th>累計投入</th><th>市值</th><th>損益</th><th>總報酬</th><th>XIRR</th></tr></thead><tbody>';
-  hs.forEach(x=>{
-    h+='<tr class="clk'+(sel===x.p.id?' sel':'')+'" data-act="trend" data-id="'+x.p.id+'"><td class="l"><div class="iv-pn">'+ivDot(x.p.color)+esc(x.p.name)+'</div></td><td class="l"><span class="iv-chip '+(x.status==='held'?'ok':'')+'">'+(x.status==='held'?'持有中':'已結清')+'</span></td><td>'+ivFmt(x.R.invested)+'</td>'
+  const {hs,list}=ivPerfRows(); const sel=ivTrendSel(); const pc=ivUI.pc;
+  const T=ivTrend(sel.pids,{range:pc.range,cFrom:pc.from,cTo:pc.to}); ivUI.chartData=T;
+  const held=hs.filter(x=>x.status==='held'), closed=hs.filter(x=>x.status==='closed');
+  const opt=(v,t)=>'<option value="'+esc(v)+'"'+(sel.key===v?' selected':'')+'>'+esc(t)+'</option>';
+  const custLabel=pc.range==='custom'?ivDateShow(T.from)+' – '+ivDateShow(T.to):'';
+  h+='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">走勢</h2>'
+    +'<select class="iv-in iv-sel" data-ivsel="trend" aria-label="分析對象">'+opt('all','全部產品')+opt('held','持有中產品（合計）')
+    +(held.length?'<optgroup label="持有中">'+held.map(x=>opt(x.p.id,x.p.name)).join('')+'</optgroup>':'')+(closed.length?'<optgroup label="已結清">'+closed.map(x=>opt(x.p.id,x.p.name)).join('')+'</optgroup>':'')+'</select></div>'
+    +'<div class="iv-rtabs" role="tablist" aria-label="走勢區間">'+IV_RANGES.map(x=>'<button type="button" role="tab" aria-selected="'+(pc.range===x[0])+'" class="'+(pc.range===x[0]?'on':'')+'" data-act="pc-range" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'
+    +(custLabel?'<div class="iv-sub" style="margin-top:-8px">區間：'+custLabel+'（再按一次「自訂」可修改）</div>':'')
+    +'<span class="iv-leg"><span><i style="background:#8F8579"></i>投入本金</span><span><i style="background:#B5532F"></i>市值</span></span>';
+  h+='<div class="iv-read" id="ivRead"></div><div class="iv-chartw" id="ivChartBox"></div>'
+    +'<div class="iv-fnote">投入本金 = 當時「持有中」部位的剩餘成本（買進含手續費；贖回會扣掉對應的成本）；市值 = 當時持有部位的市值，已贖回拿走的錢不再計入，所以贖回時兩條線會一起往下，轉投入其他產品時再升回來。歷史市值以各日前最近一筆價格估算，缺價或缺單位數的日期暫以剩餘成本代替；已結清的產品停在結清當天。手指或滑鼠在圖上移動可看各日數字。</div></div>';
+  // 各產品績效（可篩選）
+  const pf=ivUI.pf, filtered=pf.status!=='all'||!!pf.pids;
+  h+='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">各產品績效</h2><span class="iv-sub">點產品列，上方走勢圖會切換成該產品</span></div>'
+    +'<div class="iv-row" style="gap:8px">'+[['all','全部'],['held','持有中'],['closed','已結清']].map(x=>'<button type="button" class="iv-pill sm'+(pf.status===x[0]?' on':'')+'" data-act="pf-status" data-v="'+x[0]+'">'+x[1]+'</button>').join('')
+    +'<button type="button" class="iv-pill sm'+(pf.pids?' on':'')+'" data-act="pf-prods">'+(pf.pids?'已選 '+pf.pids.filter(id=>ivProd(id)).length+' 項產品':'選擇產品')+' ▾</button>'+(filtered?'<button type="button" class="iv-pill sm ghost" data-act="pf-clear">清除篩選</button>':'')+'</div>'
+    +'<div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">產品</th><th class="l">狀態</th><th>累計投入</th><th>市值</th><th>損益</th><th>總報酬</th><th>XIRR</th></tr></thead><tbody>';
+  list.forEach(x=>{
+    h+='<tr class="clk'+(sel.key===x.p.id?' sel':'')+'" data-act="trend" data-id="'+x.p.id+'"><td class="l"><div class="iv-pn">'+ivDot(x.p.color)+esc(x.p.name)+'</div></td><td class="l"><span class="iv-chip '+(x.status==='held'?'ok':'')+'">'+(x.status==='held'?'持有中':'已結清')+'</span></td><td>'+ivFmt(x.R.invested)+'</td>'
       +'<td><b>'+ivFmt(x.perfValue)+'</b>'+(x.status==='held'&&x.R.back>0?'<small>含已拿回 '+ivFmt(x.R.back)+'</small>':'')+'</td><td class="'+ivCls(x.pl)+'">'+ivFmtSigned(x.pl)+'</td><td class="'+ivCls(x.pl)+'">'+ivFmtPct(x.ret)+'</td><td>'+ivFmtPctPlain(x.xirr)+'</td></tr>';
   });
-  const S=ivSummary();
-  h+=(hs.length?'<tr class="sum"><td class="l">合計</td><td></td><td>'+ivFmt(S.invested)+'</td><td>'+ivFmt(S.perfValue)+'</td><td class="'+ivCls(S.pl)+'">'+ivFmtSigned(S.pl)+'</td><td class="'+ivCls(S.pl)+'">'+ivFmtPct(S.ret)+'</td><td>'+ivFmtPctPlain(S.xirr)+'</td></tr>':'<tr><td colspan="7" class="iv-empty">還沒有交易紀錄</td></tr>')
-    +'</tbody></table></div><div class="iv-fnote">市值（持有中） = 目前市值 + 累計已拿回（部分贖回、配息）；損益 = 市值 − 累計投入。市值（已結清）固定為全部拿回金額。XIRR 以實際現金流計算；持有少於 60 天不顯示。</div></div>';
+  const S=ivSummary(list);
+  h+=(list.length?'<tr class="sum"><td class="l">合計'+(filtered?'<small>篩選 '+list.length+' / '+hs.length+' 項</small>':'')+'</td><td></td><td>'+ivFmt(S.invested)+'</td><td>'+ivFmt(S.perfValue)+'</td><td class="'+ivCls(S.pl)+'">'+ivFmtSigned(S.pl)+'</td><td class="'+ivCls(S.pl)+'">'+ivFmtPct(S.ret)+'</td><td>'+ivFmtPctPlain(S.xirr)+'</td></tr>':'<tr><td colspan="7" class="iv-empty">'+(hs.length?'沒有符合條件的產品':'還沒有交易紀錄')+'</td></tr>')
+    +'</tbody></table></div><div class="iv-fnote">市值（持有中） = 目前市值 + 累計已拿回（部分贖回、配息）；損益 = 市值 − 累計投入。市值（已結清）固定為全部拿回金額，停在結清當天不再變動。合計只計算上面篩選出來的產品；XIRR 以實際現金流計算，持有少於 60 天不顯示。</div></div>';
   return h;
+}
+function ivPfDialog(){
+  const hs=ivAllHoldings().filter(x=>x.status!=='none'); const cur=new Set(ivUI.pf.pids||hs.map(x=>x.p.id));
+  const d=ivOverlay('選擇產品');
+  d.body.innerHTML='<div class="iv-row" style="gap:8px"><button type="button" class="iv-pill sm" id="pfAll">全選</button><button type="button" class="iv-pill sm" id="pfNone">全不選</button><button type="button" class="iv-pill sm" id="pfHeld">只選持有中</button></div>'
+    +'<div class="iv-pklist">'+hs.map(x=>'<label class="iv-pk"><input type="checkbox" value="'+x.p.id+'"'+(cur.has(x.p.id)?' checked':'')+'><span class="iv-pn">'+ivDot(x.p.color)+'<span>'+esc(x.p.name)+'<small>'+(x.status==='held'?'持有中':'已結清')+'</small></span></span></label>').join('')+'</div>'
+    +'<div class="ui-acts"><button type="button" class="ui-btn ghost" id="pfC">取消</button><button type="button" class="ui-btn primary" id="pfS">套用</button></div>';
+  const boxes=()=>[...d.body.querySelectorAll('.iv-pk input')];
+  d.body.querySelector('#pfAll').onclick=()=>boxes().forEach(b=>b.checked=true); d.body.querySelector('#pfNone').onclick=()=>boxes().forEach(b=>b.checked=false);
+  d.body.querySelector('#pfHeld').onclick=()=>boxes().forEach(b=>{ const x=hs.find(z=>z.p.id===b.value); b.checked=!!x&&x.status==='held'; });
+  d.body.querySelector('#pfC').onclick=d.close;
+  d.body.querySelector('#pfS').onclick=()=>{ const ids=boxes().filter(b=>b.checked).map(b=>b.value); if(!ids.length){ toast('至少選一個產品'); return; } ivUI.pf.pids=ids.length===hs.length?null:ids; d.close(); renderInvest(); };
 }
 
 /* ---------- 和大盤比較 ---------- */
@@ -6346,7 +6514,7 @@ function ivCmpCsv(){
 function ivRenderRebal(){
   const T=iv.targets; const rows=ivRebalRows(); const sum=rows.reduce((s,r)=>s+r.pct,0);
   let h='<div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">目標設定</h2><span class="iv-chip '+(Math.round(sum*100)===10000?'ok':'warn')+'">比例合計 '+(Math.round(sum*10)/10)+'%</span></div>'
-    +'<label class="iv-fl" style="max-width:340px"><span>目標總投入金額（希望總資產達到）</span><span class="iv-row" style="flex-wrap:nowrap"><input class="iv-in" data-rb="total" inputmode="numeric" value="'+ivFmt(T.total||0)+'"><span class="iv-sub">元</span></span></label>'
+    +'<label class="iv-fl" style="max-width:340px"><span>目標總投入金額（希望總資產達到）</span><span class="iv-row" style="flex-wrap:nowrap"><input class="iv-in" data-rb="total" inputmode="numeric" style="text-align:right" value="'+ivFmt(T.total||0)+'"><span class="iv-sub">元</span></span></label>'
     +'<div class="iv-tw"><table class="iv-tbl"><thead><tr><th class="l">產品</th><th class="l">狀態</th><th>現價（元）</th><th>目標比例（%）</th><th>目標金額</th><th></th></tr></thead><tbody>';
   rows.forEach((r,i)=>{
     h+='<tr><td class="l">'+ivPCell(r.p)+'</td><td class="l"><span class="iv-chip '+(r.held?'ok':'info')+'">'+(r.held?'持有中':'自行輸入')+'</span></td>'
@@ -6493,7 +6661,7 @@ function ivBuildReport(){
     settings_snapshot:{drift_threshold_pp:iv.settings.drift,theme_cap_pct:iv.settings.themeCap,broker_fee_rate:iv.settings.feeRate,min_fee:iv.settings.minFee,etf_sell_tax:iv.settings.sellTaxEtf},
     allocation_target:{total:iv.targets.total||0,items:iv.targets.items.map(t=>({instrument:ivName(t.pid),target_pct:+t.pct}))},
     holdings, closed_positions:closed,
-    portfolio_summary:{total_value:Math.round(S.assets),total_contributed:Math.round(S.invested),total_withdrawn:Math.round(S.back),net_principal:Math.round(S.capital),total_pl:Math.round(S.gain),xirr_inception:S.xirr!=null?+S.xirr.toFixed(4):null,fees_total:Math.round(S.hs.reduce((s,h)=>s+h.R.fees,0)),taxes_total:Math.round(S.hs.reduce((s,h)=>s+h.R.taxes,0)),valuation_date:S.valDate},
+    portfolio_summary:{total_value:Math.round(S.assets),total_contributed:Math.round(S.invested),total_withdrawn:Math.round(S.back),net_principal:Math.round(S.netPrincipal),total_pl:Math.round(S.pl),holding_cost:Math.round(S.capital),unrealized_pl:Math.round(S.gain),xirr_inception:S.xirr!=null?+S.xirr.toFixed(4):null,fees_total:Math.round(S.hs.reduce((s,h)=>s+h.R.fees,0)),taxes_total:Math.round(S.hs.reduce((s,h)=>s+h.R.taxes,0)),valuation_date:S.valDate},
     benchmark_comparison:iv.compares.map(c=>({instrument:c.name,benchmark:c.bench,actual_value:c.actual,shadow_value:c.shadow,lead:c.diff,saved_at:c.at})),
     dca_plans:iv.dca.map(p=>({instrument:ivName(p.pid),monthly_amount:p.amt,day:p.day,status:p.status==='off'?'paused':'active'})),
     cash_flows:fl.map(f=>({date:f.d,amount:Math.round(f.v)})), transactions:txs, corporate_actions:[], alerts,
@@ -6502,7 +6670,7 @@ function ivBuildReport(){
 }
 function ivReportMd(r){
   const M=[]; M.push('# 投資年度健檢','','期間：'+r.report_meta.period_start+' ～ '+r.report_meta.period_end+'（'+r.report_meta.period_note+'）','');
-  const p=r.portfolio_summary; M.push('## 總覽','','- 總資產：NT$ '+ivFmt(p.total_value),'- 累計投入：NT$ '+ivFmt(p.total_contributed)+'；累計拿回：NT$ '+ivFmt(p.total_withdrawn),'- 投入本金：NT$ '+ivFmt(p.net_principal)+'；總收益：NT$ '+ivFmtSigned(p.total_pl),'- 整體 XIRR（自投資起）：'+(p.xirr_inception!=null?(p.xirr_inception*100).toFixed(1)+'%':'—'),'');
+  const p=r.portfolio_summary; M.push('## 總覽','','- 總資產：NT$ '+ivFmt(p.total_value),'- 累計投入：NT$ '+ivFmt(p.total_contributed)+'；累計拿回：NT$ '+ivFmt(p.total_withdrawn),'- 淨投入（累計投入 − 累計拿回）：NT$ '+ivFmt(p.net_principal)+'；總損益（含已實現）：NT$ '+ivFmtSigned(p.total_pl),'- 持有中的投入本金：NT$ '+ivFmt(p.holding_cost)+'；未實現損益：NT$ '+ivFmtSigned(p.unrealized_pl),'- 整體 XIRR（自投資起）：'+(p.xirr_inception!=null?(p.xirr_inception*100).toFixed(1)+'%':'—'),'');
   M.push('## 持有中','','| 產品 | 數量 | 市值 | 比例 | 目標 | 偏離(pp) | 未實現損益 | XIRR |','|---|---:|---:|---:|---:|---:|---:|---:|');
   r.holdings.forEach(h=>M.push('| '+h.instrument+' | '+(h.quantity!=null?ivFmtDec(h.quantity,2):'—')+' | '+ivFmt(h.market_value)+' | '+(h.weight*100).toFixed(1)+'% | '+(h.target_weight!=null?(h.target_weight*100).toFixed(0)+'%':'—')+' | '+(h.drift_pp!=null?h.drift_pp:'—')+' | '+ivFmtSigned(h.unrealized_pl)+' | '+(h.xirr!=null?(h.xirr*100).toFixed(1)+'%':'—')+' |'));
   M.push('','## 已結清','','| 產品 | 投入 | 拿回 | 損益 | XIRR |','|---|---:|---:|---:|---:|'); r.closed_positions.forEach(c=>M.push('| '+c.instrument+' | '+ivFmt(c.invested)+' | '+ivFmt(c.returned)+' | '+ivFmtSigned(c.pl)+' | '+(c.xirr!=null?(c.xirr*100).toFixed(1)+'%':'—')+' |'));
@@ -6556,6 +6724,7 @@ function renderInvest(){
     case 'dca': h+=ivRenderDca(); break; case 'report': h+=ivRenderReport(); break; case 'more': h+=ivRenderMore(); break; default: h+=ivRenderOverview();
   }
   body.innerHTML=h; if(window.scrollY!==y) window.scrollTo(0,y);
+  if(ivUI.pane==='perf'&&ivUI.sub==='perf') ivDrawChart();
   if(typeof updateTabbar==='function') updateTabbar();
   // 每次打開投資分頁就自動更新一次（資料載入後才跑；10 分鐘內重複切換不會再抓，避免被證交所限流）
   if(ivUI.autoWant && iv.products.length){ ivUI.autoWant=false; const now=Date.now(); if(now-ivUI.autoAt>=600000){ ivUI.autoAt=now; setTimeout(()=>ivRunAuto(false),400); } }
@@ -6586,7 +6755,16 @@ document.addEventListener('click',e=>{
     case 'edit-add': ivEditCollect(); ivUI.hold.edit.rows.push({id:ivUid('t'),pid:ivUI.hold.edit.pid,d:ivToday(),type:'buy'}); renderInvest(); break;
     case 'edit-del': ivEditCollect(); ivUI.hold.edit.rows.splice(+el.dataset.i,1); renderInvest(); break;
     case 'sub': ivUI.sub=el.dataset.v; renderInvest(); break;
-    case 'trend': ivUI.trend=el.dataset.id||null; renderInvest(); break;
+    case 'trend': ivUI.trend=el.dataset.id||'all'; renderInvest(); break;
+    case 'pc-range': { if(el.dataset.v==='custom'){ const T=ivUI.chartData||{}; ivDateRangeDialog({title:'自訂區間',from:ivUI.pc.range==='custom'?(ivUI.pc.from||T.from):(T.from||''),to:ivUI.pc.range==='custom'?(ivUI.pc.to||T.to):(T.to||''),ok:'套用',onApply:(f,t)=>{ ivUI.pc={range:'custom',from:f,to:t}; renderInvest(); }}); break; } ivUI.pc.range=el.dataset.v; renderInvest(); break; }
+    case 'pf-status': ivUI.pf.status=el.dataset.v; renderInvest(); break;
+    case 'pf-prods': ivPfDialog(); break;
+    case 'pf-clear': ivUI.pf={status:'all',pids:null}; renderInvest(); break;
+    case 'tx-range-del': { const v=el.dataset.v; if(/^\d{4}$/.test(v)){ const hy=iv.settings.txHideYears=iv.settings.txHideYears||[]; if(!hy.includes(v)) hy.push(v); } else if(v.startsWith('r:')) iv.settings.txRanges=(iv.settings.txRanges||[]).filter(r=>'r:'+r.id!==v); if(ivUI.hold.range===v) ivUI.hold.range='all'; queueSave(); renderInvest(); break; }
+    case 'tx-range-restore': iv.settings.txHideYears=[]; queueSave(); renderInvest(); break;
+    case 'tx-range-new': ivRangeDialog(); break;
+    case 'prod-manage': ivProdManageDialog(); break;
+    case 'prod-del': ivDeleteProduct(el.dataset.id); break;
     case 'cmp-pid': ivUI.cmp.pid=el.dataset.id; ivUI.cmp.manual=false; renderInvest(); break;
     case 'cmp-manual': ivUI.cmp.manual=true; renderInvest(); break;
     case 'cmp-bench': ivUI.cmp.bench=el.dataset.id; renderInvest(); break;
@@ -6623,6 +6801,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const root=$('investView'); if(!root||!root.contains(e.target)) return; const el=e.target;
+  if(el.dataset.ivsel==='trend'){ ivUI.trend=el.value; renderInvest(); return; }
   if(el.dataset.rb){
     if(el.dataset.rb==='total'){ const n=parseFloat(el.value.replace(/,/g,'')); iv.targets.total=isNaN(n)?0:Math.max(0,n); queueSave(); renderInvest(); }
     else if(el.dataset.rb==='monthly'){ ivUI.rb.monthly[el.dataset.id]=Math.max(0,parseFloat(el.value.replace(/,/g,''))||0); renderInvest(); }
@@ -6647,6 +6826,12 @@ document.addEventListener('change',e=>{
   else if(el.id==='cmRows'){ ivUI.cmp.rows=el.value; renderInvest(); }
   else if(el.id==='cmEnd'){ ivUI.cmp.endVal=parseFloat(el.value.replace(/,/g,''))||0; renderInvest(); }
 });
+
+/* 走勢圖：滑鼠／手指移動時顯示當天數字；視窗大小改變時依實際寬度重畫（文字不會被拉扁） */
+document.addEventListener('pointermove',e=>{ const box=e.target.closest&&e.target.closest('.iv-chartw'); if(box) ivChartMove(e,box); });
+document.addEventListener('pointerdown',e=>{ const box=e.target.closest&&e.target.closest('.iv-chartw'); if(box) ivChartMove(e,box); });
+document.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse'&&e.target.classList&&e.target.classList.contains('iv-chartw')) ivChartLeave(e.target); },true);
+let ivRzT=null; window.addEventListener('resize',()=>{ clearTimeout(ivRzT); ivRzT=setTimeout(()=>{ if(activeAppTab==='invest'&&ivUI.pane==='perf'&&ivUI.sub==='perf') ivDrawChart(); },150); });
 
 /* ================= 投資模組：啟動接線 ================= */
 Object.assign(TB_ICON,{
