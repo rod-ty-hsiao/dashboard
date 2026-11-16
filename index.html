@@ -643,7 +643,8 @@ body.connected .file-out { display: inline-block; }
 .mm-nolist { color: #8A8074; font-size: 14px; padding: 18px 12px; }
 
 .mm-mhead, .mm-mtools { display: none; }
-.mm-etop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.mm-etop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: -24px; z-index: 4; margin: -24px -40px -8px; padding: 20px 40px 10px; background: var(--card); box-shadow: 0 1px 0 #EFE8DB; }   /* 工具列固定在上方（像凍結窗格），內容再長也按得到 */
+.mm-tail { flex: none; height: 40vh; min-height: 200px; cursor: text; }   /* 最後一行下方固定留白：最後一行可以捲到畫面中間，不會貼在底部或被鍵盤擋住 */
 .mm-stamp { font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: var(--muted); letter-spacing: .02em; }
 .mm-eacts { display: flex; align-items: center; gap: 6px; }
 .mm-ib { appearance: none; border: 0; background: transparent; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
@@ -678,7 +679,7 @@ body.connected .file-out { display: inline-block; }
 .mm-cole.mm-none > :not(.mm-empty) { display: none !important; }
 .mm-cole.mm-none .mm-empty { display: block; }
 .mm-fab { display: none; }
-@media (max-width: 1100px) and (min-width: 721px) { .mm-ws { grid-template-columns: minmax(0,1fr); height: auto; overflow: visible; } .mm-colf, .mm-coll { border-right: 0; border-bottom: 1px solid #EFE8DB; overflow: visible; } .mm-cole { overflow: visible; } }
+@media (max-width: 1100px) and (min-width: 721px) { .mm-ws { grid-template-columns: minmax(0,1fr); height: auto; overflow: visible; } .mm-colf, .mm-coll { border-right: 0; border-bottom: 1px solid #EFE8DB; overflow: visible; } .mm-cole { overflow: visible; } .mm-tail { height: 30vh; } .mm-etop { top: 0; } }
 
 /* ===== Notes（手機）===== */
 @media (max-width: 720px) {
@@ -711,13 +712,14 @@ body.connected .file-out { display: inline-block; }
 
   /* 編輯頁：滿版 */
   .mm-cole { display: none; }
-  body.memo-open .mm-cole { display: flex; position: fixed; inset: 0; z-index: 90; background: #F6F2EA; padding: calc(64px + env(safe-area-inset-top, 0px)) 24px calc(92px + env(safe-area-inset-bottom, 0px)); gap: 14px; overflow-y: auto; overscroll-behavior: contain; }
-  body.memo-open .mm-mhead { display: flex; position: fixed; left: 0; right: 0; top: 0; z-index: 3; align-items: center; justify-content: space-between; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 6px 6px; background: #F6F2EA; }
+  body.memo-open .mm-cole { display: flex; position: fixed; left: 0; right: 0; top: var(--vvt, 0px); bottom: var(--kb, 0px); z-index: 90; background: #F6F2EA; padding: calc(64px + env(safe-area-inset-top, 0px)) 24px calc(92px + env(safe-area-inset-bottom, 0px)); gap: 14px; overflow-y: auto; overscroll-behavior: contain; }
+  body.memo-open .mm-mhead { display: flex; position: fixed; left: 0; right: 0; top: var(--vvt, 0px); z-index: 5; align-items: center; justify-content: space-between; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 6px 6px; background: #F6F2EA; }
   .mm-back { appearance: none; border: 0; background: transparent; font: inherit; font-size: 17px; font-weight: 500; color: var(--accent); display: inline-flex; align-items: center; gap: 2px; height: 44px; padding: 0 8px 0 0; cursor: pointer; }
   .mm-mright { display: flex; align-items: center; gap: 2px; }
   .mm-mhead .mm-ib { width: 44px; height: 44px; border-radius: 50%; color: var(--ink); }
   .mm-mhead .mm-ib.on { color: var(--accent); background: #F3E4DA; }
-  .mm-etop { flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .mm-etop { flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: static; margin: 0; padding: 0; background: none; box-shadow: none; }
+  .mm-tail { height: 32vh; min-height: 180px; }
   .mm-dsk { display: none; }
   .mm-chipf { margin-right: 0; height: 38px; min-width: 200px; }
   .mm-chipf select { height: 38px; font-size: 16px; padding-left: 40px; }
@@ -730,11 +732,14 @@ body.connected .file-out { display: inline-block; }
   .mmb-text, .mmb-cktext { font-size: 17.5px !important; }
   .mmb-codetext { font-size: 14px !important; }
   .mm-blocks { --bl: -24px; --br: -24px; }
-  body.memo-open .mm-mtools { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(76px + env(safe-area-inset-bottom, 0px)); align-items: flex-start; justify-content: space-between; padding: 10px 12px 0 14px; background: var(--card); border-top: 1px solid var(--line); }
+  body.memo-open .mm-mtools { display: flex; position: fixed; left: 0; right: 0; bottom: var(--kb, 0px); z-index: 5; height: calc(76px + env(safe-area-inset-bottom, 0px)); align-items: flex-start; justify-content: space-between; padding: 10px 12px 0 14px; background: var(--card); border-top: 1px solid var(--line); }
   .mm-mtl { display: flex; align-items: center; gap: 4px; }
   .mm-mtools .mm-ib { width: 44px; height: 44px; border-radius: 50%; color: var(--ink); }
   .mm-done { appearance: none; border: 0; background: transparent; font: inherit; font-size: 17px; font-weight: 700; color: var(--accent); height: 44px; padding: 0 6px; cursor: pointer; }
   .mm-cole.mm-none { display: none; }
+  /* 鍵盤開啟時：工具列貼在鍵盤上方（不再被鍵盤蓋住），並縮矮一點把空間留給內容 */
+  body.kb-open.memo-open .mm-mtools { height: 56px; padding-top: 6px; }
+  body.kb-open.memo-open .mm-cole { padding-bottom: 72px; }
 }
 
 /* ===== 旅遊 ===== */
@@ -1269,6 +1274,25 @@ body.trip-edit .tv-edit { display: block; }
 .iv-donut .ctr { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .iv-donut .ctr b { font-size: 20px; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
 .iv-donut .ctr span { font-size: 12px; color: var(--muted); }
+.iv-donuts[data-act] { cursor: pointer; border-radius: 18px; transition: background .15s; }
+.iv-donuts[data-act]:hover { background: #F8F2E7; }
+.iv-donuts[data-act]:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+/* 抽屜：不分手機電腦都從下方滑出 */
+.ui-ov.iv-ov.sheet { align-items: end; padding: 0; }
+.ui-ov.iv-ov.sheet .iv-dlg { width: min(620px,100%); max-height: 82vh; max-height: 82dvh; border-radius: 28px 28px 0 0; padding: 14px 24px calc(22px + env(safe-area-inset-bottom, 0px)); animation: ivSheetUp .3s var(--ease-out); }
+.ui-ov.iv-ov.sheet .iv-dlg::before { content: ''; flex: none; align-self: center; width: 44px; height: 5px; border-radius: 999px; background: #DDD2C0; }
+@keyframes ivSheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ui-ov.iv-ov.sheet .iv-dlg { animation: none; } }
+.iv-al-sum { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13.5px; color: var(--muted); }
+.iv-al-sum b { font-size: 18px; color: var(--ink); }
+.iv-al { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-top: 1px solid #EFE8DB; }
+.iv-al .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15.5px; }
+.iv-al .top b { font-size: 18px; }
+.iv-al .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.iv-al .bar { position: relative; height: 10px; border-radius: 999px; background: #EFE8DB; }
+.iv-al .bar i { display: block; height: 100%; border-radius: 999px; min-width: 2px; }
+.iv-al .bar u { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 1px; }
+.iv-al .sub { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
 .iv-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13.5px; }
 .iv-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .iv-drift { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #EFE8DB; padding-top: 16px; }
@@ -1543,7 +1567,7 @@ label.iv-pk { cursor: pointer; justify-content: flex-start; }
                 <button type="button" class="mm-ib" id="mmPinM" aria-label="釘選"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3z"/><path d="M12 13.5V20"/></svg></button>
               </div>
             </div>
-            <div class="mm-etop">
+            <div class="mm-etop" id="mmEtop">
               <span class="mm-stamp" id="mmStamp"></span>
               <div class="mm-eacts">
                 <label class="mm-chipf" title="移到資料夾"><svg class="mm-ficon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 012-2h4l2 2.5h7a2 2 0 012 2v7.5a2 2 0 01-2 2h-13a2 2 0 01-2-2z"/></svg><select id="mmFolderSel" aria-label="資料夾"></select><svg class="mm-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></label>
@@ -1562,8 +1586,9 @@ label.iv-pk { cursor: pointer; justify-content: flex-start; }
               <span class="mm-gl">內容</span>
               <div class="mm-bodywrap"><div class="mm-blocks" id="mmBlocks"></div></div>
             </div>
+            <div class="mm-tail" id="mmTail" aria-hidden="true"></div>
 
-            <nav class="mm-mtools" aria-label="編輯工具">
+            <nav class="mm-mtools" id="mmTools" aria-label="編輯工具">
               <div class="mm-mtl">
                 <button type="button" class="mm-ib" id="mmCheckM" aria-label="插入核取清單"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6.5h9M11 12h9M11 17.5h9"/><path d="M3.8 6.4l1.5 1.5 2.7-3"/><path d="M3.8 11.9l1.5 1.5 2.7-3"/><rect x="3.9" y="15.5" width="4.1" height="4.1" rx="1"/></svg></button>
                 <button type="button" class="mm-ib" id="mmCodeM" aria-label="插入程式碼區塊"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 7l-5 5 5 5M15.5 7l5 5-5 5"/></svg></button>
@@ -1751,7 +1776,12 @@ document.addEventListener('pointermove', e=>{
 });
 function secId(n){ return n.toLowerCase().replace(/[^a-z0-9一-鿿]+/g,'-').replace(/^-|-$/g,''); }
 function escNote(s){ return (s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n'); }
-function unescNote(s){ return (s||'').replace(/\\n/g,'\n').replace(/\\\\/g,'\\'); }
+function unescNote(s){ return (s||'').replace(/\\(\\|n)/g,(m,c)=>c==='n'?'\n':'\\'); }   // 一次掃過：「\\」→「\」、「\n」→ 換行（分兩次取代會把「反斜線＋n」誤判成換行）
+// 以「 :: 」分欄的清單（影集、美食）：欄位內容不可以出現分隔符或換行，否則讀回來欄位會錯位
+const fld=s=>String(s==null?'':s).replace(/[\r\n]+/g,' ').replace(/(^|\s)::(?=\s|$)/g,'$1:');
+// 清單標題用 **粗體** 包住；標題本身含「**」或以「*」結尾時改寫成 &#42; 存檔，讀回來再還原
+const escTitle=t=>{ t=String(t==null?'':t).replace(/[\r\n]+/g,' '); return /\*\*|\*$/.test(t)?t.replace(/\*/g,'&#42;'):t; };
+const unescTitle=t=>t.replace(/&#42;/g,'*');
 
 /* ---------- 通用拖曳排序（含拖到邊緣自動捲動、精確插入線、批量拖曳） ---------- */
 let dragList=null, dragItems=null, dragTarget=undefined; // dragTarget: {item,before} | null(=拖到最後) | undefined(尚未決定)
@@ -1971,6 +2001,7 @@ function parse(md){
       let txt=m[2], title=txt, note='';
       const b=txt.match(/^\*\*(.+?)\*\*(.*)$/);
       if(b){title=b[1]; note=unescNote(b[2].replace(/^\s*-\s*/,'').trim());}
+      title=unescTitle(title);
       task={title,note,done:m[1].toLowerCase()==='x'}; return; }
   });
   if(task&&cur)t[cur].push(task);
@@ -1981,7 +2012,7 @@ function parse(md){
 function serialize(){
   let md='# Tasks\n';
   sections.forEach(s=>{ md+='\n## '+s.name+'\n'; (tasks[s.id]||[]).forEach(t=>{
-    md+='- ['+(t.done?'x':' ')+'] **'+t.title+'**'+(t.note?' - '+escNote(t.note):'')+'\n'; }); });
+    md+='- ['+(t.done?'x':' ')+'] **'+escTitle(t.title)+'**'+(t.note?' - '+escNote(t.note):'')+'\n'; }); });
   return md.trimEnd()+'\n';
 }
 
@@ -2104,19 +2135,21 @@ function add(){
 }
 
 /* ---------- Notes ---------- */
+// 便利貼內文若有一行以 # 開頭（例如「# Tasks」「### 小標」），存檔時前面補一個 \ ，才不會被當成檔案的區段標題而把資料切壞
+const NOTE_ESC=l=>/^\\*#/.test(l) ? '\\'+l : l;
+const NOTE_UNESC=l=>/^\\+#/.test(l) ? l.slice(1) : l;
 function parseNotes(md){
-  const notes=[]; const re=/^###\s+(.+)$/gm; const marks=[]; let m;
-  while((m=re.exec(md))){ marks.push({time:m[1].trim(), idx:m.index, len:m[0].length}); }
-  marks.forEach((cur,i)=>{
-    const start=cur.idx+cur.len;
-    const end = i+1<marks.length ? marks[i+1].idx : md.length;
-    notes.push({time:cur.time, text:md.slice(start,end).trim()});
+  const notes=[]; let cur=null;
+  md.replace(/\r\n/g,'\n').split('\n').forEach(l=>{
+    const m=l.match(/^###\s+(.+)$/);
+    if(m){ cur={time:m[1].trim(), lines:[]}; notes.push(cur); }
+    else if(cur) cur.lines.push(NOTE_UNESC(l));
   });
-  return notes;
+  return notes.map(n=>({time:n.time, text:n.lines.join('\n').trim()}));
 }
 function serializeNotes(){
   let md='# Notes\n';
-  notesList.forEach(n=>{ md+='\n### '+n.time+'\n'+n.text+'\n'; });
+  notesList.forEach(n=>{ md+='\n### '+fld(n.time)+'\n'+String(n.text||'').replace(/\r\n?/g,'\n').split('\n').map(NOTE_ESC).join('\n')+'\n'; });
   return md.trimEnd()+'\n';
 }
 // 便利貼：內文若含程式碼（``` 圍欄，或 SQL / 常見程式碼起始行）就拆成「說明文字 + 等寬程式碼區塊」
@@ -2236,7 +2269,7 @@ function parseShows(md){
 function serializeShows(){
   let md='# Shows\n';
   const line=t=>{
-    const parts=[t.title, escNote(t.note), t.poster||'', t.type||'', t.year||'', t.genre||'', t.banner||'', t.cast||'', t.watchedDate||'', t.airDate||''];
+    const parts=[t.title, escNote(t.note), t.poster||'', t.type||'', t.year||'', t.genre||'', t.banner||'', t.cast||'', t.watchedDate||'', t.airDate||''].map(fld);
     while(parts.length>1 && parts[parts.length-1]==='') parts.pop();
     return '- '+parts.join(' :: ')+'\n';
   };
@@ -2930,7 +2963,7 @@ function parseFoods(md){
 function serializeFoods(){
   let md='# Foods\n\n';
   foods.forEach(t=>{
-    const parts=[t.name, t.city||'', t.type||'', t.meal||'', t.hours||'', escNote(t.note), t.img||'', t.lat||'', t.lng||'', t.link||''];
+    const parts=[t.name, t.city||'', t.type||'', t.meal||'', t.hours||'', escNote(t.note), t.img||'', t.lat||'', t.lng||'', t.link||''].map(fld);
     while(parts.length>1 && parts[parts.length-1]==='') parts.pop();
     md+='- '+parts.join(' :: ')+'\n';
   });
@@ -3297,20 +3330,27 @@ $('showSearch').addEventListener('input', e=>{ showFilter[activeShowTab].q=e.tar
 /* ---------- 檔案讀寫(Google 雲端 / 本機檔案) ---------- */
 /* ---------- 檔案區段切分（整行比對）---------- */
 const SECTION_NAMES=['Tasks','Notes','Shows','Foods','Memos','Trips','Places','Invest'];
+let extraSections=[];      // 這個版本不認得的區段（例如較新版本新增的模組）：原封不動保留，存檔時寫回去，舊版分頁才不會把新資料洗掉
 function splitTop(md){
-  const out={}; let cur=null, buf=[];
-  const flush=()=>{ if(cur){ const k='# '+cur; out[k] = (k in out) ? out[k]+'\n'+buf.join('\n') : buf.join('\n'); } };
+  const out={}, extra=[]; let cur=null, buf=[], unknown=false;
+  const flush=()=>{
+    if(!cur) return;
+    if(unknown){ extra.push(buf.join('\n').trimEnd()); return; }
+    const k='# '+cur; out[k] = (k in out) ? out[k]+'\n'+buf.join('\n') : buf.join('\n');
+  };
   md.replace(/\r\n/g,'\n').split('\n').forEach(l=>{
     const m=l.match(/^# (\S+)\s*$/);
-    if(m && SECTION_NAMES.includes(m[1])){ flush(); cur=m[1]; buf=[l]; }
+    if(m && SECTION_NAMES.includes(m[1])){ flush(); cur=m[1]; unknown=false; buf=[l]; }
+    else if(m && /^[A-Z][A-Za-z]+$/.test(m[1]) && cur && cur!=='Notes'){ flush(); cur=m[1]; unknown=true; buf=[l]; }   // 便利貼（Notes）裡舊資料可能有「# 標題」這種內文，不當成區段
     else if(cur) buf.push(l);
   });
   flush();
+  out.__extra=extra;
   return out;
 }
 function serializeCombined(){
   let md=serialize().trimEnd()+'\n\n'+serializeNotes().trimEnd()+'\n\n'+serializeShows().trimEnd()+'\n\n'+serializeFoods().trimEnd()+'\n';
-  [serializeMemos(), serializeTrips(), serializePlaces(), serializeInvest()].forEach(s=>{ if(s) md+='\n'+s.trimEnd()+'\n'; });
+  [serializeMemos(), serializeTrips(), serializePlaces(), serializeInvest()].concat(extraSections).forEach(s=>{ if(s) md+='\n'+s.trimEnd()+'\n'; });
   return md;
 }
 
@@ -3478,7 +3518,8 @@ const DRIVE_UP='https://www.googleapis.com/upload/drive/v3';
 const LS_CID='dash-google-client-id', LS_MODE='dash-storage-mode', LS_FID='dash-drive-file-id', LS_BAK='dash-conflict-backup';
 const FS_OK=!!window.showOpenFilePicker;
 let mode=null, resave=false, syncFail=false, pulling=false;
-const APP_VERSION='2026-11-09.2';
+let dataReady=false;       // 檔案完整載入後才是 true；還沒載入成功之前一律不存檔（避免用空白／不完整的內容覆蓋檔案）
+const APP_VERSION='2026-11-16.1';
 const drive={token:null,exp:0,client:null,fileId:null,version:null,md5:null,tokenP:null,pending:null,lastText:null};
 /* 同步紀錄:留在這個瀏覽器,出問題時點「儲存位置」(電腦)或選單裡的同步狀態(手機)可以看 */
 const LS_LOG='dash-sync-log';
@@ -3565,17 +3606,24 @@ async function driveCreate(text){
 /* --- 載入資料到畫面(本機/雲端共用)--- */
 function loadMarkdown(md,name,opts){
   opts=opts||{};
-  const parts=splitTop(md);
-  const p=parse(parts['# Tasks']||'# Tasks\n'); sections=p.secs; tasks=p.t;
-  const migrated=migrateSections();
-  notesList=parseNotes(parts['# Notes']||'# Notes\n');
+  // 先把整份檔案全部解析完，確定沒有出錯才一次換上去。解析到一半失敗就維持原狀（並丟出錯誤），
+  // 不會留下「只載入一半」的資料，之後存檔也就不會把雲端的完整內容蓋掉。
+  const parts=splitTop(String(md==null?'':md));
   const hadShows=!!parts['# Shows'];
-  if(hadShows){ shows=parseShows(parts['# Shows']); } else { seedShows(); }
-  foods=parseFoods(parts['# Foods']||'# Foods\n');
-  { const mm=parseMemos(parts['# Memos']); memos=mm.memos; memoFolders=mm.folders; syncMemoFolders(); }
-  trips=parseTrips(parts['# Trips']); regions=parsePlaces(parts['# Places']);
-  let ivSeeded=false;
-  if(parts['# Invest']){ Object.assign(iv,parseInvest(parts['# Invest'])); } else { Object.assign(iv,ivSeed()); ivSeeded=true; }
+  const P={ tasks:parse(parts['# Tasks']||'# Tasks\n'), notes:parseNotes(parts['# Notes']||'# Notes\n'), shows:hadShows?parseShows(parts['# Shows']):null,
+    foods:parseFoods(parts['# Foods']||'# Foods\n'), memos:parseMemos(parts['# Memos']), trips:parseTrips(parts['# Trips']), places:parsePlaces(parts['# Places']),
+    invest:parts['# Invest']?parseInvest(parts['# Invest']):ivSeed() };
+  const ivSeeded=!parts['# Invest'];
+  sections=P.tasks.secs; tasks=P.tasks.t;
+  const migrated=migrateSections();
+  notesList=P.notes;
+  if(hadShows) shows=P.shows; else seedShows();
+  foods=P.foods;
+  memos=P.memos.memos; memoFolders=P.memos.folders; syncMemoFolders();
+  trips=P.trips; regions=P.places;
+  Object.assign(iv,P.invest);
+  extraSections=parts.__extra||[];
+  dataReady=true;
   ['intro','reconnect','driveSeed','driveReconnect'].forEach(id=>$(id).style.display='none');
   $('browserWarn').style.display='none';
   $('app').style.display='flex'; document.body.classList.add('connected');
@@ -3588,7 +3636,8 @@ function loadMarkdown(md,name,opts){
 
 /* --- 儲存 --- */
 async function save(){
-  if(!mode) return;
+  if(!mode || !dataReady) return;
+  if(mode==='drive' && drive.hold) return;          // 使用者選了「先不要同步」：等他按同步列的按鈕才繼續
   if(saving){ resave=true; return; }
   saving=true;
   try{
@@ -3625,6 +3674,15 @@ async function driveSave(){
     }
     slog('使用者選擇以本機覆蓋雲端');
   }
+  // 保險：這次要上傳的內容比上次同步的少了一半以上（正常使用幾乎不會發生）→ 先問過再上傳，並把上次同步的內容備份在這個瀏覽器
+  if(drive.lastText && drive.lastText.length>4000 && text.length<drive.lastText.length*0.5){
+    lsSet(LS_BAK,drive.lastText);
+    slog('內容大幅縮小 '+drive.lastText.length+' → '+text.length+' 字，詢問使用者');
+    const ok=await uiDialog({title:'這次要同步的內容少了一半以上', text:'如果你剛剛刪掉了大量資料，這是正常的；如果沒有，請選「先不要同步」，然後重新整理頁面，資料會從雲端重新載入。', modal:true,
+      buttons:[{label:'先不要同步',value:false,kind:'ghost'},{label:'是我刪的，照常同步',value:true,kind:'primary'}]});
+    if(ok.value!==true){ slog('使用者選擇不同步'); syncFail=true; setSyncLabel('已暫停同步'); showSyncBar('已暫停同步。重新整理頁面會從雲端重新載入；確定要用目前內容覆蓋請按右邊。','照常同步'); drive.hold=true; return; }
+    drive.lastText=text;      // 使用者已確認，之後的存檔不再重複詢問
+  }
   const r=await gfetch(DRIVE_UP+'/files/'+drive.fileId+'?uploadType=media&fields=version,modifiedTime,size,md5Checksum',{method:'PATCH',headers:{'Content-Type':'text/markdown; charset=UTF-8'},body:text});
   const j=await r.json();
   drive.version=j.version; drive.md5=j.md5Checksum||null; drive.lastText=text; syncFail=false; hideSyncBar();
@@ -3649,7 +3707,7 @@ function driveSaveFailed(e){
 $('syncRetry').onclick=async()=>{
   try{ drive.token=null; await getToken(); }
   catch(e){ showSyncBar('登入失敗:'+friendly(e)); return; }
-  syncFail=false; hideSyncBar(); save();
+  syncFail=false; drive.hold=false; hideSyncBar(); save();
 };
 
 /* --- 從雲端拉取其他裝置的更新(沒有未存變更、沒在編輯時)--- */
@@ -3680,7 +3738,10 @@ async function pullRemote(){
   }catch(e){ /* 靜默,下次再試 */ }
   finally{ pulling=false; }
 }
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden) pullRemote(); });
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){ pullRemote(); return; }
+  if(saveT && !syncFail){ clearTimeout(saveT); saveT=null; save(); }     // 切到背景／鎖定螢幕前，把還在等 0.4 秒的存檔立刻送出，手機上才不會漏存最後幾個字
+});
 window.addEventListener('focus',pullRemote);
 window.addEventListener('online',()=>{ if(mode!=='drive') return; if(syncFail){ syncFail=false; hideSyncBar(); save(); } else pullRemote(); });
 setInterval(pullRemote,60000);
@@ -4289,6 +4350,60 @@ function openMemoPage(){
   autosize($('mmTitle')); autosizeBlocks();      // 編輯頁剛顯示出來，輸入框高度要在「可見」之後才算得準
 }
 window.addEventListener('resize',()=>{ if(activeAppTab==='memo' && curMemo()){ autosize($('mmTitle')); autosizeBlocks(); } });
+/* --- 鍵盤與捲動：編輯區跟著「實際看得到的畫面」縮放，游標所在的那一行永遠留在看得到的地方 ---
+   手機鍵盤彈出時，瀏覽器只會縮小 visualViewport（版面本身不變），所以貼在底部的東西會被鍵盤蓋住。
+   這裡把鍵盤高度寫進 --kb、畫面被往上推的距離寫進 --vvt，CSS 再用它們把編輯頁對齊到真正看得到的範圍。 */
+function memoCaretBox(ta){               // 游標在畫面上的位置（textarea 已自動長高、沒有內部捲動，所以用鏡像元素量）
+  const cs=getComputedStyle(ta), r=ta.getBoundingClientRect(), m=document.createElement('div');
+  m.style.cssText='position:absolute;visibility:hidden;left:-9999px;top:0;margin:0;border:0;overflow:hidden;';
+  ['fontFamily','fontSize','fontWeight','fontStyle','lineHeight','letterSpacing','whiteSpace','overflowWrap','wordBreak','tabSize','paddingTop','paddingRight','paddingBottom','paddingLeft','boxSizing','textIndent'].forEach(k=>{ m.style[k]=cs[k]; });
+  m.style.width=ta.clientWidth+'px';
+  m.textContent=ta.value.slice(0, ta.selectionEnd==null?ta.value.length:ta.selectionEnd);
+  const mark=document.createElement('span'); mark.textContent='\u200b'; m.appendChild(mark);
+  document.body.appendChild(m);
+  const top=r.top+mark.offsetTop, h=mark.offsetHeight||parseFloat(cs.lineHeight)||24;
+  m.remove();
+  return {top, bottom:top+h};
+}
+function memoKeepCaret(){
+  const a=document.activeElement, sc=$('mmEditor');
+  if(!a || a.tagName!=='TEXTAREA' || !sc.contains(a)) return;
+  const c=memoCaretBox(a);
+  if(!/(auto|scroll)/.test(getComputedStyle(sc).overflowY)){                 // 中等寬度：整頁捲動
+    const t=$('mmEtop').offsetHeight+8, b=window.innerHeight-64;
+    const dy=c.bottom>b?c.bottom-b:(c.top<t?c.top-t:0); if(dy) window.scrollBy({top:dy,behavior:'instant'});
+    return;
+  }
+  const mobile=document.body.classList.contains('memo-open');
+  const r=sc.getBoundingClientRect();
+  const topLim = r.top + (mobile ? parseFloat(getComputedStyle(sc).paddingTop)||64 : $('mmEtop').offsetHeight) + 8;
+  const botLim = r.bottom - (mobile ? ($('mmTools').offsetHeight||76)+20 : 64);
+  if(botLim-topLim<40) return;
+  if(c.bottom>botLim) sc.scrollTop+=c.bottom-botLim;
+  else if(c.top<topLim) sc.scrollTop-=topLim-c.top;
+}
+let memoCaretT=0;
+function memoKeepCaretSoon(){ cancelAnimationFrame(memoCaretT); memoCaretT=requestAnimationFrame(memoKeepCaret); }
+(function(){
+  const vv=window.visualViewport, root=document.documentElement; if(!vv) return;
+  let raf=0, last='';
+  const apply=()=>{
+    raf=0;
+    const zoomed=vv.scale>1.01;                                              // 雙指放大時不是鍵盤，不處理
+    let kb=zoomed?0:Math.round(window.innerHeight-vv.height-vv.offsetTop); if(kb<80) kb=0;
+    const top=(zoomed||!kb)?0:Math.max(0,Math.round(vv.offsetTop));
+    const sig=kb+'|'+top; if(sig===last) return; last=sig;
+    root.style.setProperty('--kb',kb+'px'); root.style.setProperty('--vvt',top+'px');
+    document.body.classList.toggle('kb-open',kb>0);
+    if(document.body.classList.contains('memo-open')) memoKeepCaretSoon();
+  };
+  const req=()=>{ if(!raf) raf=requestAnimationFrame(apply); };
+  vv.addEventListener('resize',req); vv.addEventListener('scroll',req);
+})();
+$('mmEditor').addEventListener('input',memoKeepCaretSoon);
+$('mmEditor').addEventListener('focusin',()=>{ memoKeepCaretSoon(); setTimeout(memoKeepCaret,350); });     // 350ms：等手機鍵盤滑上來
+$('mmEditor').addEventListener('keyup',e=>{ if(/^(Arrow|Page|Home|End|Enter|Backspace)/.test(e.key)) memoKeepCaretSoon(); });
+$('mmTail').addEventListener('click',()=>{ if(curMemo()) focusBlock(memoUI.blocks.length-1,'end'); });      // 點最後一行下方的留白＝接著最後一行繼續打
 function closeMemoPage(){
   if(memoUI.pg){ const pg=memoUI.pg; memoUI.pg=null; popPage(pg); }
   closeMemoPageUI();
@@ -5691,9 +5806,11 @@ function ivFutureValue(monthly,start,years,rate){
 }
 
 /* ---------- 和大盤比較（影子組合）---------- */
+// unit：這個數字是什麼（指數的「點數」和 ETF 的「每股價格」是不同的東西，數字本來就不會一樣）
 const IV_BENCH=[
-  {id:'b_spx',name:'S&P 500',feed:'yf:^GSPC'},{id:'b_twii',name:'台灣加權指數',feed:'yf:^TWII'},{id:'b_acwi',name:'MSCI ACWI',feed:'yf:ACWI',note:'以 ACWI ETF 收盤價代替'},
-  {id:'b_0050',name:'元大台灣50（0050）',feed:'yf:0050.TW',tw:'0050'},{id:'b_00646',name:'元大S&P500（00646）',feed:'yf:00646.TW',tw:'00646'}];
+  {id:'b_spx',name:'S&P 500',feed:'yf:^GSPC',unit:'指數點數（美元計價，不含匯率與配息）'},{id:'b_twii',name:'台灣加權指數',feed:'yf:^TWII',unit:'指數點數（不含配息）'},{id:'b_acwi',name:'MSCI ACWI',feed:'yf:ACWI',note:'以 ACWI ETF 收盤價代替',unit:'ACWI ETF 每股價格（美元）'},
+  {id:'b_0050',name:'元大台灣50（0050）',feed:'yf:0050.TW',tw:'0050',unit:'每股價格（台幣）'},{id:'b_00646',name:'元大S&P500（00646）',feed:'yf:00646.TW',tw:'00646',unit:'每股價格（台幣，已含匯率變化）'}];
+const IV_BENCH_HELP='指數（S&P 500、加權指數）是「點數」，不能直接買，也沒算匯率、配息與費用，適合看大方向；0050、00646 是用台幣真的買得到的 ETF，比較時會扣手續費與稅，最接近「同一筆錢改買大盤」的實際結果。台股產品建議比 0050，美股／全球產品建議比 00646。';
 const ivBench=id=>IV_BENCH.find(b=>b.id===id);
 function ivBenchStats(){
   return IV_BENCH.map(b=>{ const s=iv.prices.filter(x=>x.k===b.id).sort((a,c)=>a.d<c.d?-1:1); return {b,n:s.length,from:s.length?s[0].d:'',to:s.length?s[s.length-1].d:''}; });
@@ -5745,7 +5862,13 @@ let ivFeed=null, ivFeedTried=false;
 function ivAddPrice(k,d,v,s,keepManual){
   if(!(v>0)||!d) return false;
   const i=iv.prices.findIndex(x=>x.k===k&&x.d===d);
-  if(i>=0){ if(keepManual!==false && iv.prices[i].s==='manual' && s!=='manual') return false; if(iv.prices[i].v===v&&iv.prices[i].s===s) return false; iv.prices[i]={k,d,v,s}; }
+  if(i>=0){
+    const old=iv.prices[i];
+    if(keepManual!==false && old.s==='manual' && s!=='manual') return false;
+    if(old.v===v && (old.s===s || s!=='manual')) return false;      // 同一天同一個價格：不因為來源不同就改寫（否則證交所與 prices.json 會輪流覆蓋，每次開啟都觸發存檔）
+    if(old.s==='twse' && s==='feed') return false;                  // 證交所的正式收盤價優先於 prices.json（Yahoo）
+    iv.prices[i]={k,d,v,s};
+  }
   else iv.prices.push({k,d,v,s});
   return true;
 }
@@ -5830,6 +5953,19 @@ async function ivAutoUpdate(opt){
     } else pending.push(p);
   }
   if(twseDone.length) log.push('證交所：'+twseDone.join('、'));
+  // 1b) 大盤對照用的 0050／00646／加權指數也跟著證交所更新，日期才會和你持有的產品一致（以前只靠每週一次的 prices.json）
+  const benchDone=[];
+  IV_BENCH.forEach(b=>{
+    if(!b.tw) return;
+    let hit=twseAll&&twseAll.get(b.tw);
+    if(!hit){ const p=iv.products.find(x=>x.kind==='sec'&&x.code===b.tw); const px=p&&ivLatestPrice(p.id); if(px&&px.s==='twse') hit={d:px.d,v:px.v}; }   // 整批查詢失敗時，沿用同代號產品剛查到的收盤
+    if(hit){ if(ivAddPrice(b.id,hit.d,hit.v,'twse')) changed++; benchDone.push(b.tw); }
+  });
+  try{
+    let rows=await ivTwiiMonth(ymNow); if(!rows.length){ await ivSleep(500); rows=await ivTwiiMonth(prevYm); }
+    if(rows.length){ const last=rows[rows.length-1]; if(ivAddPrice('b_twii',last.d,last.v,'twse')) changed++; benchDone.push('加權指數'); okAny=true; }
+  }catch(e){ /* 取不到就等 prices.json */ }
+  if(benchDone.length) log.push('大盤對照：'+benchDone.join('、')+' 已同步到最新收盤');
   // 2) 匯率
   if(iv.products.some(ivIsUSD)){
     try{ const fx=await ivFxLatestFetch(); if(ivAddPrice('fx:USDTWD',fx.d,fx.v,'er-api')) changed++; okAny=true; log.push('匯率：USD/TWD '+fx.v.toFixed(3)+'（'+fx.d.slice(5).replace('-','/')+'，市場中價，和銀行牌告會有些微差距）'); }
@@ -5837,7 +5973,7 @@ async function ivAutoUpdate(opt){
   }
   // 3) prices.json（基金淨值、櫃買 ETF、S&P 500、MSCI ACWI）
   const feed=await ivLoadFeed(true);
-  if(feed){ okAny=true; const n=ivMergeFeed(); changed+=n; log.push('prices.json：'+(feed.updated?feed.updated.slice(0,10)+' 更新，':'')+'併入 '+n+' 筆'); }
+  if(feed){ okAny=true; const n=ivMergeFeed(); changed+=n; log.push('prices.json（每週一更新；S&P 500、MSCI ACWI、基金淨值只能靠它）：'+(feed.updated?feed.updated.slice(0,10)+' 更新，':'')+'併入 '+n+' 筆'); }
   else log.push('prices.json：找不到（還沒設定 GitHub Actions），基金淨值、00719B、S&P 500、MSCI ACWI 請手動輸入');
   if(pending.length){ const still=pending.filter(p=>{ const px=ivLatestPrice(p.id); return !px||ivDays(px.d,today)>10; }); if(still.length) log.push('查不到最新報價：'+still.map(p=>p.code+' '+p.name).join('、')+'（可能是上櫃商品且 prices.json 還沒有，或剛上市；請手動輸入）'); }
   ivPruneSort();
@@ -5910,6 +6046,27 @@ function ivDonut(segs,top,sub){
   let arcs=''; if(tot>0) segs.forEach(x=>{ const len=x.v/tot*C; arcs+='<circle cx="108" cy="108" r="'+R+'" fill="none" stroke="'+esc(x.c)+'" stroke-width="40" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'"></circle>'; off+=len; });
   else arcs='<circle cx="108" cy="108" r="'+R+'" fill="none" stroke="#EFE8DB" stroke-width="40"></circle>';
   return '<div class="iv-donut"><svg viewBox="0 0 216 216" aria-hidden="true">'+arcs+'</svg><div class="ctr"><b>'+top+'</b><span>'+sub+'</span></div></div>';
+}
+
+/* ---------- 資產配置明細（點圓餅圖 → 從下方滑出的抽屜）---------- */
+function ivAllocSheet(){
+  const S=ivSummary(); const tot=S.assets||0;
+  const tg=new Map(iv.targets.items.filter(t=>ivProd(t.pid)).map(t=>[t.pid,+t.pct||0]));
+  const rows=[]; S.hs.forEach(h=>{ if(h.status==='held'&&h.value>0) rows.push({p:h.p,v:h.value}); });
+  tg.forEach((pct,pid)=>{ if(!rows.some(r=>r.p.id===pid)) rows.push({p:ivProd(pid),v:0}); });
+  rows.sort((a,b)=>b.v-a.v);
+  const d=ivOverlay('資產配置'); d.ov.classList.add('sheet');
+  const max=Math.max(1,...rows.map(r=>tot>0?r.v/tot*100:0),...rows.map(r=>tg.get(r.p.id)||0));
+  let h='<div class="iv-al-sum"><span>總資產 <b class="mono">NT$ '+ivFmt(tot)+'</b></span><span>'+rows.filter(r=>r.v>0).length+' 項持有中</span></div>';
+  if(!rows.length) h+='<div class="iv-empty">還沒有持有中的產品</div>';
+  rows.forEach(r=>{
+    const pct=tot>0?r.v/tot*100:0, has=tg.has(r.p.id), t=tg.get(r.p.id)||0, df=pct-t;
+    h+='<div class="iv-al"><div class="top"><span class="iv-pn">'+ivDot(r.p.color)+'<span class="nm">'+esc(r.p.name)+'</span></span><b class="mono">'+pct.toFixed(1)+'%</b></div>'
+      +'<div class="bar"><i style="width:'+(pct/max*100).toFixed(2)+'%;background:'+esc(r.p.color||'#8F8579')+'"></i>'+(has&&t>0?'<u style="left:'+Math.min(100,t/max*100).toFixed(2)+'%" title="目標 '+t+'%"></u>':'')+'</div>'
+      +'<div class="sub"><span class="mono">NT$ '+ivFmt(r.v)+'</span><span>'+(has?'目標 '+(+t.toFixed(1))+'%・'+(Math.abs(df)<0.05?'剛好':(df>0?'多 ':'少 ')+Math.abs(df).toFixed(1)+' pp'):'未設定目標')+'</span></div></div>';
+  });
+  if(rows.some(r=>tg.has(r.p.id))) h+='<div class="iv-fnote">色條是實際佔比，細直線是目標比例；pp = 百分點。</div>';
+  d.body.innerHTML=h;
 }
 
 /* ---------- 提醒 ---------- */
@@ -6027,11 +6184,21 @@ function ivManualPriceDialog(){
 function ivPriceHistoryDialog(){
   const d=ivOverlay('價格歷史',true);
   const keys=[...new Set(iv.prices.map(x=>x.k))];
-  const label=k=>k==='fx:USDTWD'?'美元匯率 USD/TWD':(ivBench(k)?'大盤・'+ivBench(k).name:ivName(k));
+  const held=k=>{ const p=ivProd(k); return p?(p.code?p.code+' ':'')+p.name:ivName(k); };
+  const label=k=>k==='fx:USDTWD'?'美元匯率 USD/TWD':(ivBench(k)?'大盤對照・'+ivBench(k).name:'我的產品・'+held(k));
+  keys.sort((a,b)=>{ const r=k=>k==='fx:USDTWD'?2:(ivBench(k)?1:0); return r(a)-r(b); });   // 我的產品在前、大盤對照在後、匯率最後
+  const about=k=>{
+    const b=ivBench(k);
+    if(b) return '這是「和大盤比較」用的對照資料，和你持有的產品分開存放。單位：'+b.unit+'。'
+      +(b.tw||k==='b_twii'?'每次開啟投資分頁會向證交所更新到最新收盤。':'瀏覽器無法直接取得，只能靠每週一自動更新的 prices.json，所以日期會比台股慢。')
+      +(k==='b_spx'?'注意：S&P 500 是指數點數（約幾千點），00646 是追蹤它的台幣 ETF 每股價格（約幾十元），兩者數字不同是正常的。':'');
+    if(k==='fx:USDTWD') return '美元兌台幣，用來換算美元計價產品的市值。';
+    const p=ivProd(k); return p&&p.kind==='sec'&&!p.otc?'你持有的產品。每次開啟投資分頁會向證交所更新到最新收盤。':'你持有的產品。'+(p&&p.feed?'淨值／價格來自每週一自動更新的 prices.json，也可以手動輸入。':'');
+  };
   let sel=ivUI.histKey||keys[0]||'';
   const draw=()=>{
     const rows=iv.prices.filter(x=>x.k===sel).sort((a,b)=>a.d<b.d?1:-1);
-    d.body.innerHTML='<div class="iv-row"><select class="iv-in w140" id="phK" style="width:auto;min-width:220px">'+keys.map(k=>'<option value="'+esc(k)+'"'+(k===sel?' selected':'')+'>'+esc(label(k))+'</option>').join('')+'</select><span class="iv-sub">'+rows.length+' 筆</span></div>'
+    d.body.innerHTML='<div class="iv-row"><select class="iv-in w140" id="phK" style="width:auto;min-width:220px">'+keys.map(k=>'<option value="'+esc(k)+'"'+(k===sel?' selected':'')+'>'+esc(label(k))+'</option>').join('')+'</select><span class="iv-sub">'+rows.length+' 筆</span></div><div class="iv-infobox">'+esc(about(sel))+'</div>'
       +'<div class="iv-tw" style="max-height:52vh;overflow:auto"><table class="iv-tbl"><thead><tr><th class="l">日期</th><th>價格／淨值（原幣）</th><th class="l">來源</th><th></th></tr></thead><tbody>'
       +rows.map(x=>'<tr><td class="l mono">'+ivDateShow(x.d)+'</td><td class="mono">'+ivFmtDec(x.v,x.v>1000?2:(x.k==='fx:USDTWD'?3:2))+'</td><td class="l">'+esc(IV_SRC[x.s]||x.s||'')+'</td><td><button type="button" class="iv-ib rm" data-d="'+x.d+'" aria-label="刪除這筆">'+IV_ICO.trash+'</button></td></tr>').join('')
       +(rows.length?'':'<tr><td colspan="4" class="iv-empty">還沒有資料</td></tr>')+'</tbody></table></div>';
@@ -6167,7 +6334,7 @@ function ivRenderOverview(){
   const legendIds=[]; tgt.forEach(x=>legendIds.push(x.p.id)); held.forEach(h=>{ if(!legendIds.includes(h.p.id)) legendIds.push(h.p.id); });
   let h='<div class="iv-g3"><div class="iv-card"><span class="iv-k">總資產</span><span class="v num">NT$ '+ivFmt(S.assets)+'</span><span class="iv-sub">持有中 '+held.length+' 項產品的市值</span></div><div class="iv-card"><span class="iv-k">投入本金</span><span class="v num">NT$ '+ivFmt(S.capital)+'</span><span class="iv-sub">持有中產品的剩餘成本</span></div><div class="iv-card"><span class="iv-k">總收益</span><span class="v num '+ivCls(S.gain)+'">'+(Math.round(S.gain)>0?'+ ':(Math.round(S.gain)<0?'− ':''))+'NT$ '+ivFmt(Math.abs(S.gain))+'</span><span class="iv-sub">未實現'+(S.gainRet!=null?'・報酬率 '+ivFmtPct(S.gainRet):'')+'</span></div></div>';
   const tgtTotal=iv.targets.total||0, pctSum=tgt.reduce((s,x)=>s+(+x.t.pct||0),0);
-  h+='<div class="iv-g2"><div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">資產配置</h2></div><div class="iv-donuts">'
+  h+='<div class="iv-g2"><div class="iv-card"><div class="iv-ch"><h2 class="iv-ct">資產配置</h2><span class="iv-sub">點圓餅圖看各產品佔比</span></div><div class="iv-donuts" role="button" tabindex="0" data-act="alloc" aria-label="查看各產品佔比">'
     +ivDonut(held.map(x=>({v:x.value,c:x.p.color})),ivFmt(S.assets),'實際')
     +ivDonut(tgt.filter(x=>x.t.pct>0).map(x=>({v:+x.t.pct,c:x.p.color})),ivFmt(tgtTotal),'目標總額')+'</div>'
     +'<div class="iv-legend">'+legendIds.map(id=>{ const p=ivProd(id); return '<span>'+ivDot(p.color)+esc(p.name)+'</span>'; }).join('')+'</div>';
@@ -6475,7 +6642,7 @@ function ivRenderCompare(){
     h+='<div class="iv-row"><span class="iv-chip ok">已從交易紀錄載入</span><span class="iv-sub">買進日期與金額沿用「持股明細」，不需重新輸入</span></div>'
       +'<div class="iv-row" style="gap:28px"><div><div class="iv-sub">首筆交易</div><b class="mono">'+ivDateShow(ds[0]||'')+'</b></div><div><div class="iv-sub">最後交易</div><b class="mono">'+ivDateShow(ds[ds.length-1]||'')+'</b></div><div><div class="iv-sub">買進筆數</div><b class="mono">'+buys+' 筆</b></div><div><div class="iv-sub">累計投入</div><b class="mono">'+ivFmt(H.R.invested)+'</b></div><div><div class="iv-sub">市值</div><b class="mono">'+ivFmt(H.perfValue)+'</b></div></div>';
   }
-  h+='<div class="iv-step"><b>2</b>選擇大盤</div><div class="iv-pills">'+IV_BENCH.map(b=>'<button type="button" class="iv-pill'+(c.bench===b.id?' on':'')+'" data-act="cmp-bench" data-id="'+b.id+'">'+esc(b.name)+'</button>').join('')+'</div>';
+  h+='<div class="iv-step"><b>2</b>選擇大盤</div><div class="iv-pills">'+IV_BENCH.map(b=>'<button type="button" class="iv-pill'+(c.bench===b.id?' on':'')+'" data-act="cmp-bench" data-id="'+b.id+'">'+esc(b.name)+'</button>').join('')+'</div><div class="iv-fnote">目前選的「'+esc(ivBench(c.bench).name)+'」：'+esc(ivBench(c.bench).unit)+'。'+IV_BENCH_HELP+'</div>';
   h+='<div class="iv-step"><b>3</b>比較結果</div>';
   if(!F||!F.flows.length) h+='<div class="iv-empty">請先選擇一個有交易紀錄的產品，或手動輸入投入明細。</div>';
   else {
@@ -6756,6 +6923,7 @@ function renderInvest(){
   // 每次打開投資分頁就自動更新一次（資料載入後才跑；10 分鐘內重複切換不會再抓，避免被證交所限流）
   if(ivUI.autoWant && iv.products.length){ ivUI.autoWant=false; const now=Date.now(); if(now-ivUI.autoAt>=600000){ ivUI.autoAt=now; setTimeout(()=>ivRunAuto(false),400); } }
 }
+document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ') && e.target.matches && e.target.matches('#investView [role="button"][data-act]')){ e.preventDefault(); e.target.click(); } });
 function ivGo(pane){ ivUI.pane=pane; if(ivUI.hold.edit&&pane!=='holdings'){ ivUI.hold.edit=null; document.body.classList.remove('iv-edit-all'); } renderInvest(); window.scrollTo(0,0); }
 function ivTargetField(el){
   const i=+el.dataset.i, t=iv.targets.items[i], v=el.value.replace(/,/g,'');
@@ -6768,6 +6936,7 @@ document.addEventListener('click',e=>{
   if(el.tagName==='A') e.preventDefault();
   switch(a){
     case 'go': ivGo(el.dataset.v); break; case 'go-hold': ivGo('holdings'); break;
+    case 'alloc': ivAllocSheet(); break;
     case 'px-update': ivRunAuto(true); break; case 'px-manual': ivManualPriceDialog(); break; case 'px-history': ivPriceHistoryDialog(); break;
     case 'rem-new': ivReminderDialog(null); break; case 'rem-edit': ivReminderDialog(el.dataset.id); break;
     case 'rem-del': uiConfirm('刪除這則提醒？','刪除後無法復原。','刪除',true).then(ok=>{ if(!ok) return; iv.reminders=iv.reminders.filter(r=>r.id!==el.dataset.id); queueSave(); renderInvest(); toast('已刪除提醒'); }); break;
