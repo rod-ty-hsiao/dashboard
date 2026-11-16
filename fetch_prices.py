@@ -94,19 +94,45 @@ def quotes():
     return out, notes
 
 
+def previous():
+    """上一次成功抓到的 prices.json；這次某個項目抓不到時沿用舊資料，不會因為一次失敗就把它從檔案裡洗掉。"""
+    try:
+        with open("prices.json", encoding="utf-8") as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
 def main():
-    series, failed = {}, []
+    old = previous()
+    old_series = old.get("series") if isinstance(old.get("series"), dict) else {}
+    old_quotes = old.get("quotes") if isinstance(old.get("quotes"), dict) else {}
+    series, failed, fresh = {}, [], 0
     for s in SYMBOLS:
+        key = "yf:" + s
         for attempt in range(3):
             try:
-                series["yf:" + s] = fetch(s)
+                rows = fetch(s)
+                if not rows:
+                    raise ValueError("empty series")
+                series[key] = rows
+                fresh += 1
                 break
-            except Exception as e:  # 失敗就重試，還是不行就略過
+            except Exception as e:  # 失敗就重試，還是不行就沿用上次的資料
                 if attempt == 2:
                     failed.append("%s (%s)" % (s, e))
+                    if old_series.get(key):
+                        series[key] = old_series[key]
                 time.sleep(2)
         time.sleep(0.6)
     q, notes = quotes()
+    for code, row in old_quotes.items():  # 這次沒抓到的代號（某個交易所暫時連不上）沿用上次的收盤
+        q.setdefault(code, row)
+    if not fresh and not any(n.startswith(("twse=", "tpex=")) for n in notes):
+        # 這次什麼都沒抓到：不改檔案（保留上次的資料與更新時間），並讓工作顯示失敗，才會注意到
+        print("failed:", "; ".join(failed + notes), file=sys.stderr)
+        sys.exit(1)
     doc = {"updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "series": series, "quotes": q}
     with open("prices.json", "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
@@ -114,8 +140,7 @@ def main():
     print("quotes:", len(q), "(" + ", ".join(notes) + ")")
     if failed:
         print("failed:", "; ".join(failed), file=sys.stderr)
-    if not series and not q:
-        sys.exit(1)
+
 
 
 if __name__ == "__main__":
